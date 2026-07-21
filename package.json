@@ -1,0 +1,54 @@
+{
+	"name": "levy-utils",
+	"version": "2.0.0",
+	"description": "Re-useable and common JS/TS utility functions",
+	"license": "MIT",
+	"author": {
+		"email": "levyvandervalk@gmail.com",
+		"name": "Levy van der Valk"
+	},
+	"contributors": [
+		{
+			"email": "levyvandervalk@gmail.com",
+			"name": "Levy van der Valk"
+		},
+		{
+			"name": "Levy Pondman"
+		}
+	],
+	"keywords": [
+		"javascript",
+		"typescript"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"main": "dist/levyUtils.cjs",
+	"module": "dist/levyUtils.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		"types": "./dist/index.d.ts",
+		"import": "./dist/levyUtils.js",
+		"require": "./dist/levyUtils.cjs"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ShadowWolf308/levyUtils"
+	},
+	"scripts": {
+		"dev": "vite",
+		"compile": "tsc && vite build",
+		"preview": "vite preview",
+		"production": "bun compile && npm publish",
+		"lint": "biome check . --formatter-enabled=false",
+		"lint:apply": "biome check . --formatter-enabled=false --write",
+		"lint:apply:unsafe": "biome check . --formatter-enabled=false --write --unsafe"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.4",
+		"typescript": "^7.0.0",
+		"vite": "^8.1.5",
+		"vite-plugin-dts": "^5.0.3"
+	}
+}
