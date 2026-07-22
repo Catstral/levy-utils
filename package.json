@@ -35,7 +35,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ShadowWolf308/levyUtils"
+		"url": "git+https://github.com/ShadowWolf308/levy-utils.git"
 	},
 	"scripts": {
 		"dev": "vite",
