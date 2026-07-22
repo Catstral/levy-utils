@@ -19,5 +19,6 @@
 			"~/*": ["./lib/*"]
 		}
 	},
-	"include": ["lib"]
+	"include": ["lib"],
+	"exclude": ["**/*.test.ts"]
 }
