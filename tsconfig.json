@@ -3,21 +3,19 @@
 		"target": "ESNext",
 		"useDefineForClassFields": true,
 		"module": "ESNext",
-		"lib": ["ESNext"],
+		"lib": ["ESNext", "DOM"],
 		"moduleResolution": "bundler",
 		"strict": true,
 		"sourceMap": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"esModuleInterop": true,
-		"emitDeclarationOnly": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"skipLibCheck": true,
-		"declaration": true,
 		"paths": {
-			"*": ["./lib/*"]
+			"~/*": ["./lib/*"]
 		}
 	},
 	"include": ["lib"]
