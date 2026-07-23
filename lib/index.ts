@@ -16,6 +16,7 @@ export * from "./utils/retry";
 export * from "./utils/sift";
 export * from "./utils/sleep";
 export * from "./utils/slug";
+export * from "./utils/textDifference";
 export * from "./utils/toFloat";
 export * from "./utils/toggle";
 export * from "./utils/toInt";
