@@ -28,7 +28,7 @@
 			},
 			"correctness": {
 				"noUnusedVariables": {
-					"level": "error",
+					"level": "warn",
 					"options": {
 						"ignoreRestSiblings": true
 					}
