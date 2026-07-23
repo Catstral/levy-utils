@@ -42,6 +42,7 @@ A list of all the utilities supported:
 - [sift](#siftlist)
 - [sleep](#sleepdelay)
 - [slug](#slugtext)
+- [textDifference](#textdifferenceoldvalue-newvalue-options)
 - [toFloat](#tofloatvalue-fallback)
 - [toInt](#tointvalue-fallback)
 - [toggle](#togglelist-itemtotoggle-options)
@@ -352,6 +353,89 @@ slug("Hello, World!");
 // Expected output:
 // "hello-world"
 ```
+
+### `textDifference(oldValue, newValue, options?)`
+Diffs two strings and returns either a constructed string with configurable wrapper tags around each changed part, or a list of raw diff nodes (`{ type, content, context }`).
+
+Do note that the context for the diff nodes is always `UNKNOWN` if the `htmlAware` option isn't true.
+
+Supports an HTML-aware mode that diffs markup structurally instead of as plain text: an element is only diffed on its content when its opening and closing tags are unchanged on both sides. The moment a tag itself differs (an attribute added/changed/removed, or a different element entirely) the whole element is treated as one insert/delete block instead of only the changed tag. This means the output can be used directly to render the diff.
+
+```ts
+textDifference("Hello world", "Hello there");
+// Expected output:
+// 'Hello <span data-diff="delete">world</span><span data-diff="insert">there</span>'
+
+textDifference("Hello world", "Hello there", {
+    raw: true,
+});
+// Expected output:
+// [
+//     { type: "EQUAL", content: "Hello ", context: "UNKNOWN" },
+//     { type: "DELETE", content: "world", context: "UNKNOWN" },
+//     { type: "INSERT", content: "there", context: "UNKNOWN" },
+// ]
+
+textDifference('<p class="a">Same text</p>', '<p class="b">Same text</p>', {
+    htmlAware: true,
+});
+// Expected output:
+// '<div data-diff="delete"><p class="a">Same text</p></div><div data-diff="insert"><p class="b">Same text</p></div>'
+// (the attribute change pulls the entire element into the insert/delete block, instead of just the tag)
+
+textDifference("Hello world", "Hello there", {
+    tags: {
+        insert: "**",
+        delete: "~~",
+    },
+});
+// Expected output:
+// "Hello ~~world~~**there**"
+
+textDifference("Hello world", "Hello there", {
+    tags: {
+        insert: ["<ins>", "</ins>"],
+        delete: ["<del>", "</del>"],
+    },
+});
+// Expected output:
+// "Hello <del>world</del><ins>there</ins>"
+
+textDifference("<div><p>Hello world</p></div>", "<div><p>Hello there</p><p>New paragraph</p></div>", {
+    htmlAware: true,
+    tags: {
+        insert: ["<ins>", "</ins>"],
+        delete: ["<del>", "</del>"],
+    },
+});
+// Expected output:
+// '<div><p>Hello <del>world</del><ins>there</ins></p><ins><p>New paragraph</p></ins></div>'
+
+textDifference("<div><p>Hello world</p></div>", "<div><p>Hello there</p><p>New paragraph</p></div>", {
+    htmlAware: true,
+    tags: {
+        inlineContext: {
+            insert: ["<ins>", "</ins>"],
+            delete: ["<del>", "</del>"],
+        },
+        blockContext: {
+            insert: ['<div class="diff-insert">', "</div>"],
+            delete: ['<div class="diff-delete">', "</div>"],
+        },
+    },
+});
+// Expected output:
+// '<div><p>Hello <del>world</del><ins>there</ins></p><div class="diff-insert"><p>New paragraph</p></div></div>'
+// (the inline text change uses inlineContext tags, the whole new paragraph uses blockContext tags)
+```
+
+Options:
+- `htmlAware` — diffs HTML structurally instead of as plain text (default `false`)
+- `raw` — when `true`, returns the raw list of diff nodes instead of a constructed string (default `false`)
+- `tags` — customizes the wrapper tags used around `equal`/`insert`/`delete` content when constructing into a string. Each can be a single string (used as both the opening and closing tag) or a `[open, close]` tuple. When `htmlAware` is `true`, `tags` can instead be split into `inlineContext`/`blockContext` to use different wrappers for inline versus block-level HTML changes.  
+	By default it will use no tags for `equal`.  
+	for `insert` it will use `<span data-diff="insert">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="insert">` for opening and `</div>` for closing instead).  
+	for `delete` it will use `<span data-diff="delete">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="delete">` for opening and `</div>` for closing instead).
 
 ### `toFloat(value, fallback?)`
 Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
