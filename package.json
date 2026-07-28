@@ -39,7 +39,7 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"compile": "tsc && vite build",
+		"compile": "tsc && bun test && vite build",
 		"preview": "vite preview",
 		"production": "bun compile && npm publish",
 		"tsc": "tsc --noEmit --diagnostics",

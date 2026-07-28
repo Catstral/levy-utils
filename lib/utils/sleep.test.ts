@@ -1,3 +1,5 @@
-// TODO: Write unit tests
+import { describe, test } from "bun:test";
 
-export function testSleep() {}
+describe.todo("sleep", () => {
+	test("todo", () => {});
+});

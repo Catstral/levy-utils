@@ -1,3 +1,5 @@
-// TODO: Write unit tests
+import { describe, test } from "bun:test";
 
-export function testToFloat() {}
+describe.todo("toFloat", () => {
+	test("todo", () => {});
+});

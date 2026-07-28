@@ -1,3 +1,5 @@
-// TODO: Write unit tests
+import { describe, test } from "bun:test";
 
-export function testDefer() {}
+describe.todo("defer", () => {
+	test("todo", () => {});
+});
