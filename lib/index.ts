@@ -1,5 +1,5 @@
+export * from "./error";
 export type * as Helpers from "./types";
-
 export * from "./utils/cluster";
 export * from "./utils/compute";
 export * from "./utils/counting";
