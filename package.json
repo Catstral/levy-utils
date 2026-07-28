@@ -19,7 +19,11 @@
 	],
 	"keywords": [
 		"javascript",
-		"typescript"
+		"typescript",
+		"util",
+		"utils",
+		"utility",
+		"utilities"
 	],
 	"type": "module",
 	"sideEffects": false,
