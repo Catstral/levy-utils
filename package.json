@@ -1,6 +1,6 @@
 {
 	"name": "levy-utils",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"description": "Re-useable and common JS/TS utility functions",
 	"license": "MIT",
 	"author": {
