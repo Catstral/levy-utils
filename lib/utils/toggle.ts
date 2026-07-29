@@ -36,13 +36,13 @@ export interface ToggleOptions<T> {
  * @returns {T[]} A new list with the specified item toggled
  */
 export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOptions<T>): T[] {
-	const currentList = klona(list);
-
 	const toKey = (item: T) => {
 		return options?.toKey?.(item) ?? item;
 	};
 
-	const index = currentList.findIndex((item) => toKey(item) === toKey(itemToToggle));
+	const index = list.findIndex((item) => toKey(item) === toKey(itemToToggle));
+
+	const currentList = klona(list);
 
 	if (index === -1) {
 		const strategy = options?.strategy ?? "APPEND";
