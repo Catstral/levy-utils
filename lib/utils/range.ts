@@ -1,3 +1,4 @@
+import { UtilError } from "..";
 import { type Computable, compute } from "./compute";
 
 /**
@@ -25,6 +26,8 @@ export interface RangeOptions<T> {
 /**
  * Returns a generator that returns values from a specified range.
  *
+ * If `start` is greater than `end`, the range will traverse negatively (counting down) instead of positively.
+ *
  * The time complexity for this is `O(n)` where `n` is the amount of steps needed to generate the result.
  *
  * @example
@@ -40,8 +43,20 @@ export interface RangeOptions<T> {
  * }
  *
  * @example
+ * // This will log the following: 3, 2, 1, 0
+ * for (const value of range(3, 0)) {
+ * 	console.log(value);
+ * }
+ *
+ * @example
  * // This will log the following: 0, 2, 4, 6
  * for (const value of range(0, 6, { step: 2 })) {
+ * 	console.log(value);
+ * }
+ *
+ * @example
+ * // This will log the following: 6, 4, 2, 0
+ * for (const value of range(6, 0, { step: -2 })) {
  * 	console.log(value);
  * }
  *
@@ -68,18 +83,41 @@ export interface RangeOptions<T> {
  * @param {number | undefined} [end] The end of the range (inclusive), if this value is not given, the `startOrLength` will be used to determine the end
  * @param {RangeOptions<T>} options The options used to generate the range (see {@link RangeOptions} for more details)
  * @returns {Generator<T>} A generator of a specified range (optionally mapped to a specified value)
+ * @throws {UtilError} If `options.step` is `0`
+ * @throws {UtilError} If `options.step` is positive while the range traverses negatively (`start` > `end`), or negative while the range traverses positively
  */
 export function* range<const T = number>(startOrLength: number, end?: number, options?: RangeOptions<T>): Generator<T> {
 	let value = typeof end === "number" ? startOrLength : 0;
 	const endValue = typeof end === "number" ? end : startOrLength;
+	const shouldStepDown = value > endValue;
 
-	while (value <= endValue) {
+	if (options) {
+		if (typeof options.step === "number") {
+			if (options.step === 0) {
+				throw new UtilError("range", "Step cannot be 0, that would cause the range to become infinite");
+			}
+
+			if (shouldStepDown && options.step > 0) {
+				throw new UtilError(
+					"range",
+					"Given start and end should cause the range to traverse negatively, but step is specified to traverse positively",
+				);
+			} else if (!shouldStepDown && options.step < 0) {
+				throw new UtilError(
+					"range",
+					"Given start and end should cause the range to traverse positively, but step is specified to traverse negatively",
+				);
+			}
+		}
+	}
+
+	while (shouldStepDown ? value >= endValue : value <= endValue) {
 		if (options?.valueMapper !== undefined) {
 			yield compute(options.valueMapper, value);
 		} else {
 			yield value as T;
 		}
 
-		value += options?.step ?? 1;
+		value += options?.step ?? (shouldStepDown ? -1 : 1);
 	}
 }
