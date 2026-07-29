@@ -21,7 +21,7 @@ export class ClusterUtilError extends UtilError {
  */
 export function cluster<const T>(items: T[], size: number): T[][] {
 	if (size < 1) {
-		throw new ClusterUtilError("Cluster size cannnot be smaller then 1");
+		throw new ClusterUtilError("Cluster size cannot be smaller than 1");
 	}
 
 	if (!Array.isArray(items)) {
