@@ -1,6 +1,12 @@
 import { UtilError } from "..";
 import { type Computable, compute } from "./compute";
 
+export class RangeUtilError extends UtilError {
+	public get util(): "range" {
+		return "range";
+	}
+}
+
 /**
  * @typedef {Object} RangeOptions
  * @template T
@@ -83,8 +89,8 @@ export interface RangeOptions<T> {
  * @param {number | undefined} [end] The end of the range (inclusive), if this value is not given, the `startOrLength` will be used to determine the end
  * @param {RangeOptions<T>} options The options used to generate the range (see {@link RangeOptions} for more details)
  * @returns {Generator<T>} A generator of a specified range (optionally mapped to a specified value)
- * @throws {UtilError} If `options.step` is `0`
- * @throws {UtilError} If `options.step` is positive while the range traverses negatively (`start` > `end`), or negative while the range traverses positively
+ * @throws {RangeUtilError} If `options.step` is `0`
+ * @throws {RangeUtilError} If `options.step` is positive while the range traverses negatively (`start` > `end`), or negative while the range traverses positively
  */
 export function* range<const T = number>(startOrLength: number, end?: number, options?: RangeOptions<T>): Generator<T> {
 	let value = typeof end === "number" ? startOrLength : 0;
@@ -94,17 +100,15 @@ export function* range<const T = number>(startOrLength: number, end?: number, op
 	if (options) {
 		if (typeof options.step === "number") {
 			if (options.step === 0) {
-				throw new UtilError("range", "Step cannot be 0, that would cause the range to become infinite");
+				throw new RangeUtilError("Step cannot be 0, that would cause the range to become infinite");
 			}
 
 			if (shouldStepDown && options.step > 0) {
-				throw new UtilError(
-					"range",
+				throw new RangeUtilError(
 					"Given start and end should cause the range to traverse negatively, but step is specified to traverse positively",
 				);
 			} else if (!shouldStepDown && options.step < 0) {
-				throw new UtilError(
-					"range",
+				throw new RangeUtilError(
 					"Given start and end should cause the range to traverse positively, but step is specified to traverse negatively",
 				);
 			}

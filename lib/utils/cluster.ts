@@ -1,6 +1,12 @@
 import { klona } from "klona";
 import { UtilError } from "~/error";
 
+export class ClusterUtilError extends UtilError {
+	public get util(): "cluster" {
+		return "cluster";
+	}
+}
+
 /**
  * Clusters a list of items into a list of lists of items limited to a specified size.
  *
@@ -10,14 +16,16 @@ import { UtilError } from "~/error";
  * @param {T[]} items The items to cluster
  * @param size The max size for each list
  * @returns {T[][]} An array of arrays with a max size of the specified size
+ * @throws {ClusterUtilError} If the cluster size is less then 1
+ * @throws {ClusterUtilError} If the given items are not an array
  */
 export function cluster<const T>(items: T[], size: number): T[][] {
 	if (size < 1) {
-		throw new UtilError("cluster", "Cluster size cannnot be smaller then 1");
+		throw new ClusterUtilError("Cluster size cannnot be smaller then 1");
 	}
 
 	if (!Array.isArray(items)) {
-		throw new UtilError("cluster", "Items must be an array");
+		throw new ClusterUtilError("Items must be an array");
 	}
 
 	const cloned = klona(items);

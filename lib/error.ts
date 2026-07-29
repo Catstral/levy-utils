@@ -1,11 +1,5 @@
-import type { UtilErrorCode } from "./types";
+import type * as utils from ".";
 
-export class UtilError extends Error {
-	public readonly util: UtilErrorCode;
-
-	public constructor(util: UtilErrorCode, message: string, options?: ErrorOptions) {
-		super(message, options);
-
-		this.util = util;
-	}
+export abstract class UtilError extends Error {
+	public abstract get util(): Exclude<keyof typeof utils, `${string}UtilError`>;
 }
