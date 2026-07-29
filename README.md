@@ -24,6 +24,7 @@ import { range, sift, toggle } from "levy-utils";
 
 ## Utils
 A list of all the utilities supported:
+- [chain](#chaincallbacks)
 - [cluster](#clusteritems-size)
 - [compute / isComputation](#computevalue-args--iscomputationvalue)
 - [counting](#countinglist-identity)
@@ -46,6 +47,18 @@ A list of all the utilities supported:
 - [toFloat](#tofloatvalue-fallback)
 - [toInt](#tointvalue-fallback)
 - [toggle](#togglelist-itemtotoggle-options)
+
+### `chain(...callbacks)`
+Chains many callbacks together, with each callback accepting the result of the previous one as an argument, returning the result of the final callback.
+
+Note: due to a TypeScript limitation, the argument of each chained callback requires a type hint in order to infer the argument correctly (it does not allow passing an invalid argument type however).
+
+```ts
+// note the type hint for the argument
+chain(() => true, (value: boolean) => value ? "true" : "false");
+// Expected output:
+// "true"
+```
 
 ### `cluster(items, size)`
 Clusters a list of items into a list of lists, each limited to a specified size.
