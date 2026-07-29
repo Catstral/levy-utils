@@ -2,25 +2,120 @@ import { describe, expect, test } from "bun:test";
 import { omit } from "./omit";
 
 describe("omit", () => {
-	test("Omitting to empty object with literal key", () => {
-		expect(omit({ foo: "bar" }, "foo")).toBeEmptyObject();
+	test("Omitting the only key (literal) results in an empty object", () => {
+		expect(
+			omit(
+				{
+					foo: "bar",
+				},
+				"foo",
+			),
+		).toBeEmptyObject();
 	});
 
-	test("Omitting to empty object with key array", () => {
-		expect(omit({ foo: "bar" }, ["foo"])).toBeEmptyObject();
+	test("Omitting the only key (array) results in an empty object", () => {
+		expect(
+			omit(
+				{
+					foo: "bar",
+				},
+				["foo"],
+			),
+		).toBeEmptyObject();
 	});
 
-	test("Omitting to single key with literal key", () => {
-		const omitted = omit({ foo: "bar", key: "value" }, "foo");
+	test("Omitting one of two keys (literal) leaves the other", () => {
+		const omitted = omit(
+			{
+				foo: "bar",
+				key: "value",
+			},
+			"foo",
+		);
+
 		expect(omitted).not.toContainKey("foo");
 		expect(omitted).toContainKey("key");
 		expect(omitted.key).toBe("value");
 	});
 
-	test("Omitting to single key with key array", () => {
-		const omitted = omit({ foo: "bar", key: "value" }, ["foo"]);
+	test("Omitting one of two keys (array) leaves the other", () => {
+		const omitted = omit(
+			{
+				foo: "bar",
+				key: "value",
+			},
+			["foo"],
+		);
+
 		expect(omitted).not.toContainKey("foo");
 		expect(omitted).toContainKey("key");
 		expect(omitted.key).toBe("value");
+	});
+
+	test("Omitting multiple keys with key array", () => {
+		const omitted = omit(
+			{
+				foo: "bar",
+				key: "value",
+				baz: "qux",
+			},
+			["foo", "baz"],
+		);
+
+		expect(omitted).not.toContainKey("foo");
+		expect(omitted).not.toContainKey("baz");
+		expect(omitted).toContainKey("key");
+		expect(omitted.key).toBe("value");
+	});
+
+	test("Omitting a key that does not exist on the object", () => {
+		const original = {
+			foo: "bar",
+		};
+
+		const omitted = omit(original, "key" as "foo");
+
+		expect(omitted).toContainKey("foo");
+		expect((omitted as typeof original).foo).toBe("bar");
+	});
+
+	test("Omitting with an empty key array keeps all keys", () => {
+		const omitted = omit(
+			{
+				foo: "bar",
+				key: "value",
+			},
+			[],
+		);
+
+		expect(omitted).toContainAllKeys(["foo", "key"]);
+	});
+
+	test("Does not mutate the original object", () => {
+		const original = {
+			foo: "bar",
+			key: "value",
+		};
+
+		const omitted = omit(original, "foo");
+
+		expect(omitted).not.toContainKey("foo");
+		expect(original).toContainKey("foo");
+		expect(original.foo).toBe("bar");
+	});
+
+	test("Deep clones nested values instead of referencing them", () => {
+		const nested = {
+			deep: "value",
+		};
+		const original = {
+			foo: "bar",
+			key: nested,
+		};
+
+		const omitted = omit(original, "foo");
+
+		expect(omitted.key).not.toBe(nested);
+		expect(omitted.key).toEqual(nested);
 	});
 });

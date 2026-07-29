@@ -23,6 +23,14 @@ describe("compute", () => {
 		test("Object", () => {
 			expect(compute({})).toBeEmptyObject();
 		});
+
+		test("Null", () => {
+			expect(compute(null)).toBeNull();
+		});
+
+		test("Undefined", () => {
+			expect(compute(undefined)).toBeUndefined();
+		});
 	});
 
 	describe("Computable", () => {
@@ -45,6 +53,35 @@ describe("compute", () => {
 
 		test("Object", () => {
 			expect(compute(() => ({}))).toBeEmptyObject();
+		});
+
+		test("Undefined return value", () => {
+			expect(compute(() => undefined)).toBeUndefined();
+		});
+
+		test("Passes arguments through to the callback", () => {
+			const result = compute((a: number, b: number) => a + b, 1, 2);
+			expect(result).toBe(3);
+		});
+
+		test("Promise-returning callback is not awaited by compute", async () => {
+			const result = compute(() => Promise.resolve(5));
+			expect(result).toBeInstanceOf(Promise);
+			await expect(result).resolves.toBe(5);
+		});
+
+		test("Async function", async () => {
+			const result = compute(async () => "foo");
+			expect(result).toBeInstanceOf(Promise);
+			await expect(result).resolves.toBe("foo");
+		});
+
+		test("Propagates errors thrown by the callback", () => {
+			expect(() =>
+				compute(() => {
+					throw new Error("boom");
+				}),
+			).toThrow("boom");
 		});
 	});
 });
@@ -71,6 +108,14 @@ describe("isComputation", () => {
 		test("Object", () => {
 			expect(isComputation({})).toBeFalse();
 		});
+
+		test("Null", () => {
+			expect(isComputation(null)).toBeFalse();
+		});
+
+		test("Undefined", () => {
+			expect(isComputation(undefined)).toBeFalse();
+		});
 	});
 
 	describe("Computable", () => {
@@ -93,6 +138,10 @@ describe("isComputation", () => {
 
 		test("Object", () => {
 			expect(isComputation(() => ({}))).toBeTrue();
+		});
+
+		test("Async function", () => {
+			expect(isComputation(async () => "foo")).toBeTrue();
 		});
 	});
 });

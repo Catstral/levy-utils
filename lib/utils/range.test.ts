@@ -1,5 +1,5 @@
 import { describe, expect, mock, test } from "bun:test";
-import { range } from "./range";
+import { RangeUtilError, range } from "./range";
 
 describe("range", () => {
 	test("Simple range", () => {
@@ -174,5 +174,195 @@ describe("range", () => {
 		expect(calls[2].value).toBe("foo-4");
 		expect(calls[3].value).toBe("foo-6");
 		expect(calls[4].value).toBe("foo-8");
+	});
+
+	test("Zero-length range", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(0)) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(1);
+
+		const calls = fn.mock.results;
+
+		expect(calls[0].type).toBe("return");
+		expect(calls[0].value).toBe(0);
+	});
+
+	test("Range where start equals end", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(3, 3)) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(1);
+
+		const calls = fn.mock.results;
+
+		expect(calls[0].type).toBe("return");
+		expect(calls[0].value).toBe(3);
+	});
+
+	test("Range with negative start and end", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(-3, -1)) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(3);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe(-3);
+		expect(calls[1].value).toBe(-2);
+		expect(calls[2].value).toBe(-1);
+	});
+
+	test("Range with a non-integer step", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(0, 2, {
+			step: 0.5,
+		})) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(5);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe(0);
+		expect(calls[1].value).toBe(0.5);
+		expect(calls[2].value).toBe(1);
+		expect(calls[3].value).toBe(1.5);
+		expect(calls[4].value).toBe(2);
+	});
+
+	test("Range with a length and options only (no explicit end)", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(4, undefined, {
+			step: 2,
+		})) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(3);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe(0);
+		expect(calls[1].value).toBe(2);
+		expect(calls[2].value).toBe(4);
+	});
+
+	test("Descending range (start greater than end)", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(4, 0)) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(5);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe(4);
+		expect(calls[1].value).toBe(3);
+		expect(calls[2].value).toBe(2);
+		expect(calls[3].value).toBe(1);
+		expect(calls[4].value).toBe(0);
+	});
+
+	test("Descending range with a matching negative step", () => {
+		const fn = mock((i) => i);
+
+		for (const index of range(6, 0, {
+			step: -2,
+		})) {
+			fn(index);
+		}
+
+		expect(fn).toBeCalledTimes(4);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe(6);
+		expect(calls[1].value).toBe(4);
+		expect(calls[2].value).toBe(2);
+		expect(calls[3].value).toBe(0);
+	});
+
+	test("Descending range with a mapping function", () => {
+		const fn = mock((i) => i);
+
+		for (const value of range(2, 0, {
+			valueMapper: (step) => `foo-${step}`,
+		})) {
+			fn(value);
+		}
+
+		expect(fn).toBeCalledTimes(3);
+
+		const calls = fn.mock.results;
+
+		for (const call of calls) {
+			expect(call.type).toBe("return");
+		}
+
+		expect(calls[0].value).toBe("foo-2");
+		expect(calls[1].value).toBe("foo-1");
+		expect(calls[2].value).toBe("foo-0");
+	});
+
+	test("Range with a step of zero throws a UtilError", () => {
+		expect(() => {
+			const generator = range(0, 2, {
+				step: 0,
+			});
+			generator.next();
+		}).toThrow(RangeUtilError);
+	});
+
+	test("Ascending range with a negative step throws a UtilError", () => {
+		expect(() => {
+			const generator = range(0, 4, {
+				step: -1,
+			});
+			generator.next();
+		}).toThrow(RangeUtilError);
+	});
+
+	test("Descending range with a positive step throws a UtilError", () => {
+		expect(() => {
+			const generator = range(4, 0, {
+				step: 1,
+			});
+			generator.next();
+		}).toThrow(RangeUtilError);
 	});
 });

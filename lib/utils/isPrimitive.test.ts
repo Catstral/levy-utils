@@ -30,7 +30,7 @@ describe("isPrimitive", () => {
 	});
 
 	describe("Non primitives", () => {
-		test("Big int", () => {
+		test("BigInt", () => {
 			expect(isPrimitive(0n)).toBeFalse();
 		});
 
@@ -44,6 +44,18 @@ describe("isPrimitive", () => {
 
 		test("Class", () => {
 			expect(isPrimitive(new (class Foo {})())).toBeFalse();
+		});
+
+		test("Function", () => {
+			expect(isPrimitive(() => {})).toBeFalse();
+		});
+
+		test("Date", () => {
+			expect(isPrimitive(new Date())).toBeFalse();
+		});
+
+		test("RegExp", () => {
+			expect(isPrimitive(/foo/)).toBeFalse();
 		});
 	});
 });
