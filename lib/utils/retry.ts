@@ -1,4 +1,5 @@
 import type { Promisable } from "~/types";
+import { UtilError } from "..";
 import { sleep } from "./sleep";
 
 // TODO: Write docs
@@ -9,7 +10,7 @@ export interface RetryOptions {
 	 *
 	 * @default 3
 	 */
-	attempts: number;
+	attempts?: number;
 	/**
 	 * Retry delay in milliseconds.
 	 *
@@ -44,7 +45,9 @@ export async function retry<const T>(callback: () => Promisable<T>, options?: Re
 			return result;
 		} catch (err) {
 			if (attempts >= retries) {
-				throw err;
+				throw new UtilError("retry", "Callback failed too often, stopping retry loop", {
+					cause: err,
+				});
 			} else {
 				options?.onRetry?.(err, attempts);
 
