@@ -1,3 +1,4 @@
+import { klona } from "klona";
 import type { Key } from "~/types";
 
 /**
@@ -35,30 +36,32 @@ export interface ToggleOptions<T> {
  * @returns {T[]} A new list with the specified item toggled
  */
 export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOptions<T>): T[] {
+	const currentList = klona(list);
+
 	const toKey = (item: T) => {
 		return options?.toKey?.(item) ?? item;
 	};
 
-	const index = list.findIndex((item) => toKey(item) === toKey(itemToToggle));
+	const index = currentList.findIndex((item) => toKey(item) === toKey(itemToToggle));
 
 	if (index === -1) {
 		const strategy = options?.strategy ?? "APPEND";
 
 		switch (strategy) {
 			case "APPEND": {
-				list.push(itemToToggle);
+				currentList.push(itemToToggle);
 
 				break;
 			}
 			case "PREPEND": {
-				list.unshift(itemToToggle);
+				currentList.unshift(itemToToggle);
 
 				break;
 			}
 		}
 	} else {
-		list.splice(index, 1);
+		currentList.splice(index, 1);
 	}
 
-	return list;
+	return currentList;
 }
