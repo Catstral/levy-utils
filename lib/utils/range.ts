@@ -87,7 +87,7 @@ export interface RangeOptions<T> {
  * @template [T=number]
  * @param {number} startOrLength The start of the range, or if this is the only parameter given, the length of the range (inclusive)
  * @param {number | undefined} [end] The end of the range (inclusive), if this value is not given, the `startOrLength` will be used to determine the end
- * @param {RangeOptions<T>} options The options used to generate the range (see {@link RangeOptions} for more details)
+ * @param {RangeOptions<T>} [options] The options used to generate the range (see {@link RangeOptions} for more details)
  * @returns {Generator<T>} A generator of a specified range (optionally mapped to a specified value)
  * @throws {RangeUtilError} If `options.step` is `0`
  * @throws {RangeUtilError} If `options.step` is positive while the range traverses negatively (`start` > `end`), or negative while the range traverses positively
