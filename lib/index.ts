@@ -11,6 +11,7 @@ export * from "./utils/isEmpty";
 export * from "./utils/isObject";
 export * from "./utils/isPrimitive";
 export * from "./utils/keys";
+export * from "./utils/list";
 export * from "./utils/omit";
 export * from "./utils/parseUrlParams";
 export * from "./utils/pick";
