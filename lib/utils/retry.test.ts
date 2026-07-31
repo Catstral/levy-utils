@@ -19,9 +19,19 @@ describe.concurrent("retry", () => {
 			throw new Error("Some failure");
 		});
 
-		expect(async () => {
+		let thrown: unknown;
+
+		try {
 			await retry(fn);
-		}).toThrow();
+		} catch (err) {
+			thrown = err;
+		}
+
+		expect(thrown).toBeInstanceOf(RetryUtilError);
+		expect((thrown as RetryUtilError).util).toBe("retry");
+		expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+		expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+		expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
 
 		expect(fn).toBeCalledTimes(3);
 
@@ -37,11 +47,21 @@ describe.concurrent("retry", () => {
 			throw new Error("Some failure");
 		});
 
-		expect(async () => {
+		let thrown: unknown;
+
+		try {
 			await retry(fn, {
 				delay: 0,
 			});
-		}).toThrow();
+		} catch (err) {
+			thrown = err;
+		}
+
+		expect(thrown).toBeInstanceOf(RetryUtilError);
+		expect((thrown as RetryUtilError).util).toBe("retry");
+		expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+		expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+		expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
 
 		expect(fn).toBeCalledTimes(3);
 
@@ -57,12 +77,22 @@ describe.concurrent("retry", () => {
 			throw new Error("Some failure");
 		});
 
-		expect(async () => {
+		let thrown: unknown;
+
+		try {
 			await retry(fn, {
 				delay: 100,
 				backoff: true,
 			});
-		}).toThrow();
+		} catch (err) {
+			thrown = err;
+		}
+
+		expect(thrown).toBeInstanceOf(RetryUtilError);
+		expect((thrown as RetryUtilError).util).toBe("retry");
+		expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+		expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+		expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
 
 		expect(fn).toBeCalledTimes(3);
 
@@ -78,11 +108,21 @@ describe.concurrent("retry", () => {
 			throw new Error("Some failure");
 		});
 
-		expect(async () => {
+		let thrown: unknown;
+
+		try {
 			await retry(fn, {
 				attempts: 1,
 			});
-		}).toThrow();
+		} catch (err) {
+			thrown = err;
+		}
+
+		expect(thrown).toBeInstanceOf(RetryUtilError);
+		expect((thrown as RetryUtilError).util).toBe("retry");
+		expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+		expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+		expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
 
 		expect(fn).toBeCalledTimes(1);
 

@@ -35,6 +35,8 @@ describe("cluster", () => {
 			expect().fail("Invalid size definition passed clustering");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
+			expect((err as ClusterUtilError).util).toBe("cluster");
+			expect((err as ClusterUtilError).message).toBe("Cluster size cannot be smaller than 1");
 		}
 	});
 
@@ -44,6 +46,8 @@ describe("cluster", () => {
 			expect().fail("Invalid item definition passed clustering");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
+			expect((err as ClusterUtilError).util).toBe("cluster");
+			expect((err as ClusterUtilError).message).toBe("Items must be an array");
 		}
 	});
 
@@ -53,6 +57,8 @@ describe("cluster", () => {
 			expect().fail("Null item definition passed clustering");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
+			expect((err as ClusterUtilError).util).toBe("cluster");
+			expect((err as ClusterUtilError).message).toBe("Items must be an array");
 		}
 	});
 
@@ -62,6 +68,8 @@ describe("cluster", () => {
 			expect().fail("Negative size definition passed clustering");
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
+			expect((err as ClusterUtilError).util).toBe("cluster");
+			expect((err as ClusterUtilError).message).toBe("Cluster size cannot be smaller than 1");
 		}
 	});
 

@@ -339,30 +339,49 @@ describe("range", () => {
 		expect(calls[2].value).toBe("foo-0");
 	});
 
-	test("Range with a step of zero throws a UtilError", () => {
-		expect(() => {
+	test("Range with a step of zero throws a RangeUtilError", () => {
+		try {
 			const generator = range(0, 2, {
 				step: 0,
 			});
 			generator.next();
-		}).toThrow(RangeUtilError);
+			expect().fail("Expected range to throw");
+		} catch (err) {
+			expect(err).toBeInstanceOf(RangeUtilError);
+			expect((err as RangeUtilError).util).toBe("range");
+			expect((err as RangeUtilError).message).toBe("Step cannot be 0, that would cause the range to become infinite");
+		}
 	});
 
-	test("Ascending range with a negative step throws a UtilError", () => {
-		expect(() => {
+	test("Ascending range with a negative step throws a RangeUtilError", () => {
+		try {
 			const generator = range(0, 4, {
 				step: -1,
 			});
 			generator.next();
-		}).toThrow(RangeUtilError);
+			expect().fail("Expected range to throw");
+		} catch (err) {
+			expect(err).toBeInstanceOf(RangeUtilError);
+			expect((err as RangeUtilError).util).toBe("range");
+			expect((err as RangeUtilError).message).toBe(
+				"Given start and end should cause the range to traverse positively, but step is specified to traverse negatively",
+			);
+		}
 	});
 
-	test("Descending range with a positive step throws a UtilError", () => {
-		expect(() => {
+	test("Descending range with a positive step throws a RangeUtilError", () => {
+		try {
 			const generator = range(4, 0, {
 				step: 1,
 			});
 			generator.next();
-		}).toThrow(RangeUtilError);
+			expect().fail("Expected range to throw");
+		} catch (err) {
+			expect(err).toBeInstanceOf(RangeUtilError);
+			expect((err as RangeUtilError).util).toBe("range");
+			expect((err as RangeUtilError).message).toBe(
+				"Given start and end should cause the range to traverse negatively, but step is specified to traverse positively",
+			);
+		}
 	});
 });
