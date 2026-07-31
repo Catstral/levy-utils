@@ -8,6 +8,8 @@
  */
 export async function sleep(delay: number): Promise<void> {
 	return new Promise((resolve) => {
-		setTimeout(resolve, delay);
+		const finalDelay = Math.max(delay, 0);
+
+		setTimeout(resolve, finalDelay);
 	});
 }
