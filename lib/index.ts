@@ -1,5 +1,6 @@
 export * from "./error";
 export type * as Helpers from "./types";
+export * from "./utils/casing";
 export * from "./utils/chain";
 export * from "./utils/cluster";
 export * from "./utils/compute";
