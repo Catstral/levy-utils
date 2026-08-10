@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { httpHeaderCase } from "./html";
+import { httpHeaderCase } from "./http";
 
 describe("httpHeaderCase", () => {
 	test("Converts a space-separated string", () => {
