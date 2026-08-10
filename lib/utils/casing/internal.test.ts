@@ -14,8 +14,8 @@ describe("splitCasing", () => {
 		expect(splitCasing("helloWorldFoo")).toEqual(["hello", "World", "Foo"]);
 	});
 
-	test("Groups consecutive uppercase letters into a single word by default", () => {
-		expect(splitCasing("HTTPServer")).toEqual(["HTTPServer"]);
+	test("Groups consecutive uppercase letters into a single word by default, splitting on uppercase letter before lowercase letter", () => {
+		expect(splitCasing("HTTPServer")).toEqual(["HTTP", "Server"]);
 	});
 
 	test("Groups consecutive uppercase letters separated by a delimiter into their own word", () => {

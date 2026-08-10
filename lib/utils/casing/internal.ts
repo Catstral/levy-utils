@@ -41,7 +41,7 @@ export interface SplitCasingOptions {
  * const words = splitCasing("helloWorld", undefined); // -> ["hello", "World"]
  *
  * @example
- * const words = splitCasing("HTTPServer", undefined); // -> ["HTTPServer"]
+ * const words = splitCasing("HTTPServer", undefined); // -> ["HTTP", "Server"]
  *
  * @example
  * const words = splitCasing("HTTPServer", { groupUppercaseLetters: false }); // -> ["H", "T", "T", "P", "Server"]
@@ -130,6 +130,19 @@ export function splitCasing(str: string, options?: SplitCasingOptions): string[]
 			currentWord += char;
 
 			continue;
+		}
+
+		const charBeforePrevChar = currentWord.at(-2);
+
+		if (
+			groupUppercase &&
+			uppercaseTest.test(prevChar) &&
+			charBeforePrevChar !== undefined &&
+			uppercaseTest.test(charBeforePrevChar)
+		) {
+			words.push(currentWord.slice(0, -1));
+
+			currentWord = prevChar;
 		}
 
 		currentWord += char;
