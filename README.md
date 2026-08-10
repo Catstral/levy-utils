@@ -70,7 +70,7 @@ cluster([1, 2, 3, 4, 5], 2);
 ```
 
 ### `compute(value, ...args)` / `isComputation(value)`
-`compute` resolves a `Computable<T>` — either a plain value or a function that produces one — calling it with the given args if it's a function. `isComputation` checks whether a `Computable<T>` is the function variant.
+`compute` resolves a `Computable<T>` - either a plain value or a function that produces one - calling it with the given args if it's a function. `isComputation` checks whether a `Computable<T>` is the function variant.
 
 ```ts
 compute(5);
@@ -327,10 +327,10 @@ await retry(() => fetchSomething(), {
 ```
 
 Options:
-- `attempts` — maximum number of attempts (default `3`)
-- `delay` — delay between retries in milliseconds (default `1000`)
-- `backoff` — whether to double the delay after each retry (default `false`)
-- `onRetry` — callback invoked with the error and attempt number on each failed attempt
+- `attempts` - maximum number of attempts (default `3`)
+- `delay` - delay between retries in milliseconds (default `1000`)
+- `backoff` - whether to double the delay after each retry (default `false`)
+- `onRetry` - callback invoked with the error and attempt number on each failed attempt
 
 ### `sift(list)`
 Filters all falsy values out of a list.
@@ -443,9 +443,9 @@ textDifference("<div><p>Hello world</p></div>", "<div><p>Hello there</p><p>New p
 ```
 
 Options:
-- `htmlAware` — diffs HTML structurally instead of as plain text (default `false`)
-- `raw` — when `true`, returns the raw list of diff nodes instead of a constructed string (default `false`)
-- `tags` — customizes the wrapper tags used around `equal`/`insert`/`delete` content when constructing into a string. Each can be a single string (used as both the opening and closing tag) or a `[open, close]` tuple. When `htmlAware` is `true`, `tags` can instead be split into `inlineContext`/`blockContext` to use different wrappers for inline versus block-level HTML changes.  
+- `htmlAware` - diffs HTML structurally instead of as plain text (default `false`)
+- `raw` - when `true`, returns the raw list of diff nodes instead of a constructed string (default `false`)
+- `tags` - customizes the wrapper tags used around `equal`/`insert`/`delete` content when constructing into a string. Each can be a single string (used as both the opening and closing tag) or a `[open, close]` tuple. When `htmlAware` is `true`, `tags` can instead be split into `inlineContext`/`blockContext` to use different wrappers for inline versus block-level HTML changes.  
 	By default it will use no tags for `equal`.  
 	for `insert` it will use `<span data-diff="insert">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="insert">` for opening and `</div>` for closing instead).  
 	for `delete` it will use `<span data-diff="delete">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="delete">` for opening and `</div>` for closing instead).
@@ -516,5 +516,286 @@ toggle(
 ```
 
 Options:
-- `toKey` — maps an item to a key used to determine equality (defaults to comparing items directly)
-- `strategy` — `"APPEND"` or `"PREPEND"`, determines where new items are inserted (default `"APPEND"`)
+- `toKey` - maps an item to a key used to determine equality (defaults to comparing items directly)
+- `strategy` - `"APPEND"` or `"PREPEND"`, determines where new items are inserted (default `"APPEND"`)
+
+### Casing utils
+#### `camelCase(str, options?)`
+Turns a string into a camel cased version of that same string.
+
+```ts
+camelCase("Some value");
+// Expected output:
+// "someValue"
+
+camelCase("someValue");
+// Expected output:
+// "someValue"
+
+camelCase("some_value");
+// Expected output:
+// "someValue"
+
+camelCase("some 123 value");
+// Expected output:
+// "some123value"
+
+camelCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some123Value"
+
+camelCase("someUPPERValue");
+// Expected output:
+// "someUpperValue"
+
+camelCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "someUPPERValue"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+#### `customCase(str, options)`
+Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
+
+> NOTE:  
+  This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
+
+```ts
+customCase("someValue", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "some.value"
+
+customCase("someValue", {
+	seperator: ".",
+	transform: (str, index) => `${str.toLowercase()}${index}`,
+});
+// Expected output:
+// "some0.value1"
+
+customCase("someValue123", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "some.value123"
+
+customCase("someValue123", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+	groupNumbers: true,
+});
+// Expected output:
+// "some.value.123"
+
+customCase("HTTP", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "http"
+
+customCase("HTTPServer", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "http.server"
+
+customCase("HTTP", {
+	seperator: ".",
+	transform: (str) => str.toLowercase(),
+	groupUppercaseLetters: false,
+});
+// Expected output:
+// "h.t.t.p"
+```
+
+Options:
+- `seperator` (required) - The seperator to use when combining the words back together
+- `transform` (required) - a function that is given the current word + the index of that word and transforms it into a string that is then used for the output
+- `groupNumbers` - A flag for whether numbers should be grouped into it's own word, or if it should be appended into the current word. (default `false`)
+- `groupUppercaseLetters` - A flag for whether multiple consecutive uppercase letters are considered their own word, or part of the current word. Do note that if this is false then uppercase letters are still considered word terminators, closing the current word and starting a new one, turning `HTTP` into `["H", "T", "T", "P"]` for example (default `true`)
+- `parser` - A function that is given the entire string and expected to parse it into the words. This is here just in case the build in parser does not satisfy your use case. If this is defined, the other options meant for parsing (`groupNumbers` and `groupUppercaseLetters`) are ignored as this function is expected to handle this behavior itself
+
+> The default word parser uses a regex to determine the characters casing and splits the given string into words, those words are by default the entire word until a new uppercase letter or spacing character (using `/[\s-_]/` regex) is found. By default it tries to group all uppercase letters until a lowercase letter is found, if that is found then the character before that character is assumed to belong to new lowercase letter.
+
+#### httpHeaderCase(str, options?)
+Turns a string into a http header cased version of that same string.
+
+> This is also aliased to `trainCase`
+
+```ts
+httpHeaderCase("Some value");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("someValue");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("some_value");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("some 123 value");
+// Expected output:
+// "Some-123value"
+
+httpHeaderCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some-123-Value"
+
+httpHeaderCase("someUPPERValue");
+// Expected output:
+// "Some-Upper-Value"
+
+httpHeaderCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "Some-U-P-P-E-R-Value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+#### kebabCase(str, options?)
+Turns a string into a kebab cased version of that same string.
+
+```ts
+kebabCase("Some value");
+// Expected output:
+// "some-value"
+
+kebabCase("someValue");
+// Expected output:
+// "some-value"
+
+kebabCase("some_value");
+// Expected output:
+// "some-value"
+
+kebabCase("some 123 value");
+// Expected output:
+// "some-123value"
+
+kebabCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some-123-value"
+
+kebabCase("someUPPERValue");
+// Expected output:
+// "some-upper-value"
+
+kebabCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "some-u-p-p-e-r-value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+#### pascalCase(str, options?)
+Turns a string into a pascal cased version of that same string.
+
+```ts
+pascalCase("Some value");
+// Expected output:
+// "SomeValue"
+
+pascalCase("someValue");
+// Expected output:
+// "SomeValue"
+
+pascalCase("some_value");
+// Expected output:
+// "SomeValue"
+
+pascalCase("some 123 value");
+// Expected output:
+// "Some123value"
+
+pascalCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some123Value"
+
+pascalCase("someUPPERValue");
+// Expected output:
+// "SomeUpperValue"
+
+pascalCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "SomeUPPERValue"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+#### snakeCase(str, options?)
+Turns a string into a snake cased version of that same string.
+
+```ts
+snakeCase("Some value");
+// Expected output:
+// "some_value"
+
+snakeCase("someValue");
+// Expected output:
+// "some_value"
+
+snakeCase("some-value");
+// Expected output:
+// "some_value"
+
+snakeCase("some 123 value");
+// Expected output:
+// "some_123value"
+
+snakeCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some_123_value"
+
+snakeCase("someUPPERValue");
+// Expected output:
+// "some_upper_value"
+
+snakeCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "some_u_p_p_e_r_value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+#### titleCase(str, options?)
+Turns a string into a title cased version of that same string.
+
+```ts
+titleCase("Some_value");
+// Expected output:
+// "Some Value"
+
+titleCase("someValue");
+// Expected output:
+// "Some Value"
+
+titleCase("some_value");
+// Expected output:
+// "Some Value"
+
+titleCase("some 123 value");
+// Expected output:
+// "Some 123value"
+
+titleCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some 123 Value"
+
+titleCase("someUPPERValue");
+// Expected output:
+// "Some Upper Value"
+
+titleCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "Some U P P E R Value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
