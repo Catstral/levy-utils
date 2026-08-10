@@ -96,21 +96,4 @@ describe("cluster", () => {
 		expect(clustered[1]).toEqual([1]);
 		expect(clustered[2]).toEqual([2]);
 	});
-
-	test("Items are cloned, mutating the output does not affect the input", () => {
-		const original = [
-			{
-				value: 0,
-			},
-			{
-				value: 1,
-			},
-		];
-
-		const clustered = cluster(original, 2);
-
-		clustered[0][0].value = 999;
-
-		expect(original[0].value).toBe(0);
-	});
 });

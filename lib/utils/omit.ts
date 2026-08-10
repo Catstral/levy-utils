@@ -1,5 +1,3 @@
-import { klona } from "klona";
-
 /**
  * Omits certain keys off of an object and returns a new object without those keys.
  *
@@ -15,7 +13,9 @@ export function omit<const T extends Record<string, unknown>, const K extends ke
 	object: T,
 	keys: K | K[],
 ): Omit<T, K> {
-	const omitted = klona(object);
+	const omitted = {
+		...object,
+	};
 	const finalKeys = Array.isArray(keys) ? keys : [keys];
 
 	for (const key of finalKeys) {

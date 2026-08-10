@@ -164,18 +164,5 @@ describe("toggle", () => {
 
 			expect(list).toEqual(["a", "b"]);
 		});
-
-		test("A pre-existing object item toggled off is unaffected by later mutating the result", () => {
-			const original = {
-				id: 1,
-			};
-			const result = toggle([original], {
-				id: 2,
-			});
-
-			result[0].id = 999;
-
-			expect(original.id).toBe(1);
-		});
 	});
 });

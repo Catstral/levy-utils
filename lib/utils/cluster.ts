@@ -1,4 +1,3 @@
-import { klona } from "klona";
 import { UtilError } from "~/error";
 
 export class ClusterUtilError extends UtilError {
@@ -28,12 +27,11 @@ export function cluster<const T>(items: T[], size: number): T[][] {
 		throw new ClusterUtilError("Items must be an array");
 	}
 
-	const cloned = klona(items);
 	const clustered: T[][] = [[]];
 
 	let index = 0;
 
-	for (const item of cloned) {
+	for (const item of items) {
 		if (clustered[index].length < size) {
 			clustered[index].push(item);
 		} else {

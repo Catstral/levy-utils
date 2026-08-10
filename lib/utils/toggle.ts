@@ -1,4 +1,3 @@
-import { klona } from "klona";
 import type { Key } from "~/types";
 
 /**
@@ -42,7 +41,7 @@ export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOpti
 
 	const index = list.findIndex((item) => toKey(item) === toKey(itemToToggle));
 
-	const currentList = klona(list);
+	const currentList = [...list];
 
 	if (index === -1) {
 		const strategy = options?.strategy ?? "APPEND";

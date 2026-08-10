@@ -103,19 +103,4 @@ describe("omit", () => {
 		expect(original).toContainKey("foo");
 		expect(original.foo).toBe("bar");
 	});
-
-	test("Deep clones nested values instead of referencing them", () => {
-		const nested = {
-			deep: "value",
-		};
-		const original = {
-			foo: "bar",
-			key: nested,
-		};
-
-		const omitted = omit(original, "foo");
-
-		expect(omitted.key).not.toBe(nested);
-		expect(omitted.key).toEqual(nested);
-	});
 });
