@@ -2,6 +2,8 @@ export * from "./camel";
 export * from "./custom";
 export * from "./http";
 export * from "./kebab";
+export * from "./lower";
 export * from "./pascal";
 export * from "./snake";
 export * from "./title";
+export * from "./upper";
