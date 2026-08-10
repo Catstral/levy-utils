@@ -30,10 +30,10 @@ describe("camelCase", () => {
 		expect(camelCase("hello world")).toBe("helloWorld");
 	});
 
-	test("Splits a run of digits into its own word when splitOnNumbers is true", () => {
+	test("Splits a run of digits into its own word when groupNumbers is true", () => {
 		expect(
 			camelCase("foo123bar", {
-				splitOnNumbers: true,
+				groupNumbers: true,
 			}),
 		).toBe("foo123Bar");
 	});

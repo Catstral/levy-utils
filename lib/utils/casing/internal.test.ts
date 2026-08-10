@@ -34,18 +34,18 @@ describe("splitCasing", () => {
 		expect(splitCasing("foo123bar")).toEqual(["foo123bar"]);
 	});
 
-	test("Keeps a run of digits attached to the previous word when splitOnNumbers is false", () => {
+	test("Keeps a run of digits attached to the previous word when groupNumbers is false", () => {
 		expect(
 			splitCasing("foo123bar", {
-				splitOnNumbers: false,
+				groupNumbers: false,
 			}),
 		).toEqual(["foo123bar"]);
 	});
 
-	test("Splits a run of digits into its own word when splitOnNumbers is true", () => {
+	test("Splits a run of digits into its own word when groupNumbers is true", () => {
 		expect(
 			splitCasing("foo123bar", {
-				splitOnNumbers: true,
+				groupNumbers: true,
 			}),
 		).toEqual(["foo", "123", "bar"]);
 	});
@@ -53,7 +53,7 @@ describe("splitCasing", () => {
 	test("Starts a new word when a run of digits is followed by an uppercase letter", () => {
 		expect(
 			splitCasing("foo123Bar", {
-				splitOnNumbers: true,
+				groupNumbers: true,
 			}),
 		).toEqual(["foo", "123", "Bar"]);
 	});
@@ -61,7 +61,7 @@ describe("splitCasing", () => {
 	test("Starts a new word when a run of digits is at the start of the string", () => {
 		expect(
 			splitCasing("123bar", {
-				splitOnNumbers: true,
+				groupNumbers: true,
 			}),
 		).toEqual(["123", "bar"]);
 	});
@@ -69,7 +69,7 @@ describe("splitCasing", () => {
 	test("A run of digits at the end of the string is its own word", () => {
 		expect(
 			splitCasing("foo123", {
-				splitOnNumbers: true,
+				groupNumbers: true,
 			}),
 		).toEqual(["foo", "123"]);
 	});
@@ -92,5 +92,29 @@ describe("splitCasing", () => {
 
 	test("A single word returns a single-item array", () => {
 		expect(splitCasing("hello")).toEqual(["hello"]);
+	});
+
+	test("Uses a custom parser to split the string when provided", () => {
+		expect(
+			splitCasing("foo.bar.baz", {
+				parser: (str) => str.split("."),
+			}),
+		).toEqual(["foo", "bar", "baz"]);
+	});
+
+	test("Passes the original, untrimmed string to the custom parser", () => {
+		const parser = (str: string) => [str];
+
+		expect(splitCasing("  hello world  ", { parser })).toEqual(["  hello world  "]);
+	});
+
+	test("Ignores other options when a custom parser is provided", () => {
+		expect(
+			splitCasing("foo.bar.baz", {
+				parser: (str) => str.split("."),
+				groupNumbers: true,
+				groupUppercaseLetters: false,
+			}),
+		).toEqual(["foo", "bar", "baz"]);
 	});
 });

@@ -1,22 +1,31 @@
+export type splitCasingParser = (str: string) => string[];
+
 /**
  * @typedef {Object} SplitCasingOptions
- * @prop {boolean} [splitOnNumbers] Whether a run of digits should be split off into its own word
+ * @prop {boolean} [splitOnNumbers] Whether a run of digits should be split off into its own word, or seen as normal characters of the same word
  * @prop {boolean} [groupUppercaseLetters] Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time
+ * @prop {splitCasingParser} [parser] A custom parser to parse a given string into word that are then used for changing the casing of words
  */
 
 export interface SplitCasingOptions {
 	/**
-	 * Whether a run of digits should be split off into its own word.
+	 * Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
 	 *
 	 * @default false
 	 */
-	splitOnNumbers?: boolean;
+	groupNumbers?: boolean;
 	/**
 	 * Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
 	 *
 	 * @default true
 	 */
 	groupUppercaseLetters?: boolean;
+	/**
+	 * A custom parser to parse a given string into word that are then used for changing the casing of words.
+	 *
+	 * If this is defined, all other options are ignored.
+	 */
+	parser?: splitCasingParser;
 }
 
 /**
@@ -41,7 +50,7 @@ export interface SplitCasingOptions {
  * const words = splitCasing("HTTP_server", undefined); // -> ["HTTP", "server"]
  *
  * @example
- * const words = splitCasing("foo123bar", { splitOnNumbers: true }); // -> ["foo", "123", "bar"]
+ * const words = splitCasing("foo123bar", { groupNumbers: true }); // -> ["foo", "123", "bar"]
  *
  * @example
  * const words = splitCasing("foo_bar-baz qux", undefined); // -> ["foo", "bar", "baz", "qux"]
@@ -51,7 +60,11 @@ export interface SplitCasingOptions {
  * @returns {string[]} The words found in the given string, with their original casing preserved
  */
 export function splitCasing(str: string, options?: SplitCasingOptions): string[] {
-	const splitNumbers = options?.splitOnNumbers ?? false;
+	if (options?.parser) {
+		return options.parser(str);
+	}
+
+	const groupNumbers = options?.groupNumbers ?? false;
 	const groupUppercase = options?.groupUppercaseLetters ?? true;
 	const words: string[] = [];
 
@@ -86,7 +99,7 @@ export function splitCasing(str: string, options?: SplitCasingOptions): string[]
 			continue;
 		}
 
-		if (splitNumbers) {
+		if (groupNumbers) {
 			if (numberTest.test(char)) {
 				if (numberTest.test(prevChar)) {
 					currentWord += char;

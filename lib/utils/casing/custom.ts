@@ -26,7 +26,7 @@ export interface CustomCaseOptions extends SplitCasingOptions {
  * transforming each word along the way.
  *
  * This is the building block used by the other casing utilities (`camelCase`, `kebabCase`, `pascalCase`, `snakeCase`,
- * `titleCase`, and `httpHeaderCase`).
+ * `titleCase`, `httpHeaderCase`, etc.), That also means that those casing options should be used instead most of the time.
  *
  * The time complexity for this is `O(n)` where `n` is the length of the given string.
  *

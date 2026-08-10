@@ -60,7 +60,7 @@ describe("customCase", () => {
 		expect(
 			customCase("foo123bar", {
 				seperator: "-",
-				splitOnNumbers: true,
+				groupNumbers: true,
 				transform: (word) => word,
 			}),
 		).toBe("foo-123-bar");
