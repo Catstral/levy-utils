@@ -18,6 +18,7 @@ export * from "./utils/parseUrlParams";
 export * from "./utils/pick";
 export * from "./utils/range";
 export * from "./utils/retry";
+export * from "./utils/select";
 export * from "./utils/sift";
 export * from "./utils/sleep";
 export * from "./utils/slug";
