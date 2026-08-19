@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { capitalize } from "./capitlize";
+import { capitalize } from "./capitalize";
 
-describe("capitlize", () => {
+describe("capitalize", () => {
 	test("Converts a string", () => {
 		expect(capitalize("hello world")).toBe("Hello world");
 	});

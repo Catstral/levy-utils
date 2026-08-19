@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { uncapitalize } from "./uncapitlize";
+import { uncapitalize } from "./uncapitalize";
 
-describe("upperuncapitlizeCase", () => {
+describe("uncapitilize", () => {
 	test("Converts a string", () => {
 		expect(uncapitalize("Hello World")).toBe("hello World");
 	});
