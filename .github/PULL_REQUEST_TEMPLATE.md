@@ -3,6 +3,7 @@
 - [ ] New utility / feature
 - [ ] Breaking change
 - [ ] Documentation
+- [ ] Refactor / Readability imrovements
 - [ ] Chores / tooling changes
 
 ## Checklist
