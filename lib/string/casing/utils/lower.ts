@@ -7,9 +7,9 @@
  * const str = lowerCase("Hello World"); // -> "hello world"
  *
  * @template {string} T
- * @param {T} value
+ * @param {T} str
  * @returns {Lowercase<T>}
  */
-export function lowerCase<const T extends string>(value: T): Lowercase<T> {
-	return value.toLowerCase() as Lowercase<T>;
+export function lowerCase<const T extends string>(str: T): Lowercase<T> {
+	return str.toLowerCase() as Lowercase<T>;
 }

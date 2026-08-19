@@ -7,9 +7,9 @@
  * const str = uncapitalize("Hello world"); // -> "hello world"
  *
  * @template {string} T
- * @param {T} value
+ * @param {T} str
  * @returns {Uncapitalize<T>}
  */
-export function uncapitalize<const T extends string>(value: T): Uncapitalize<T> {
-	return `${value.slice(0, 1).toLowerCase()}${value.slice(1)}` as Uncapitalize<T>;
+export function uncapitalize<const T extends string>(str: T): Uncapitalize<T> {
+	return `${str.slice(0, 1).toLowerCase()}${str.slice(1)}` as Uncapitalize<T>;
 }

@@ -7,9 +7,9 @@
  * const str = upperCase("Hello World"); // -> "HELLO WORLD"
  *
  * @template {string} T
- * @param {T} value
+ * @param {T} str
  * @returns {Uppercase<T>}
  */
-export function upperCase<const T extends string>(value: T): Uppercase<T> {
-	return value.toUpperCase() as Uppercase<T>;
+export function upperCase<const T extends string>(str: T): Uppercase<T> {
+	return str.toUpperCase() as Uppercase<T>;
 }
