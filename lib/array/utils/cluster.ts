@@ -1,9 +1,7 @@
-import { UtilError } from "~/error";
+import { UtilError } from "~/index";
 
 export class ClusterUtilError extends UtilError {
-	public get util(): "cluster" {
-		return "cluster";
-	}
+	public readonly util = "cluster";
 }
 
 /**

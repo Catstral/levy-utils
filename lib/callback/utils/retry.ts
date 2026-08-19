@@ -1,11 +1,7 @@
-import type { Promisable } from "~/types";
-import { UtilError } from "..";
-import { sleep } from "./sleep";
+import { type Promisable, sleep, UtilError } from "~/index";
 
 export class RetryUtilError extends UtilError {
-	public get util(): "retry" {
-		return "retry";
-	}
+	public readonly util = "retry";
 }
 
 // TODO: Write docs

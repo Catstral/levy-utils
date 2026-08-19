@@ -1,4 +1,4 @@
-import { type SplitCasingOptions, splitCasing } from "./internal";
+import { type SplitCasingOptions, splitCasing } from "../internal/splitCasing";
 
 /**
  * @typedef {Object} CustomCaseOptions

@@ -1,10 +1,7 @@
-import { UtilError } from "..";
-import { type Computable, compute } from "./compute";
+import { type Computable, compute, UtilError } from "~/index";
 
 export class ListUtilError extends UtilError {
-	public get util(): "list" {
-		return "list";
-	}
+	public readonly util = "list";
 }
 
 /**

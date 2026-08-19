@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Integer } from "./toInt";
-import { toInt } from "./toInt";
+import { type Integer, toInt } from "./toInt";
 
 describe.concurrent("toInt", () => {
 	describe.concurrent("Booleans", () => {

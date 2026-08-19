@@ -1,10 +1,7 @@
-import { UtilError } from "..";
-import { type Computable, compute } from "./compute";
+import { type Computable, compute, UtilError } from "~/index";
 
 export class RangeUtilError extends UtilError {
-	public get util(): "range" {
-		return "range";
-	}
+	public readonly util = "range";
 }
 
 /**

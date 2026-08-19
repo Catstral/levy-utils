@@ -1,5 +1,5 @@
-import { customCase } from "./custom";
-import type { SplitCasingOptions } from "./internal";
+import { customCase } from "~/index";
+import type { SplitCasingOptions } from "../internal/splitCasing";
 
 /**
  * @typedef {Object} HttpHeaderCaseOptions

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { splitCasing } from "./internal";
+import { splitCasing } from "./splitCasing";
 
 describe("splitCasing", () => {
 	test("Splits on whitespace", () => {
