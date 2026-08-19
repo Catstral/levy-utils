@@ -13,7 +13,9 @@ export interface CamelCaseOptions extends SplitCasingOptions {}
  * The first word is lowercased, every following word has its first letter uppercased with the rest lowercased, and
  * words are joined together with no separator.
  *
- * The time complexity for this is `O(n)` where `n` is the length of the given string.
+ * The time complexity for this is `O(n + m)` where:
+ * - `n` is the length of the given string.
+ * - `m` is the amount of words in `n`.
  *
  * @example
  * const str = camelCase("hello world"); // -> "helloWorld"

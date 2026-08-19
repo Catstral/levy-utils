@@ -28,7 +28,9 @@ export interface CustomCaseOptions extends SplitCasingOptions {
  * This is the building block used by the other casing utilities (`camelCase`, `kebabCase`, `pascalCase`, `snakeCase`,
  * `titleCase`, `httpHeaderCase`, etc.), That also means that those casing options should be used instead most of the time.
  *
- * The time complexity for this is `O(n)` where `n` is the length of the given string.
+ * The time complexity for this is `O(n + m)` where:
+ * - `n` is the length of the given string.
+ * - `m` is the amount of words in `n`.
  *
  * @example
  * const str = customCase("hello world", { seperator: "-", transform: (word) => word.toUpperCase() }); // -> "HELLO-WORLD"
@@ -42,6 +44,15 @@ export interface CustomCaseOptions extends SplitCasingOptions {
  */
 export function customCase(str: string, options: CustomCaseOptions): string {
 	const words = splitCasing(str, options);
+	const lastIndex = words.length - 1;
 
-	return words.map((word, index) => options.transform(word, index)).join(options.seperator);
+	return words.reduce<string>((acc, word, index) => {
+		acc += options.transform(word, index);
+
+		if (index !== lastIndex) {
+			acc += options.seperator;
+		}
+
+		return acc;
+	}, "");
 }
