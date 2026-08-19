@@ -20,7 +20,9 @@ export interface SnakeCaseOptions extends SplitCasingOptions {
  *
  * Every word is lowercased (or uppercased if `options.screaming` is `true`) and joined together using a `_`.
  *
- * The time complexity for this is `O(n)` where `n` is the length of the given string.
+ * The time complexity for this is `O(n + m)` where:
+ * - `n` is the length of the given string.
+ * - `m` is the amount of words in `n`.
  *
  * @example
  * const str = snakeCase("hello world"); // -> "hello_world"
