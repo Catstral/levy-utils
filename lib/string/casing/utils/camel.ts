@@ -1,5 +1,5 @@
-import { customCase } from "~/index";
 import type { SplitCasingOptions } from "../internal/splitCasing";
+import { customCase } from "./custom";
 
 /**
  * @typedef {Object} CamelCaseOptions

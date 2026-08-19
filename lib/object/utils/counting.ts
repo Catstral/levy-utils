@@ -1,4 +1,4 @@
-import type { Key } from "~/index";
+import type { Key } from "~/types";
 
 /**
  * Reduces a list down to an object of keys (specified using the `identity` param)

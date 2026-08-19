@@ -1,4 +1,4 @@
-import type { Key } from "~/index";
+import type { Key } from "~/types";
 
 /**
  * @typedef {Object} ToggleOptions

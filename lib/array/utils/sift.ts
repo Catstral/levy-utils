@@ -1,4 +1,4 @@
-import type { Falsy } from "~/index";
+import type { Falsy } from "~/types";
 
 /**
  * Turns a list of items into another list of items with all the falsy values filtered out of the list.

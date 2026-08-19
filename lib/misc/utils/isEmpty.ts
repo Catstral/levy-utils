@@ -1,4 +1,4 @@
-import { isObject } from "~/index";
+import { isObject } from "~/object/utils/isObject";
 
 /**
  * Checks if the given value is considered empty.
