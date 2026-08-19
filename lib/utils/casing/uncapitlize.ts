@@ -4,7 +4,7 @@
  * The time complexity for this is `O(n)` where `n` is the length of the given string.
  *
  * @example
- * const str = capitalize("Hello World"); // -> "hello World"
+ * const str = uncapitalize("Hello World"); // -> "hello World"
  *
  * @template {string} T
  * @param {T} value
