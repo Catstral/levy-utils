@@ -117,7 +117,9 @@ describe("list", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(ListUtilError);
 			expect((err as ListUtilError).util).toBe("list");
-			expect((err as ListUtilError).message).toBe("Step cannot be 0, that would cause the list to become infinite");
+			expect((err as ListUtilError).message).toBe(
+				"Step cannot be 0, that would cause the list to become infinite",
+			);
 		}
 	});
 

@@ -349,7 +349,9 @@ describe("range", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(RangeUtilError);
 			expect((err as RangeUtilError).util).toBe("range");
-			expect((err as RangeUtilError).message).toBe("Step cannot be 0, that would cause the range to become infinite");
+			expect((err as RangeUtilError).message).toBe(
+				"Step cannot be 0, that would cause the range to become infinite",
+			);
 		}
 	});
 
