@@ -1,5 +1,5 @@
-# levyUtils
-levyUtils is a lightweight, dependency-light library of common JS/TS utility functions covering everyday needs: array/object manipulation, type checks, async helpers, and value conversion.
+# levy-utils
+levy-utils is a lightweight, dependency-light library of common JS/TS utility functions covering everyday needs: array/object manipulation, type checks, async helpers, and value conversion.
 
 ## How to install
 Install with a package manager
@@ -24,43 +24,54 @@ import { range, sift, toggle } from "levy-utils";
 
 ## Utils
 A list of all the utilities supported:
-- [chain](#chaincallbacks)
-- [cluster](#clusteritems-size)
-- [compute / isComputation](#computevalue-args--iscomputationvalue)
-- [counting](#countinglist-identity)
-- [defer](#defercallback)
-- [entries](#entriesvalue)
-- [fork](#forklist-condition)
-- [isEmpty](#isemptyvalue)
-- [isObject](#isobjectitem)
-- [isPrimitive](#isprimitivevalue)
-- [keys](#keysvalue)
-- [omit](#omitobject-keys)
-- [pick](#pickobject-keys)
-- [parseUrlParams](#parseurlparamsurl-transform)
-- [range](#rangestartorlength-end-options)
-- [retry](#retrycallback-options)
-- [sift](#siftlist)
-- [sleep](#sleepdelay)
-- [slug](#slugtext)
-- [textDifference](#textdifferenceoldvalue-newvalue-options)
-- [toFloat](#tofloatvalue-fallback)
-- [toInt](#tointvalue-fallback)
-- [toggle](#togglelist-itemtotoggle-options)
+- [Array utilities](#array-utilities)
+  - [cluster](#clusteritems-size)
+  - [counting](#countinglist-identity)
+  - [fork](#forklist-condition)
+  - [list](#liststartorlength-end-options)
+  - [select](#selectlist-filter-mapper)
+  - [sift](#siftlist)
+  - [toggle](#togglelist-itemtotoggle-options)
+- [Callback utilities](#callback-utilities)
+  - [chain](#chaincallbacks)
+  - [defer](#defercallback)
+  - [retry](#retrycallback-options)
+- [Miscellaneous utilities](#miscellaneous-utilities)
+  - [compute / isComputation](#computevalue-args--iscomputationvalue)
+  - [isEmpty](#isemptyvalue)
+  - [isPrimitive](#isprimitivevalue)
+  - [range](#rangestartorlength-end-options)
+  - [sleep](#sleepdelay)
+- [Number utilities](#number-utilities)
+  - [toFloat](#tofloatvalue-fallback)
+  - [toInt](#tointvalue-fallback)
+- [Object utilities](#object-utilities)
+  - [entries](#entriesvalue)
+  - [isObject](#isobjectitem)
+  - [keys](#keysvalue)
+  - [omit](#omitobject-keys)
+  - [pick](#pickobject-keys)
+- [String utilities](#string-utilities)
+  - [Casing utilities](#casing-utilities)
+    - [camelCase](#camelcasestr-options)
+    - [capitalize](#capitalizestr)
+    - [customCase](#customcasestr-options)
+    - [httpHeaderCase / trainCase](#httpheadercasestr-options)
+    - [kebabCase](#kebabcasestr-options)
+    - [lowerCase](#lowercasestr)
+    - [pascalCase](#pascalcasestr-options)
+    - [snakeCase](#snakecasestr-options)
+    - [titleCase](#titlecasestr-options)
+    - [uncapitalize](#uncapitalizestr)
+    - [upperCase](#uppercasestr)
+  - [parseUrlParams](#parseurlparamsurl-transform)
+  - [slug](#slugtext)
+  - [textDifference](#textdifferenceoldvalue-newvalue-options)
 
-### `chain(...callbacks)`
-Chains many callbacks together, with each callback accepting the result of the previous one as an argument, returning the result of the final callback.
+<!-- SECTION: Array utils -->
 
-Note: due to a TypeScript limitation, the argument of each chained callback requires a type hint in order to infer the argument correctly (it does not allow passing an invalid argument type however).
-
-```ts
-// note the type hint for the argument
-chain(() => true, (value: boolean) => value ? "true" : "false");
-// Expected output:
-// "true"
-```
-
-### `cluster(items, size)`
+### Array utilities
+#### `cluster(items, size)`
 Clusters a list of items into a list of lists, each limited to a specified size.
 
 ```ts
@@ -69,20 +80,7 @@ cluster([1, 2, 3, 4, 5], 2);
 // [[1, 2], [3, 4], [5]]
 ```
 
-### `compute(value, ...args)` / `isComputation(value)`
-`compute` resolves a `Computable<T>` - either a plain value or a function that produces one - calling it with the given args if it's a function. `isComputation` checks whether a `Computable<T>` is the function variant.
-
-```ts
-compute(5);
-// Expected output:
-// 5
-
-compute((a: number, b: number) => a + b, 2, 3);
-// Expected output:
-// 5
-```
-
-### `counting(list, identity)`
+#### `counting(list, identity)`
 Reduces a list down to an object of keys (as determined by the `identity` callback) mapped to how many times that key occurred.
 
 ```ts
@@ -95,26 +93,7 @@ counting(["a", "b", "a", "c", "a"], (item) => item);
 // }
 ```
 
-### `defer(callback)`
-Defers a callback to the next execution cycle.
-
-```ts
-defer(() => console.log("runs after the current call stack clears"));
-```
-
-### `entries(value)`
-A typed version of `Object.entries`.
-
-```ts
-entries({
-    a: 1,
-    b: "two",
-});
-// Expected output:
-// [["a", 1], ["b", "two"]] (typed as [K, T[K]][])
-```
-
-### `fork(list, condition)`
+#### `fork(list, condition)`
 Splits a list into a tuple of two arrays based on a condition: items that pass, and items that don't.
 
 ```ts
@@ -123,7 +102,147 @@ fork([1, 2, 3, 4], (n) => n % 2 === 0);
 // [[2, 4], [1, 3]]
 ```
 
-### `isEmpty(value)`
+### `list(startOrLength, end?, options?)`
+Returns an array with values to a specified size (inclusive), optionally stepped and/or mapped to another value.
+
+```ts
+list(3)
+// Expected output:
+// [0, 1, 2, 3]
+
+list(0, 3)
+// Expected output:
+// [0, 1, 2, 3]
+
+list(0, 6, {
+    step: 2,
+})
+// Expected output:
+// [0, 2, 4, 6]
+
+list(0, 3, {
+    valueMapper: (step) => `foo-${step}`,
+})
+// Expected output:
+// ["foo-0", "foo-1", "foo-2", "foo-3"]
+```
+
+<!-- TODO -->
+#### `select(list, filter, mapper)`
+Returns a new list of items based on filtered and mapped values of a given list.
+
+#### `sift(list)`
+Filters all falsy values out of a list.
+
+Falsy values are:
+- `false`
+- `0`
+- `0n` (bigint 0)
+- `""`
+- `null`
+- `undefined`
+
+```ts
+sift([1, 0, 2, null, 3, undefined, false]);
+// Expected output:
+// [1, 2, 3]
+```
+
+#### `toggle(list, itemToToggle, options?)`
+Toggles a value in an array: removes it if present, adds it if not.
+
+```ts
+toggle([1, 2, 3], 2);
+// Expected output:
+// [1, 3]
+
+toggle([1, 2, 3], 4);
+// Expected output:
+// [1, 2, 3, 4]
+
+toggle([1, 2, 3], 4, {
+    strategy: "PREPEND",
+});
+// Expected output:
+// [4, 1, 2, 3]
+
+toggle(
+    [{ id: 1 }, { id: 2 }],
+    {
+        id: 1,
+    },
+    {
+        toKey: (item) => item.id,
+    },
+);
+// Expected output:
+// [{ id: 2 }]
+```
+
+Options:
+- `toKey` - maps an item to a key used to determine equality (defaults to comparing items directly)
+- `strategy` - `"APPEND"` or `"PREPEND"`, determines where new items are inserted (default `"APPEND"`)
+
+<!-- !SECTION -->
+<!-- SECTION: Callback utils -->
+
+
+### Callback utilities
+#### `chain(...callbacks)`
+Chains many callbacks together, with each callback accepting the result of the previous one as an argument, returning the result of the final callback.
+
+Note: due to a TypeScript limitation, the argument of each chained callback requires a type hint in order to infer the argument correctly (it does not allow passing an invalid argument type however).
+
+```ts
+// note the type hint for the argument
+chain(() => true, (value: boolean) => value ? "true" : "false");
+// Expected output:
+// "true"
+```
+
+#### `defer(callback)`
+Defers a callback to the next execution cycle.
+
+```ts
+defer(() => console.log("runs after the current call stack clears"));
+```
+
+#### `retry(callback, options?)`
+Retries an async (or sync) callback until it succeeds or the maximum number of attempts is reached.
+
+```ts
+await retry(() => fetchSomething(), {
+    attempts: 5,
+    delay: 500,
+    backoff: true,
+    onRetry: (error, attempt) => console.log(`attempt ${attempt} failed`, error),
+});
+```
+
+Options:
+- `attempts` - maximum number of attempts (default `3`)
+- `delay` - delay between retries in milliseconds (default `1000`)
+- `backoff` - whether to double the delay after each retry (default `false`)
+- `onRetry` - callback invoked with the error and attempt number on each failed attempt
+
+<!-- !SECTION -->
+<!-- SECTION: Misc utils -->
+
+### miscellaneous utilities
+#### `compute(value, ...args)` / `isComputation(value)`
+`compute` resolves a `Computable<T>` - either a plain value or a function that produces one - calling it with the given args if it's a function. `isComputation` checks whether a `Computable<T>` is the function variant.
+
+```ts
+compute(5);
+// Expected output:
+// 5
+
+compute((a: number, b: number) => a + b, 2, 3);
+// Expected output:
+// 5
+```
+
+#### `isEmpty(value)`
 Checks if a value is considered empty.
 
 All values that are considered empty:
@@ -157,20 +276,7 @@ isEmpty({
 // false (the key exists)
 ```
 
-### `isObject(item)`
-Checks if a value is an object, excluding arrays.
-
-```ts
-isObject({});
-// Expected output:
-// true
-
-isObject([]);
-// Expected output:
-// false
-```
-
-### `isPrimitive(value)`
+#### `isPrimitive(value)`
 Checks if a value is a primitive: `string`, `number`, `boolean`, `symbol`, `null`, or `undefined`.
 
 ```ts
@@ -183,105 +289,7 @@ isPrimitive({});
 // false
 ```
 
-### `keys(value)`
-A typed version of `Object.keys`.
-
-```ts
-keys({
-    a: 1,
-    b: 2,
-});
-// Expected output:
-// ["a", "b"] (typed as (keyof T)[])
-```
-
-### `omit(object, keys)`
-Returns a new object with the specified key(s) removed.
-
-```ts
-omit(
-    {
-        a: 1,
-        b: 2,
-        c: 3,
-    },
-    "b",
-);
-// Expected output:
-// {
-//     a: 1,
-//     c: 3
-// }
-
-omit(
-    {
-        a: 1,
-        b: 2,
-        c: 3,
-    },
-    ["a", "c"],
-);
-// Expected output:
-// {
-//     b: 2
-// }
-```
-
-### `pick(object, keys)`
-Returns a new object containing only the specified key(s).
-
-```ts
-pick(
-    {
-        a: 1,
-        b: 2,
-        c: 3,
-    },
-    "b",
-);
-// Expected output:
-// {
-//     b: 2
-// }
-
-pick(
-    {
-        a: 1,
-        b: 2,
-        c: 3,
-    },
-    ["a", "c"],
-);
-// Expected output:
-// {
-//     a: 1,
-//     c: 3
-// }
-```
-
-### `parseUrlParams(url, transform?)`
-Parses the query params of a URL into an object. Optionally accepts a `transform` object to map each param key to a parser function, producing a typed result.
-
-```ts
-parseUrlParams("https://example.com?page=2&active=true");
-// Expected output:
-// {
-//     page: "2",
-//     active: "true"
-// }
-
-parseUrlParams("https://example.com?page=2&active=true", {
-    page: toInt,
-    active: (value) => value === "true",
-});
-// Expected output:
-// {
-//     page: 2,
-//     active: true
-// }
-```
-
-### `range(startOrLength, end?, options?)`
+#### `range(startOrLength, end?, options?)`
 Returns a generator that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
 
 ```ts
@@ -314,42 +322,7 @@ for (const value of range(0, 3, {
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
 ```
 
-### `retry(callback, options?)`
-Retries an async (or sync) callback until it succeeds or the maximum number of attempts is reached.
-
-```ts
-await retry(() => fetchSomething(), {
-    attempts: 5,
-    delay: 500,
-    backoff: true,
-    onRetry: (error, attempt) => console.log(`attempt ${attempt} failed`, error),
-});
-```
-
-Options:
-- `attempts` - maximum number of attempts (default `3`)
-- `delay` - delay between retries in milliseconds (default `1000`)
-- `backoff` - whether to double the delay after each retry (default `false`)
-- `onRetry` - callback invoked with the error and attempt number on each failed attempt
-
-### `sift(list)`
-Filters all falsy values out of a list.
-
-Falsy values are:
-- `false`
-- `0`
-- `0n` (bigint 0)
-- `""`
-- `null`
-- `undefined`
-
-```ts
-sift([1, 0, 2, null, 3, undefined, false]);
-// Expected output:
-// [1, 2, 3]
-```
-
-### `sleep(delay)`
+#### `sleep(delay)`
 Returns a promise that resolves after the specified delay (in milliseconds).
 
 ```ts
@@ -358,7 +331,493 @@ await sleep(1000);
 // waits 1 second
 ```
 
-### `slug(text)`
+<!-- !SECTION -->
+<!-- SECTION: Number utils -->
+
+### Number utilities
+#### `toFloat(value, fallback?)`
+Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
+
+```ts
+toFloat("3.14");
+// Expected output:
+// 3.14
+
+toFloat(true);
+// Expected output:
+// 1
+
+toFloat("not a number", -1);
+// Expected output:
+// -1
+```
+
+#### `toInt(value, fallback?)`
+Converts a value to an integer, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
+
+```ts
+toInt("42");
+// Expected output:
+// 42
+
+toInt(true);
+// Expected output:
+// 1
+
+toInt("not a number", -1);
+// Expected output:
+// -1
+```
+
+<!-- !SECTION -->
+<!-- SECTION: object -->
+
+### Object utilities
+#### `entries(value)`
+A typed version of `Object.entries`.
+
+```ts
+entries({
+    a: 1,
+    b: "two",
+});
+// Expected output:
+// [["a", 1], ["b", "two"]] (typed as [K, T[K]][])
+```
+
+#### `isObject(item)`
+Checks if a value is an object, excluding arrays.
+
+```ts
+isObject({});
+// Expected output:
+// true
+
+isObject([]);
+// Expected output:
+// false
+```
+
+#### `keys(value)`
+A typed version of `Object.keys`.
+
+```ts
+keys({
+    a: 1,
+    b: 2,
+});
+// Expected output:
+// ["a", "b"] (typed as (keyof T)[])
+```
+
+#### `omit(object, keys)`
+Returns a new object with the specified key(s) removed.
+
+```ts
+omit(
+    {
+        a: 1,
+        b: 2,
+        c: 3,
+    },
+    "b",
+);
+// Expected output:
+// {
+//     a: 1,
+//     c: 3
+// }
+
+omit(
+    {
+        a: 1,
+        b: 2,
+        c: 3,
+    },
+    ["a", "c"],
+);
+// Expected output:
+// {
+//     b: 2
+// }
+```
+
+#### `pick(object, keys)`
+Returns a new object containing only the specified key(s).
+
+```ts
+pick(
+    {
+        a: 1,
+        b: 2,
+        c: 3,
+    },
+    "b",
+);
+// Expected output:
+// {
+//     b: 2
+// }
+
+pick(
+    {
+        a: 1,
+        b: 2,
+        c: 3,
+    },
+    ["a", "c"],
+);
+// Expected output:
+// {
+//     a: 1,
+//     c: 3
+// }
+```
+
+<!-- !SECTION -->
+<!-- SECTION: String utils -->
+
+### String utilities
+#### Casing utilities
+##### `camelCase(str, options?)`
+Turns a string into a camel cased version of that same string.
+
+```ts
+camelCase("Some value");
+// Expected output:
+// "someValue"
+
+camelCase("someValue");
+// Expected output:
+// "someValue"
+
+camelCase("some_value");
+// Expected output:
+// "someValue"
+
+camelCase("some 123 value");
+// Expected output:
+// "some123value"
+
+camelCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some123Value"
+
+camelCase("someUPPERValue");
+// Expected output:
+// "someUpperValue"
+
+camelCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "someUPPERValue"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `capitalize(str)`
+Converts the first character of string to uppercase.
+
+```ts
+capitalize("some value");
+// Expected output:
+// "Some value"
+```
+
+##### `customCase(str, options)`
+Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
+
+> NOTE:  
+  This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
+
+```ts
+customCase("someValue", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "some.value"
+
+customCase("someValue", {
+    seperator: ".",
+    transform: (str, index) => `${str.toLowercase()}${index}`,
+});
+// Expected output:
+// "some0.value1"
+
+customCase("someValue123", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "some.value123"
+
+customCase("someValue123", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+    groupNumbers: true,
+});
+// Expected output:
+// "some.value.123"
+
+customCase("HTTP", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "http"
+
+customCase("HTTPServer", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+});
+// Expected output:
+// "http.server"
+
+customCase("HTTP", {
+    seperator: ".",
+    transform: (str) => str.toLowercase(),
+    groupUppercaseLetters: false,
+});
+// Expected output:
+// "h.t.t.p"
+```
+
+Options:
+- `seperator` (required) - The seperator to use when combining the words back together
+- `transform` (required) - a function that is given the current word + the index of that word and transforms it into a string that is then used for the output
+- `groupNumbers` - A flag for whether numbers should be grouped into it's own word, or if it should be appended into the current word. (default `false`)
+- `groupUppercaseLetters` - A flag for whether multiple consecutive uppercase letters are considered their own word, or part of the current word. Do note that if this is false then uppercase letters are still considered word terminators, closing the current word and starting a new one, turning `HTTP` into `["H", "T", "T", "P"]` for example (default `true`)
+- `parser` - A function that is given the entire string and expected to parse it into the words. This is here just in case the build in parser does not satisfy your use case. If this is defined, the other options meant for parsing (`groupNumbers` and `groupUppercaseLetters`) are ignored as this function is expected to handle this behavior itself
+
+> The default word parser uses a regex to determine the characters casing and splits the given string into words, those words are by default the entire word until a new uppercase letter or spacing character (using `/[\s-_]/` regex) is found. By default it tries to group all uppercase letters until a lowercase letter is found, if that is found then the character before that character is assumed to belong to new lowercase letter.
+
+##### `httpHeaderCase(str, options?)`
+Turns a string into a http header cased version of that same string.
+
+> This is also aliased to `trainCase`
+
+```ts
+httpHeaderCase("Some value");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("someValue");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("some_value");
+// Expected output:
+// "Some-Value"
+
+httpHeaderCase("some 123 value");
+// Expected output:
+// "Some-123value"
+
+httpHeaderCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some-123-Value"
+
+httpHeaderCase("someUPPERValue");
+// Expected output:
+// "Some-Upper-Value"
+
+httpHeaderCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "Some-U-P-P-E-R-Value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `kebabCase(str, options?)`
+Turns a string into a kebab cased version of that same string.
+
+```ts
+kebabCase("Some value");
+// Expected output:
+// "some-value"
+
+kebabCase("someValue");
+// Expected output:
+// "some-value"
+
+kebabCase("some_value");
+// Expected output:
+// "some-value"
+
+kebabCase("some 123 value");
+// Expected output:
+// "some-123value"
+
+kebabCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some-123-value"
+
+kebabCase("someUPPERValue");
+// Expected output:
+// "some-upper-value"
+
+kebabCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "some-u-p-p-e-r-value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `lowerCase(str)`
+Converts a string to lowercase.
+
+```ts
+lowerCase("SOME VALUE");
+// Expected output:
+// "some value"
+```
+
+##### `pascalCase(str, options?)`
+Turns a string into a pascal cased version of that same string.
+
+```ts
+pascalCase("Some value");
+// Expected output:
+// "SomeValue"
+
+pascalCase("someValue");
+// Expected output:
+// "SomeValue"
+
+pascalCase("some_value");
+// Expected output:
+// "SomeValue"
+
+pascalCase("some 123 value");
+// Expected output:
+// "Some123value"
+
+pascalCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some123Value"
+
+pascalCase("someUPPERValue");
+// Expected output:
+// "SomeUpperValue"
+
+pascalCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "SomeUPPERValue"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `snakeCase(str, options?)`
+Turns a string into a snake cased version of that same string.
+
+```ts
+snakeCase("Some value");
+// Expected output:
+// "some_value"
+
+snakeCase("someValue");
+// Expected output:
+// "some_value"
+
+snakeCase("some-value");
+// Expected output:
+// "some_value"
+
+snakeCase("some 123 value");
+// Expected output:
+// "some_123value"
+
+snakeCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "some_123_value"
+
+snakeCase("someUPPERValue");
+// Expected output:
+// "some_upper_value"
+
+snakeCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "some_u_p_p_e_r_value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `titleCase(str, options?)`
+Turns a string into a title cased version of that same string.
+
+```ts
+titleCase("Some_value");
+// Expected output:
+// "Some Value"
+
+titleCase("someValue");
+// Expected output:
+// "Some Value"
+
+titleCase("some_value");
+// Expected output:
+// "Some Value"
+
+titleCase("some 123 value");
+// Expected output:
+// "Some 123value"
+
+titleCase("some 123 value", { groupNumbers: true });
+// Expected output:
+// "Some 123 Value"
+
+titleCase("someUPPERValue");
+// Expected output:
+// "Some Upper Value"
+
+titleCase("someUPPERValue", { groupUppercaseLetters: false });
+// Expected output:
+// "Some U P P E R Value"
+```
+
+> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### `uncapitalize(str)`
+Converts the first character of string to lowercase.
+
+```ts
+uncapitalize("Some value");
+// Expected output:
+// "some value"
+```
+
+##### `upperCase(str)`
+Converts a string to UPPERCASE.
+
+```ts
+upperCase("some value");
+// Expected output:
+// "SOME VALUE"
+```
+
+#### `parseUrlParams(url, transform?)`
+Parses the query params of a URL into an object. Optionally accepts a `transform` object to map each param key to a parser function, producing a typed result.
+
+```ts
+parseUrlParams("https://example.com?page=2&active=true");
+// Expected output:
+// {
+//     page: "2",
+//     active: "true"
+// }
+
+parseUrlParams("https://example.com?page=2&active=true", {
+    page: toInt,
+    active: (value) => value === "true",
+});
+// Expected output:
+// {
+//     page: 2,
+//     active: true
+// }
+```
+
+#### `slug(text)`
 Converts a string into a URL-friendly slug.
 
 ```ts
@@ -367,7 +826,7 @@ slug("Hello, World!");
 // "hello-world"
 ```
 
-### `textDifference(oldValue, newValue, options?)`
+#### `textDifference(oldValue, newValue, options?)`
 Diffs two strings and returns either a constructed string with configurable wrapper tags around each changed part, or a list of raw diff nodes (`{ type, content, context }`).
 
 Do note that the context for the diff nodes is always `UNKNOWN` if the `htmlAware` option isn't true.
@@ -446,356 +905,8 @@ Options:
 - `htmlAware` - diffs HTML structurally instead of as plain text (default `false`)
 - `raw` - when `true`, returns the raw list of diff nodes instead of a constructed string (default `false`)
 - `tags` - customizes the wrapper tags used around `equal`/`insert`/`delete` content when constructing into a string. Each can be a single string (used as both the opening and closing tag) or a `[open, close]` tuple. When `htmlAware` is `true`, `tags` can instead be split into `inlineContext`/`blockContext` to use different wrappers for inline versus block-level HTML changes.  
-	By default it will use no tags for `equal`.  
-	for `insert` it will use `<span data-diff="insert">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="insert">` for opening and `</div>` for closing instead).  
-	for `delete` it will use `<span data-diff="delete">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="delete">` for opening and `</div>` for closing instead).
-
-### `toFloat(value, fallback?)`
-Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
-
-```ts
-toFloat("3.14");
-// Expected output:
-// 3.14
-
-toFloat(true);
-// Expected output:
-// 1
-
-toFloat("not a number", -1);
-// Expected output:
-// -1
-```
-
-### `toInt(value, fallback?)`
-Converts a value to an integer, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
-
-```ts
-toInt("42");
-// Expected output:
-// 42
-
-toInt(true);
-// Expected output:
-// 1
-
-toInt("not a number", -1);
-// Expected output:
-// -1
-```
-
-### `toggle(list, itemToToggle, options?)`
-Toggles a value in an array: removes it if present, adds it if not.
-
-```ts
-toggle([1, 2, 3], 2);
-// Expected output:
-// [1, 3]
-
-toggle([1, 2, 3], 4);
-// Expected output:
-// [1, 2, 3, 4]
-
-toggle([1, 2, 3], 4, {
-    strategy: "PREPEND",
-});
-// Expected output:
-// [4, 1, 2, 3]
-
-toggle(
-    [{ id: 1 }, { id: 2 }],
-    {
-        id: 1,
-    },
-    {
-        toKey: (item) => item.id,
-    },
-);
-// Expected output:
-// [{ id: 2 }]
-```
-
-Options:
-- `toKey` - maps an item to a key used to determine equality (defaults to comparing items directly)
-- `strategy` - `"APPEND"` or `"PREPEND"`, determines where new items are inserted (default `"APPEND"`)
-
-### Casing utils
-#### `camelCase(str, options?)`
-Turns a string into a camel cased version of that same string.
-
-```ts
-camelCase("Some value");
-// Expected output:
-// "someValue"
-
-camelCase("someValue");
-// Expected output:
-// "someValue"
-
-camelCase("some_value");
-// Expected output:
-// "someValue"
-
-camelCase("some 123 value");
-// Expected output:
-// "some123value"
-
-camelCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "some123Value"
-
-camelCase("someUPPERValue");
-// Expected output:
-// "someUpperValue"
-
-camelCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "someUPPERValue"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
-
-#### `customCase(str, options)`
-Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
-
-> NOTE:  
-  This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
-
-```ts
-customCase("someValue", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-});
-// Expected output:
-// "some.value"
-
-customCase("someValue", {
-	seperator: ".",
-	transform: (str, index) => `${str.toLowercase()}${index}`,
-});
-// Expected output:
-// "some0.value1"
-
-customCase("someValue123", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-});
-// Expected output:
-// "some.value123"
-
-customCase("someValue123", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-	groupNumbers: true,
-});
-// Expected output:
-// "some.value.123"
-
-customCase("HTTP", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-});
-// Expected output:
-// "http"
-
-customCase("HTTPServer", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-});
-// Expected output:
-// "http.server"
-
-customCase("HTTP", {
-	seperator: ".",
-	transform: (str) => str.toLowercase(),
-	groupUppercaseLetters: false,
-});
-// Expected output:
-// "h.t.t.p"
-```
-
-Options:
-- `seperator` (required) - The seperator to use when combining the words back together
-- `transform` (required) - a function that is given the current word + the index of that word and transforms it into a string that is then used for the output
-- `groupNumbers` - A flag for whether numbers should be grouped into it's own word, or if it should be appended into the current word. (default `false`)
-- `groupUppercaseLetters` - A flag for whether multiple consecutive uppercase letters are considered their own word, or part of the current word. Do note that if this is false then uppercase letters are still considered word terminators, closing the current word and starting a new one, turning `HTTP` into `["H", "T", "T", "P"]` for example (default `true`)
-- `parser` - A function that is given the entire string and expected to parse it into the words. This is here just in case the build in parser does not satisfy your use case. If this is defined, the other options meant for parsing (`groupNumbers` and `groupUppercaseLetters`) are ignored as this function is expected to handle this behavior itself
-
-> The default word parser uses a regex to determine the characters casing and splits the given string into words, those words are by default the entire word until a new uppercase letter or spacing character (using `/[\s-_]/` regex) is found. By default it tries to group all uppercase letters until a lowercase letter is found, if that is found then the character before that character is assumed to belong to new lowercase letter.
-
-#### httpHeaderCase(str, options?)
-Turns a string into a http header cased version of that same string.
-
-> This is also aliased to `trainCase`
-
-```ts
-httpHeaderCase("Some value");
-// Expected output:
-// "Some-Value"
-
-httpHeaderCase("someValue");
-// Expected output:
-// "Some-Value"
-
-httpHeaderCase("some_value");
-// Expected output:
-// "Some-Value"
-
-httpHeaderCase("some 123 value");
-// Expected output:
-// "Some-123value"
-
-httpHeaderCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "Some-123-Value"
-
-httpHeaderCase("someUPPERValue");
-// Expected output:
-// "Some-Upper-Value"
-
-httpHeaderCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "Some-U-P-P-E-R-Value"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
-
-#### kebabCase(str, options?)
-Turns a string into a kebab cased version of that same string.
-
-```ts
-kebabCase("Some value");
-// Expected output:
-// "some-value"
-
-kebabCase("someValue");
-// Expected output:
-// "some-value"
-
-kebabCase("some_value");
-// Expected output:
-// "some-value"
-
-kebabCase("some 123 value");
-// Expected output:
-// "some-123value"
-
-kebabCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "some-123-value"
-
-kebabCase("someUPPERValue");
-// Expected output:
-// "some-upper-value"
-
-kebabCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "some-u-p-p-e-r-value"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
-
-#### pascalCase(str, options?)
-Turns a string into a pascal cased version of that same string.
-
-```ts
-pascalCase("Some value");
-// Expected output:
-// "SomeValue"
-
-pascalCase("someValue");
-// Expected output:
-// "SomeValue"
-
-pascalCase("some_value");
-// Expected output:
-// "SomeValue"
-
-pascalCase("some 123 value");
-// Expected output:
-// "Some123value"
-
-pascalCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "Some123Value"
-
-pascalCase("someUPPERValue");
-// Expected output:
-// "SomeUpperValue"
-
-pascalCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "SomeUPPERValue"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
-
-#### snakeCase(str, options?)
-Turns a string into a snake cased version of that same string.
-
-```ts
-snakeCase("Some value");
-// Expected output:
-// "some_value"
-
-snakeCase("someValue");
-// Expected output:
-// "some_value"
-
-snakeCase("some-value");
-// Expected output:
-// "some_value"
-
-snakeCase("some 123 value");
-// Expected output:
-// "some_123value"
-
-snakeCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "some_123_value"
-
-snakeCase("someUPPERValue");
-// Expected output:
-// "some_upper_value"
-
-snakeCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "some_u_p_p_e_r_value"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
-
-#### titleCase(str, options?)
-Turns a string into a title cased version of that same string.
-
-```ts
-titleCase("Some_value");
-// Expected output:
-// "Some Value"
-
-titleCase("someValue");
-// Expected output:
-// "Some Value"
-
-titleCase("some_value");
-// Expected output:
-// "Some Value"
-
-titleCase("some 123 value");
-// Expected output:
-// "Some 123value"
-
-titleCase("some 123 value", { groupNumbers: true });
-// Expected output:
-// "Some 123 Value"
-
-titleCase("someUPPERValue");
-// Expected output:
-// "Some Upper Value"
-
-titleCase("someUPPERValue", { groupUppercaseLetters: false });
-// Expected output:
-// "Some U P P E R Value"
-```
-
-> The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+  By default it will use no tags for `equal`.  
+  for `insert` it will use `<span data-diff="insert">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="insert">` for opening and `</div>` for closing instead).  
+  for `delete` it will use `<span data-diff="delete">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="delete">` for opening and `</div>` for closing instead).
+
+<!-- !SECTION -->
