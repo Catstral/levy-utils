@@ -1,25 +1,25 @@
-# levy-utils
-levy-utils is a lightweight, dependency-light library of common JS/TS utility functions covering everyday needs: array/object manipulation, type checks, async helpers, and value conversion.
+# @catstral/levy-utils
+@catstral/levy-utils is a lightweight, dependency-light library of common JS/TS utility functions covering everyday needs: array/object manipulation, type checks, async helpers, and value conversion.
 
 ## How to install
 Install with a package manager
 ```bash
 # using npm
-npm install levy-utils
+npm install @catstral/levy-utils
 
 # using yarn
-yarn add levy-utils
+yarn add @catstral/levy-utils
 
 # using pnpm
-pnpm add levy-utils
+pnpm add @catstral/levy-utils
 
 # using bun
-bun add levy-utils
+bun add @catstral/levy-utils
 ```
 
 ## Usage
 ```ts
-import { range, sift, toggle } from "levy-utils";
+import { range, sift, toggle } from "@catstral/levy-utils";
 ```
 
 ## Utils
