@@ -1,6 +1,5 @@
 /**
- * Presets the parameters of a callback, either to a fixed set of arguments
- * or a callback that computes the arguments from a new set of arguments.
+ * Presets the parameters of a callback with a callback that computes its arguments.
  *
  * The time complexity for this is `O(1)`.
  *
