@@ -5,7 +5,7 @@ export type Extend<T extends Record<Key, unknown>, U extends Partial<T> | Record
 /**
  * Extends an object with another object.
  *
- * The time complexity for this is `O(n)` where `n` is the amount of keys in `other`.
+ * The time complexity for this is `O(n * m)` where `n` is the amount of keys in `other`.
  *
  * @template {Record<Key, unknown>} T
  * @template {Partial<T> & Record<Key, unknown>} U
@@ -17,8 +17,15 @@ export function extend<const T extends Record<Key, unknown>, const U extends Par
 	value: T,
 	other: U,
 ): Extend<T, U> {
-	return {
-		...value,
-		...other,
-	} as Extend<T, U>;
+	const result: Extend<T, U> = Object.create(
+		Object.getPrototypeOf(value),
+		Object.getOwnPropertyDescriptors(value),
+	);
+
+	Object.defineProperties(
+		result,
+		Object.getOwnPropertyDescriptors(other),
+	);
+
+	return result;
 }
