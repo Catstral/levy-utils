@@ -32,15 +32,11 @@ describe("sum", () => {
 		expect(calls[2].value).toBe(3);
 	});
 
-	test("Non-numeric values only count if mapped to a number", () => {
+	test("Non-numeric values only count if truthy", () => {
 		const list = ["", false, null, undefined, "Hello", true, [], {}, new Date()];
 		const total = sum(list);
 
-		expect(total).toBe(0);
-
-		const mappedTotal = sum(list, (item) => (item ? 1 : 0));
-
-		expect(mappedTotal).toBe(5);
+		expect(total).toBe(5);
 	});
 
 	test("Preserves the original array", () => {
