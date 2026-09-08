@@ -64,14 +64,10 @@ export function compose<const T extends ComposeEntry[]>(
 	...callbacks: Compose<T>
 ): (...args: ComposeParameters<T>) => ComposeResult<T> {
 	return (...args: ComposeParameters<T>): ComposeResult<T> => {
-		let value: unknown;
-
-		for (const [index, callback] of callbacks.entries()) {
+		return callbacks.reduce<unknown>((acc, callback, index) => {
 			const step = callback as (...args: unknown[]) => unknown;
 
-			value = index === 0 ? step(...(args as unknown[])) : step(value);
-		}
-
-		return value as ComposeResult<T>;
+			return index === 0 ? step(...(args as unknown[])) : step(acc)
+		}, undefined) as ComposeResult<T>;
 	};
 }
