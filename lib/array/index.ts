@@ -4,4 +4,5 @@ export * from "./utils/fork";
 export * from "./utils/list";
 export * from "./utils/select";
 export * from "./utils/sift";
+export * from "./utils/sum";
 export * from "./utils/toggle";
