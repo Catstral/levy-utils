@@ -17,15 +17,9 @@ export function extend<const T extends Record<Key, unknown>, const U extends Par
 	value: T,
 	other: U,
 ): Extend<T, U> {
-	const result: Extend<T, U> = Object.create(
-		Object.getPrototypeOf(value),
-		Object.getOwnPropertyDescriptors(value),
-	);
+	const result: Extend<T, U> = Object.create(Object.getPrototypeOf(value), Object.getOwnPropertyDescriptors(value));
 
-	Object.defineProperties(
-		result,
-		Object.getOwnPropertyDescriptors(other),
-	);
+	Object.defineProperties(result, Object.getOwnPropertyDescriptors(other));
 
 	return result;
 }
