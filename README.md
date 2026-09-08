@@ -31,22 +31,28 @@ A list of all the utilities supported:
   - [list](#liststartorlength-end-options)
   - [select](#selectlist-filter-mapper)
   - [sift](#siftlist)
+  - [sum](#sumlist-mapper)
   - [toggle](#togglelist-itemtotoggle-options)
 - [Callback utilities](#callback-utilities)
   - [chain](#chaincallbacks)
+  - [compose](#composecallbacks)
   - [defer](#defercallback)
+  - [preset](#presetcallback-parameters)
   - [retry](#retrycallback-options)
 - [Miscellaneous utilities](#miscellaneous-utilities)
   - [compute / isComputation](#computevalue-args--iscomputationvalue)
   - [isEmpty](#isemptyvalue)
   - [isPrimitive](#isprimitivevalue)
+  - [match](#matchvalue-clause-fallback)
   - [range](#rangestartorlength-end-options)
   - [sleep](#sleepdelay)
+  - [values](#valuestarget)
 - [Number utilities](#number-utilities)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
 - [Object utilities](#object-utilities)
   - [entries](#entriesvalue)
+  - [extend](#extendvalue-other)
   - [isObject](#isobjectitem)
   - [keys](#keysvalue)
   - [omit](#omitobject-keys)
@@ -148,6 +154,27 @@ sift([1, 0, 2, null, 3, undefined, false]);
 // [1, 2, 3]
 ```
 
+#### `sum(list, mapper?)`
+Sums a list of items into a total number.
+
+```ts
+sum([1, 2, 3]);
+// Expected output:
+// 6
+
+sum([1, 2, 3], (n) => n * 2);
+// Expected output:
+// 12
+
+sum([false, true, "", "Hello", null, {}, undefined, []]);
+// Expected output:
+// 4
+
+sum(["3", "4", "5"], (item) => Number.parseInt(item, 10));
+// Expected output:
+// 12
+```
+
 #### `toggle(list, itemToToggle, options?)`
 Toggles a value in an array: removes it if present, adds it if not.
 
@@ -200,11 +227,47 @@ chain(() => true, (value: boolean) => value ? "true" : "false");
 // "true"
 ```
 
+#### `compose(...callbacks)`
+Turns many callbacks into a single re-usable callback.
+
+```ts
+const fn = compose(
+    (n: number) => n + 1,
+    (n: number) => n * 2,
+);
+
+fn(2);
+// Expected output:
+// 6
+
+fn(5);
+// Expected output:
+// 12
+```
+
 #### `defer(callback)`
 Defers a callback to the next execution cycle.
 
 ```ts
 defer(() => console.log("runs after the current call stack clears"));
+```
+
+#### `preset(callback, parameters)`
+Presets the parameters of a callback with a callback that computes its arguments.
+
+```ts
+const fn = preset(
+    Number.parseInt,
+    (value: string): [string, number] => [value, 10],
+);
+
+fn("10");
+// Expected output:
+// 10
+
+fn("3.2");
+// Expected output:
+// 3
 ```
 
 #### `retry(callback, options?)`
@@ -289,6 +352,35 @@ isPrimitive({});
 // false
 ```
 
+#### `match(value, clause, fallback?)`
+Matches a value to a clause that return a value
+and returns a fallback if none of the cases match.
+
+```ts
+const fn = (value: string) => {
+	return match(
+		value,
+		{
+			A: 1,
+			B: 2,
+		},
+		-1
+	);
+};
+
+fn("A");
+// Expected output:
+// 1
+
+fn("B");
+// Expected output:
+// 2
+
+fn("C");
+// Expected output:
+// -1
+```
+
 #### `range(startOrLength, end?, options?)`
 Returns a generator that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
 
@@ -329,6 +421,35 @@ Returns a promise that resolves after the specified delay (in milliseconds).
 await sleep(1000);
 // Expected output:
 // waits 1 second
+```
+
+#### `values(target)`
+Returns an array of values based on the given target.
+
+```ts
+values([1, 2, 3]);
+// Expected output:
+// [1, 2, 3]
+
+values(new Set([4, 5, 6]));
+// Expected output:
+// [4, 5, 6]
+
+values({
+  A: "a",
+  B: "b",
+  C: "c",
+});
+// Expected output:
+// ["a", "b", "c"]
+
+values(new Map([
+  ["D", "d"],
+  ["E", "e"],
+  ["F", "f"],
+]));
+// Expected output:
+// ["d", "e", "f"]
 ```
 
 <!-- !SECTION -->
@@ -383,6 +504,25 @@ entries({
 });
 // Expected output:
 // [["a", 1], ["b", "two"]] (typed as [K, T[K]][])
+```
+
+#### `extend(value, other)`
+Extends an object with another object.
+
+```ts
+extend(
+    {
+        key: "value",
+    },
+    {
+        foo: "bar",
+    },
+);
+// Expected output:
+// {
+//     key: "value",
+//     foo: "bar",
+// }
 ```
 
 #### `isObject(item)`
