@@ -1,4 +1,5 @@
 export * from "./utils/cluster";
+export * from "./utils/concat";
 export * from "./utils/counting";
 export * from "./utils/fork";
 export * from "./utils/list";
