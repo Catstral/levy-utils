@@ -1,6 +1,8 @@
 import { describe, expect, mock, test } from "bun:test";
 import { RangeUtilError, range } from ".";
 
+// TODO: update test that expect a generator + add new tests for new functionality
+
 describe("range", () => {
 	test("Simple range", () => {
 		const fn = mock((i) => i);
