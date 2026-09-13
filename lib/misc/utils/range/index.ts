@@ -61,6 +61,28 @@ export class Range<const T = number> {
 		}
 	}
 
+	public get details() {
+		const startValue = this.#start;
+		const endValue = this.#end;
+		const stepValue = this.#step;
+		const mapperValue = this.#mapper;
+
+		return {
+			get start() {
+				return startValue;
+			},
+			get end() {
+				return endValue;
+			},
+			get step() {
+				return stepValue;
+			},
+			get mapper() {
+				return mapperValue;
+			},
+		};
+	}
+
 	public start(start: number): Range<T> {
 		return new Range<T>({
 			start,
