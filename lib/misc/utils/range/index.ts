@@ -8,9 +8,9 @@ export class RangeUtilError extends UtilError {
 export type RangeString = ".." | `${number}..` | `${number | ""}..${"=" | ""}${number}` | `${number}..${number | ""}`;
 
 export interface RangeDetails<T> {
-	start?: number;
-	end?: number;
-	step?: number;
+	start?: number | null;
+	end?: number | null;
+	step?: number | null;
 	mapper?: Computable<T, [step: number]> | undefined;
 }
 
@@ -31,32 +31,42 @@ export class Range<const T = number> {
 	#step: number | undefined;
 	#mapper: Computable<T, [step: number]> | undefined;
 
-	public constructor(details: RangeString);
+	public constructor(details?: RangeString);
 	public constructor(details: RangeDetails<T>);
 	public constructor(details: RangeDetails<T> | RangeString);
-	public constructor(details: RangeDetails<T> | RangeString) {
-		if (typeof details === "string") {
-			const match = details.match(Range.#rangeRegex);
+	public constructor(details?: RangeDetails<T> | RangeString) {
+		if (details === undefined || typeof details === "string") {
+			const rangeString = details ?? "..";
+			const match = rangeString.match(Range.#rangeRegex);
 
-			if (match) {
-				const start = match[1] ? Number.parseFloat(match[1]) : null;
-				const inclusiveEnd = !!match[2];
-				const end = match[3] ? Number.parseFloat(match[3]) : null;
-
-				if (typeof start === "number") {
-					this.#start = start;
-				}
-
-				if (typeof end === "number") {
-					this.#end = inclusiveEnd ? end : end - 1;
-				}
-			} else {
+			if (!match) {
 				throw new RangeUtilError("Got a range string, but given range string is not valid");
 			}
+
+			const start = match[1] ? Number.parseFloat(match[1]) : null;
+			const inclusiveEnd = !!match[2];
+			const end = match[3] ? Number.parseFloat(match[3]) : null;
+
+			if (typeof start === "number") {
+				this.#start = start;
+			}
+
+			if (typeof end === "number") {
+				this.#end = inclusiveEnd ? end : end - 1;
+			}
 		} else {
-			this.#start = details.start;
-			this.#end = details.end;
-			this.#step = details.step;
+			if (typeof details.start === "number") {
+				this.#start = details.start;
+			}
+
+			if (typeof details.end === "number") {
+				this.#end = details.end;
+			}
+
+			if (typeof details.step === "number") {
+				this.#step = details.step;
+			}
+
 			this.#mapper = details.mapper;
 		}
 	}
@@ -250,6 +260,7 @@ export interface RangeOptions<T> {
 	step?: number;
 }
 
+export function range<const T = number>(range: RangeString, options?: RangeOptions<T>): Range<T>;
 /**
  * Returns a Range that returns values from a specified range.
  *
@@ -306,16 +317,50 @@ export interface RangeOptions<T> {
  * }
  *
  * @template [T=number]
- * @param {number} startOrLength The start of the range, or if this is the only parameter given, the length of the range (inclusive)
- * @param {number | undefined} [end] The end of the range (inclusive), if this value is not given, the `startOrLength` will be used to determine the end
+ * @param {number | null | undefined} startOrLength The start of the range, or if this is the only parameter given, the length of the range (inclusive)
+ * @param {number | null | undefined} [end] The end of the range (inclusive), if this value is not given (undefined), the `startOrLength` will be used to determine the end
  * @param {RangeOptions<T>} [options] The options used to generate the range (see {@link RangeOptions} for more details)
  * @returns {Range<T>} A Range of a specified range (optionally mapped to a specified value)
  * @throws {RangeUtilError} If `options.step` is `0`
  * @throws {RangeUtilError} If `options.step` is positive while the range traverses negatively (`start` > `end`), or negative while the range traverses positively
  */
-export function range<const T = number>(startOrLength: number, end?: number, options?: RangeOptions<T>): Range<T> {
-	const startValue = typeof end === "number" ? startOrLength : 0;
-	const endValue = typeof end === "number" ? end : startOrLength;
+export function range<const T = number>(
+	startOrLength?: number | null,
+	end?: number | null,
+	options?: RangeOptions<T>,
+): Range<T>;
+export function range<const T = number>(
+	startOrLengthOrRange?: number | RangeString | null,
+	endOrOptions?: number | RangeOptions<T> | null,
+	options?: RangeOptions<T>,
+): Range<T> {
+	if (typeof startOrLengthOrRange === "string") {
+		if (typeof endOrOptions === "number") {
+			throw new RangeUtilError("cannot define a end number when a range string is used");
+		}
+
+		let range = new Range<T>(startOrLengthOrRange);
+
+		if (endOrOptions) {
+			if (typeof endOrOptions.step === "number") {
+				range = range.step(endOrOptions.step);
+			}
+
+			if (typeof endOrOptions.valueMapper !== "undefined") {
+				range = range.map(endOrOptions.valueMapper);
+			}
+		}
+
+		return range;
+	}
+
+	const startValue =
+		typeof startOrLengthOrRange === "number" || startOrLengthOrRange === null
+			? typeof endOrOptions === "number" || endOrOptions === null
+				? startOrLengthOrRange
+				: 0
+			: undefined;
+	const endValue = typeof endOrOptions === "number" || endOrOptions === null ? endOrOptions : startOrLengthOrRange;
 
 	return new Range<T>({
 		start: startValue,
