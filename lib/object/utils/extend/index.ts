@@ -5,7 +5,9 @@ export type Extend<T extends Record<Key, unknown>, U extends Partial<T> | Record
 /**
  * Extends an object with another object.
  *
- * The time complexity for this is `O(n * m)` where `n` is the amount of keys in `other`.
+ * The time complexity for this is `O(n + m)` where:
+ * - `n` is the amount of keys in `value`.
+ * - `m` is the amount of keys in `other`.
  *
  * @template {Record<Key, unknown>} T
  * @template {Partial<T> & Record<Key, unknown>} U

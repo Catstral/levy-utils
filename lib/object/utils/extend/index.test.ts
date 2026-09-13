@@ -106,4 +106,71 @@ describe("extend", () => {
 
 		expect(extended.foo).toBe(nested);
 	});
+
+	test("Non-enumerable properties from the original object are preserved", () => {
+		const original = Object.defineProperty({ foo: "bar" }, "hidden", {
+			value: "secret",
+			enumerable: false,
+		}) as { foo: string; hidden: string };
+
+		const extended = extend(original, { key: "value" });
+
+		expect(extended.hidden).toBe("secret");
+		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.enumerable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("hidden");
+	});
+
+	test("Non-enumerable properties from the other object are added and remain non-enumerable", () => {
+		const other = Object.defineProperty({}, "hidden", {
+			value: "secret",
+			enumerable: false,
+		}) as { hidden: string };
+
+		const extended = extend({ foo: "bar" }, other);
+
+		expect(extended.hidden).toBe("secret");
+		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.enumerable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("hidden");
+	});
+
+	test("A non-enumerable property on the other object overrides an enumerable one on the original", () => {
+		const original = { foo: "bar" };
+		const other = Object.defineProperty({}, "foo", {
+			value: "baz",
+			enumerable: false,
+		});
+
+		const extended = extend(original, other);
+
+		expect(extended.foo).toBe("baz");
+		expect(Object.getOwnPropertyDescriptor(extended, "foo")?.enumerable).toBe(false);
+	});
+
+	test("Symbol keys from the original object are preserved", () => {
+		const symbolKey = Symbol("symbolKey");
+		const original = { foo: "bar", [symbolKey]: "symbolValue" };
+
+		const extended = extend(original, { key: "value" });
+
+		expect(extended[symbolKey]).toBe("symbolValue");
+	});
+
+	test("Symbol keys from the other object are added", () => {
+		const symbolKey = Symbol("symbolKey");
+		const other = { [symbolKey]: "symbolValue" };
+
+		const extended = extend({ foo: "bar" }, other);
+
+		expect(extended[symbolKey]).toBe("symbolValue");
+	});
+
+	test("A shared symbol key on the other object overrides the value on the original", () => {
+		const symbolKey = Symbol("symbolKey");
+		const original = { [symbolKey]: "original" };
+		const other = { [symbolKey]: "overridden" };
+
+		const extended = extend(original, other);
+
+		expect(extended[symbolKey]).toBe("overridden");
+	});
 });
