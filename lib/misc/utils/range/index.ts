@@ -7,16 +7,85 @@ export class RangeUtilError extends UtilError {
 
 export type RangeString = ".." | `${number}..` | `${number | ""}..${"=" | ""}${number}` | `${number}..${number | ""}`;
 
+/**
+ * @typedef {Object} RangeDetails
+ * @template T
+ * @prop {number | null} [start] A number to define the start of the Range
+ * @prop {number | null} [end] A number to define the end of the Range
+ * @prop {number | null} [step] A number to define the step of the Range
+ * @prop {Computable<T, [step: number]>} [mapper] A mapper to map the current step of the range to a given value that will be returned by the Range
+ */
+
 export interface RangeDetails<T> {
+	/**
+	 * A number to define the start of the Range.
+	 */
 	start?: number | null;
+	/**
+	 * A number to define the end of the Range.
+	 */
 	end?: number | null;
+	/**
+	 * A number to define the step of the Range.
+	 */
 	step?: number | null;
+	/**
+	 * A mapper to map the current step of the range to a given value that will be returned by the Range.
+	 */
 	mapper?: Computable<T, [step: number]> | undefined;
 }
 
+/**
+ * @typedef {Object} InternalRangeDetails
+ * @template T
+ * @prop {number | null} [start] The current start value of the range
+ * @prop {number | null} [end] The current end value of the range
+ * @prop {number | null} [step] The current step value of the range
+ * @prop {Computable<T, [step: number]>} [mapper] The current mapper of the range
+ */
+
+export interface InternalRangeDetails<T> {
+	/**
+	 * The current start value of the range.
+	 *
+	 * @returns {number | undefined} The start value.
+	 */
+	get start(): number | undefined;
+	/**
+	 * The current end value of the range.
+	 *
+	 * @returns {number | undefined} The end value.
+	 */
+	get end(): number | undefined;
+	/**
+	 * The current step value of the range.
+	 *
+	 * @returns {number | undefined} The step value.
+	 */
+	get step(): number | undefined;
+	/**
+	 * The current mapper of the range.
+	 *
+	 * @returns {Computable<T, [step: number]> | undefined} The mapper.
+	 */
+	get mapper(): Computable<T, [step: number]> | undefined;
+}
+
+/**
+ * A class to hold details about a given range.
+ *
+ * @template [T=number]
+ */
 export class Range<const T = number> {
 	static #rangeRegex = /^(\d+?(?:\.\d+)?)?\.\.(=)?(\d+?(?:\.\d+)?)?$/;
 
+	/**
+	 * Creates a new Range based on the details of another Range.
+	 *
+	 * @template T
+	 * @param {Range<T>} range A given Range to construct the new Range from
+	 * @returns {Range<T>} A new Range with the same details as the given Range.
+	 */
 	static from<const T>(range: Range<T>): Range<T> {
 		return new Range({
 			start: range.#start,
@@ -71,7 +140,12 @@ export class Range<const T = number> {
 		}
 	}
 
-	public get details() {
+	/**
+	 * A getter to be able to read the values of the Range.
+	 *
+	 * @returns {InternalRangeDetails<T>} The internal details of the range
+	 */
+	public get details(): InternalRangeDetails<T> {
 		const startValue = this.#start;
 		const endValue = this.#end;
 		const stepValue = this.#step;
@@ -93,7 +167,13 @@ export class Range<const T = number> {
 		};
 	}
 
-	public start(start: number): Range<T> {
+	/**
+	 * Creates a new Range with the a new start value specified.
+	 *
+	 * @param {number | null} [start] The start value for the new Range.
+	 * @returns {Range<T>} A new Range with the specified start value set.
+	 */
+	public start(start?: number | null): Range<T> {
 		return new Range<T>({
 			start,
 			end: this.#end,
@@ -102,7 +182,13 @@ export class Range<const T = number> {
 		});
 	}
 
-	public end(end: number): Range<T> {
+	/**
+	 * Creates a new Range with the a new end value specified.
+	 *
+	 * @param {number | null} [end] The end value for the new Range.
+	 * @returns {Range<T>} A new Range with the specified end value set.
+	 */
+	public end(end?: number | null): Range<T> {
 		return new Range<T>({
 			start: this.#start,
 			end,
@@ -111,7 +197,13 @@ export class Range<const T = number> {
 		});
 	}
 
-	public step(step: number): Range<T> {
+	/**
+	 * Creates a new Range with the a new step value specified.
+	 *
+	 * @param {number | null} [step] The step value for the new Range.
+	 * @returns {Range<T>} A new Range with the specified step value set.
+	 */
+	public step(step?: number | null): Range<T> {
 		return new Range<T>({
 			start: this.#start,
 			end: this.#end,
@@ -120,7 +212,14 @@ export class Range<const T = number> {
 		});
 	}
 
-	public map<const M>(mapper: Computable<M, [step: number]>): Range<M> {
+	/**
+	 * Creates a new Range with the a new mapper specified.
+	 *
+	 * @template [M=number]
+	 * @param {Computable<M, [step: number]> | undefined} mapper The mapper for the new Range.
+	 * @returns {Range<M>} A new Range with the specified mapper set.
+	 */
+	public map<const M = number>(mapper: Computable<M, [step: number]> | undefined): Range<M> {
 		return new Range<M>({
 			start: this.#start,
 			end: this.#end,
@@ -129,10 +228,30 @@ export class Range<const T = number> {
 		});
 	}
 
+	/**
+	 * Returns a boolean to signal if the given value is on the edges of the range.
+	 *
+	 * Notes:
+	 * - If the range is a full range, then this will **always** return false.
+	 * - `NaN` will **always** return false.
+	 *
+	 * @param {number} value The value to check.
+	 * @returns {boolean} A boolean to signal if the specified value is on the edges of the range.
+	 */
 	public isOn(value: number): boolean {
 		return value === this.#start || value === this.#end;
 	}
 
+	/**
+	 * Returns a boolean to signal if the given value is between the edges of the range.
+	 *
+	 * Notes:
+	 * - If the range is a full range, then this will **always** return true.
+	 * - `NaN` will **always** return false (unless the range is a full range).
+	 *
+	 * @param {number} value The value to check.
+	 * @returns {boolean} A boolean to signal if the specified value is between the edges of the range.
+	 */
 	public isBetween(value: number): boolean {
 		const isIncremental =
 			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
@@ -154,10 +273,30 @@ export class Range<const T = number> {
 		return true;
 	}
 
+	/**
+	 * Returns a boolean to signal if the given value is between or on the edges of the range.
+	 *
+	 * Notes:
+	 * - If the range is a full range, then this will **always** return true.
+	 * - `NaN` will **always** return false (unless the range is a full range).
+	 *
+	 * @param {number} value The value to check.
+	 * @returns {boolean} A boolean to signal if the specified value is between or on the edges of the range.
+	 */
 	public isBetweenOrOn(value: number): boolean {
 		return this.isBetween(value) || this.isOn(value);
 	}
 
+	/**
+	 * Returns a boolean to signal if the given value is outside the edges of the range.
+	 *
+	 * Notes:
+	 * - If the range is a full range, then this will **always** return false.
+	 * - `NaN` will **always** return false.
+	 *
+	 * @param {number} value The value to check.
+	 * @returns {boolean} A boolean to signal if the specified value is outside the edges of the range.
+	 */
 	public isOutside(value: number): boolean {
 		const isIncremental =
 			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
@@ -179,6 +318,16 @@ export class Range<const T = number> {
 		return false;
 	}
 
+	/**
+	 * Returns a boolean to signal if the given value is outside or on the edges of the range.
+	 *
+	 * Notes:
+	 * - If the range is a full range, then this will **always** return false.
+	 * - `NaN` will **always** return false.
+	 *
+	 * @param {number} value The value to check.
+	 * @returns {boolean} A boolean to signal if the specified value is outside or on the edges of the range.
+	 */
 	public isOutsideOrOn(value: number): boolean {
 		return this.isOutside(value) || this.isOn(value);
 	}
@@ -229,10 +378,20 @@ export class Range<const T = number> {
 		}
 	}
 
+	/**
+	 * Returns an array based on the values of the Range.
+	 *
+	 * @returns {T[]} An array based on the values of the Range.
+	 */
 	public toArray(): T[] {
 		return Array.from(this);
 	}
 
+	/**
+	 * Returns a new Range with same details.
+	 *
+	 * @returns {Range<T>} A new Range with same details
+	 */
 	public clone(): Range<T> {
 		return Range.from(this);
 	}
@@ -241,7 +400,7 @@ export class Range<const T = number> {
 /**
  * @typedef {Object} RangeOptions
  * @template T
- * @prop {T | ((step: number) => T)} [valueMapper] A mapper to map the current step of the range to a given value that will be returned by the Range
+ * @prop {Computable<T, [step: number]>} [valueMapper] A mapper to map the current step of the range to a given value that will be returned by the Range
  * @prop {number} [step] A number to define the steps that should be used by the Range
  */
 
