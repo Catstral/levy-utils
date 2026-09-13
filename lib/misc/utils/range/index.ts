@@ -5,13 +5,19 @@ export class RangeUtilError extends UtilError {
 	public readonly util = "range";
 }
 
-export type RangeString = ".." | `${number}..` | `${number | ""}..${"=" | ""}${number}` | `${number}..${number | ""}`;
+export type RangeString =
+	| ".."
+	| `${number}${">" | ""}..`
+	| `${number}${">" | ""}..${"=" | ""}${number}`
+	| `..${"=" | ""}${number}`;
 
 /**
  * @typedef {Object} RangeDetails
  * @template T
  * @prop {number | null} [start] A number to define the start of the Range
+ * @prop {boolean} [inclusiveStart=true] Wether or not the start value is inclusive
  * @prop {number | null} [end] A number to define the end of the Range
+ * @prop {boolean} [inclusiveEnd=false] Wether or not the end value is inclusive
  * @prop {number | null} [step] A number to define the step of the Range
  * @prop {Computable<T, [step: number]>} [mapper] A mapper to map the current step of the range to a given value that will be returned by the Range
  */
@@ -22,9 +28,21 @@ export interface RangeDetails<T> {
 	 */
 	start?: number | null;
 	/**
+	 * Wether or not the start value is inclusive.
+	 *
+	 * @default true
+	 */
+	inclusiveStart?: boolean;
+	/**
 	 * A number to define the end of the Range.
 	 */
 	end?: number | null;
+	/**
+	 * Wether or not the end value is inclusive.
+	 *
+	 * @default false
+	 */
+	inclusiveEnd?: boolean;
 	/**
 	 * A number to define the step of the Range.
 	 */
@@ -39,7 +57,9 @@ export interface RangeDetails<T> {
  * @typedef {Object} InternalRangeDetails
  * @template T
  * @prop {number | null} [start] The current start value of the range
+ * @prop {boolean} inclusiveStart The current inclusivity of the start value of the Range
  * @prop {number | null} [end] The current end value of the range
+ * @prop {boolean} inclusiveEnd The current inclusivity of the end value of the Range
  * @prop {number | null} [step] The current step value of the range
  * @prop {Computable<T, [step: number]>} [mapper] The current mapper of the range
  */
@@ -52,11 +72,23 @@ export interface InternalRangeDetails<T> {
 	 */
 	get start(): number | undefined;
 	/**
+	 * If the given range should consider the start value to be inclusive.
+	 *
+	 * @returns {boolean} If the start value is inclusive.
+	 */
+	get inclusiveStart(): boolean;
+	/**
 	 * The current end value of the range.
 	 *
 	 * @returns {number | undefined} The end value.
 	 */
 	get end(): number | undefined;
+	/**
+	 * If the given range should consider the end value to be inclusive.
+	 *
+	 * @returns {boolean} If the end value is inclusive.
+	 */
+	get inclusiveEnd(): boolean;
 	/**
 	 * The current step value of the range.
 	 *
@@ -77,7 +109,7 @@ export interface InternalRangeDetails<T> {
  * @template [T=number]
  */
 export class Range<const T = number> {
-	static #rangeRegex = /^(\d+?(?:\.\d+)?)?\.\.(=)?(\d+?(?:\.\d+)?)?$/;
+	static #rangeRegex = /^(\d+?(?:\.\d+)?)?(>)?\.\.(=)?(\d+?(?:\.\d+)?)?$/;
 
 	/**
 	 * Creates a new Range based on the details of another Range.
@@ -96,7 +128,9 @@ export class Range<const T = number> {
 	}
 
 	#start: number | undefined;
+	#inclusiveStart: boolean;
 	#end: number | undefined;
+	#inclusiveEnd: boolean;
 	#step: number | undefined;
 	#mapper: Computable<T, [step: number]> | undefined;
 
@@ -113,15 +147,19 @@ export class Range<const T = number> {
 			}
 
 			const start = match[1] ? Number.parseFloat(match[1]) : null;
-			const inclusiveEnd = !!match[2];
-			const end = match[3] ? Number.parseFloat(match[3]) : null;
+			const inclusiveStart = !match[2];
+			const inclusiveEnd = !!match[3];
+			const end = match[4] ? Number.parseFloat(match[4]) : null;
+
+			this.#inclusiveStart = inclusiveStart;
+			this.#inclusiveEnd = inclusiveEnd;
 
 			if (typeof start === "number") {
 				this.#start = start;
 			}
 
 			if (typeof end === "number") {
-				this.#end = inclusiveEnd ? end : end - 1;
+				this.#end = end;
 			}
 		} else {
 			if (typeof details.start === "number") {
@@ -136,6 +174,8 @@ export class Range<const T = number> {
 				this.#step = details.step;
 			}
 
+			this.#inclusiveStart = details.inclusiveStart ?? true;
+			this.#inclusiveEnd = details.inclusiveEnd ?? false;
 			this.#mapper = details.mapper;
 		}
 	}
@@ -147,7 +187,9 @@ export class Range<const T = number> {
 	 */
 	public get details(): InternalRangeDetails<T> {
 		const startValue = this.#start;
+		const inclusiveStartValue = this.#inclusiveStart;
 		const endValue = this.#end;
+		const inclusiveEndValue = this.#inclusiveEnd;
 		const stepValue = this.#step;
 		const mapperValue = this.#mapper;
 
@@ -155,8 +197,14 @@ export class Range<const T = number> {
 			get start() {
 				return startValue;
 			},
+			get inclusiveStart() {
+				return inclusiveStartValue;
+			},
 			get end() {
 				return endValue;
+			},
+			get inclusiveEnd() {
+				return inclusiveEndValue;
 			},
 			get step() {
 				return stepValue;
@@ -173,10 +221,29 @@ export class Range<const T = number> {
 	 * @param {number | null} [start] The start value for the new Range.
 	 * @returns {Range<T>} A new Range with the specified start value set.
 	 */
-	public start(start?: number | null): Range<T> {
+	public start(start?: number | null, inclusiveStart: boolean = this.#inclusiveStart): Range<T> {
 		return new Range<T>({
 			start,
+			inclusiveStart,
 			end: this.#end,
+			inclusiveEnd: this.#inclusiveEnd,
+			step: this.#step,
+			mapper: this.#mapper,
+		});
+	}
+
+	/**
+	 * Creates a new Range with the new inclusivity of the start value specified.
+	 *
+	 * @param {boolean} inclusiveStart Wether or no the start value should be considered inclusive.
+	 * @returns {Range<T>} A new Range with the specified inclusivity of the start value set.
+	 */
+	public inclusiveStart(inclusiveStart: boolean): Range<T> {
+		return new Range<T>({
+			start: this.#start,
+			inclusiveStart,
+			end: this.#end,
+			inclusiveEnd: this.#inclusiveEnd,
 			step: this.#step,
 			mapper: this.#mapper,
 		});
@@ -186,12 +253,32 @@ export class Range<const T = number> {
 	 * Creates a new Range with the a new end value specified.
 	 *
 	 * @param {number | null} [end] The end value for the new Range.
+	 * @param {boolean} [inclusiveEnd=this.#inclusiveEnd] Wether or not the end value should be considered inclusive (defaults to current inclusiveEnd value).
 	 * @returns {Range<T>} A new Range with the specified end value set.
 	 */
-	public end(end?: number | null): Range<T> {
+	public end(end?: number | null, inclusiveEnd: boolean = this.#inclusiveEnd): Range<T> {
 		return new Range<T>({
 			start: this.#start,
+			inclusiveStart: this.#inclusiveStart,
 			end,
+			inclusiveEnd,
+			step: this.#step,
+			mapper: this.#mapper,
+		});
+	}
+
+	/**
+	 * Creates a new Range with the new inclusivity of the end value specified.
+	 *
+	 * @param {boolean} inclusiveEnd Wether or no the end value should be considered inclusive.
+	 * @returns {Range<T>} A new Range with the specified inclusivity of the end value set.
+	 */
+	public inclusiveEnd(inclusiveEnd: boolean): Range<T> {
+		return new Range<T>({
+			start: this.#start,
+			inclusiveStart: this.#inclusiveStart,
+			end: this.#end,
+			inclusiveEnd,
 			step: this.#step,
 			mapper: this.#mapper,
 		});
@@ -206,7 +293,9 @@ export class Range<const T = number> {
 	public step(step?: number | null): Range<T> {
 		return new Range<T>({
 			start: this.#start,
+			inclusiveStart: this.#inclusiveStart,
 			end: this.#end,
+			inclusiveEnd: this.#inclusiveEnd,
 			step,
 			mapper: this.#mapper,
 		});
@@ -222,7 +311,9 @@ export class Range<const T = number> {
 	public map<const M = number>(mapper: Computable<M, [step: number]> | undefined): Range<M> {
 		return new Range<M>({
 			start: this.#start,
+			inclusiveStart: this.#inclusiveStart,
 			end: this.#end,
+			inclusiveEnd: this.#inclusiveEnd,
 			step: this.#step,
 			mapper,
 		});
@@ -239,7 +330,7 @@ export class Range<const T = number> {
 	 * @returns {boolean} A boolean to signal if the specified value is on the edges of the range.
 	 */
 	public isOn(value: number): boolean {
-		return value === this.#start || value === this.#end;
+		return (this.#inclusiveStart && value === this.#start) || (this.#inclusiveEnd && value === this.#end);
 	}
 
 	/**
@@ -367,7 +458,27 @@ export class Range<const T = number> {
 
 		const finalStep = this.#step ?? (shouldStepDown ? -1 : 1);
 
-		while (shouldStepDown ? value >= endValue : value <= endValue) {
+		const checkValue = () => {
+			if (shouldStepDown) {
+				if (this.#inclusiveEnd) {
+					return value >= endValue;
+				}
+
+				return value > endValue;
+			}
+
+			if (this.#inclusiveEnd) {
+				return value <= endValue;
+			}
+
+			return value < endValue;
+		};
+
+		if (!this.#inclusiveStart) {
+			value += finalStep;
+		}
+
+		while (checkValue()) {
 			if (this.#mapper !== undefined) {
 				yield compute(this.#mapper, value);
 			} else {
@@ -417,6 +528,18 @@ export interface RangeOptions<T> {
 	 * @default 1
 	 */
 	step?: number;
+	/**
+	 * wether the start value is considered inclusive.
+	 *
+	 * @default true
+	 */
+	inclusiveStart?: boolean;
+	/**
+	 * wether the end value is considered inclusive.
+	 *
+	 * @default false
+	 */
+	inclusiveEnd?: boolean;
 }
 
 export function range<const T = number>(range: RangeString, options?: RangeOptions<T>): Range<T>;
@@ -508,6 +631,14 @@ export function range<const T = number>(
 			if (typeof endOrOptions.valueMapper !== "undefined") {
 				range = range.map(endOrOptions.valueMapper);
 			}
+
+			if (typeof endOrOptions.inclusiveStart === "boolean") {
+				range = range.inclusiveStart(endOrOptions.inclusiveStart);
+			}
+
+			if (typeof endOrOptions.inclusiveEnd === "boolean") {
+				range = range.inclusiveEnd(endOrOptions.inclusiveEnd);
+			}
 		}
 
 		return range;
@@ -524,6 +655,7 @@ export function range<const T = number>(
 	return new Range<T>({
 		start: startValue,
 		end: endValue,
+		inclusiveEnd: options?.inclusiveEnd,
 		step: options?.step,
 		mapper: options?.valueMapper,
 	});

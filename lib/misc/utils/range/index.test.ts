@@ -10,6 +10,8 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with start (string)",
@@ -18,14 +20,18 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with end (string)",
 			rangeType: "..10",
 			start: undefined,
-			end: 9,
+			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with inclusive end (string)",
@@ -34,14 +40,18 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
 		},
 		{
 			name: "Range with start and end (string)",
 			rangeType: "1..10",
 			start: 1,
-			end: 9,
+			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with start and inclusive end (string)",
@@ -50,6 +60,8 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
 		},
 
 		{
@@ -59,6 +71,8 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with start (object)",
@@ -70,6 +84,8 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with end (object)",
@@ -81,6 +97,8 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with start and end (object)",
@@ -92,6 +110,8 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 
 		{
@@ -105,6 +125,8 @@ describe("range", () => {
 			end: undefined,
 			step: 2,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with step and start (object)",
@@ -117,6 +139,8 @@ describe("range", () => {
 			end: undefined,
 			step: 2,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with step and end (object)",
@@ -129,6 +153,8 @@ describe("range", () => {
 			end: 10,
 			step: 2,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with step and start and end (object)",
@@ -141,6 +167,8 @@ describe("range", () => {
 			end: 10,
 			step: 2,
 			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 
 		{
@@ -154,6 +182,8 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and start (object)",
@@ -166,6 +196,8 @@ describe("range", () => {
 			end: undefined,
 			step: undefined,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and end (object)",
@@ -178,6 +210,8 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and start and end (object)",
@@ -190,6 +224,8 @@ describe("range", () => {
 			end: 10,
 			step: undefined,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 
 		{
@@ -204,6 +240,8 @@ describe("range", () => {
 			end: undefined,
 			step: 2,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and step and start (object)",
@@ -217,6 +255,8 @@ describe("range", () => {
 			end: undefined,
 			step: 2,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and step and end (object)",
@@ -230,6 +270,8 @@ describe("range", () => {
 			end: 10,
 			step: 2,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 		{
 			name: "Range with mapper and step and start and end (object)",
@@ -243,6 +285,8 @@ describe("range", () => {
 			end: 10,
 			step: 2,
 			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
 		},
 	] satisfies {
 		name: string;
@@ -251,6 +295,8 @@ describe("range", () => {
 		end: number | undefined;
 		step: number | undefined;
 		hasMapper: boolean;
+		inclusiveStart: boolean;
+		inclusiveEnd: boolean;
 	}[];
 
 	describe("Util method", () => {
@@ -261,7 +307,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -273,7 +319,6 @@ describe("range", () => {
 			expect(calls[1].value).toBe(1);
 			expect(calls[2].value).toBe(2);
 			expect(calls[3].value).toBe(3);
-			expect(calls[4].value).toBe(4);
 		});
 
 		test("Simple range with end", () => {
@@ -283,7 +328,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -295,7 +340,6 @@ describe("range", () => {
 			expect(calls[1].value).toBe(1);
 			expect(calls[2].value).toBe(2);
 			expect(calls[3].value).toBe(3);
-			expect(calls[4].value).toBe(4);
 		});
 
 		test("Simple range with start and end", () => {
@@ -305,7 +349,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(3);
+			expect(fn).toBeCalledTimes(2);
 
 			const calls = fn.mock.results;
 
@@ -315,7 +359,6 @@ describe("range", () => {
 
 			expect(calls[0].value).toBe(2);
 			expect(calls[1].value).toBe(3);
-			expect(calls[2].value).toBe(4);
 		});
 
 		test("Simple range with step", () => {
@@ -327,7 +370,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(3);
+			expect(fn).toBeCalledTimes(2);
 
 			const calls = fn.mock.results;
 
@@ -337,7 +380,6 @@ describe("range", () => {
 
 			expect(calls[0].value).toBe(0);
 			expect(calls[1].value).toBe(2);
-			expect(calls[2].value).toBe(4);
 		});
 
 		test("Simple range with mapping literal", () => {
@@ -349,7 +391,7 @@ describe("range", () => {
 				fn(value);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -368,7 +410,7 @@ describe("range", () => {
 				fn(value);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -380,7 +422,6 @@ describe("range", () => {
 			expect(calls[1].value).toBe("foo-1");
 			expect(calls[2].value).toBe("foo-2");
 			expect(calls[3].value).toBe("foo-3");
-			expect(calls[4].value).toBe("foo-4");
 		});
 
 		test("Simple range with mapping literal and step", () => {
@@ -393,7 +434,7 @@ describe("range", () => {
 				fn(value);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -413,7 +454,7 @@ describe("range", () => {
 				fn(value);
 			}
 
-			expect(fn).toBeCalledTimes(5);
+			expect(fn).toBeCalledTimes(4);
 
 			const calls = fn.mock.results;
 
@@ -425,7 +466,6 @@ describe("range", () => {
 			expect(calls[1].value).toBe("foo-2");
 			expect(calls[2].value).toBe("foo-4");
 			expect(calls[3].value).toBe("foo-6");
-			expect(calls[4].value).toBe("foo-8");
 		});
 
 		test("Zero-length range", () => {
@@ -435,12 +475,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(1);
-
-			const calls = fn.mock.results;
-
-			expect(calls[0].type).toBe("return");
-			expect(calls[0].value).toBe(0);
+			expect(fn).toBeCalledTimes(0);
 		});
 
 		test("Range where start equals end", () => {
@@ -450,12 +485,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(1);
-
-			const calls = fn.mock.results;
-
-			expect(calls[0].type).toBe("return");
-			expect(calls[0].value).toBe(3);
+			expect(fn).toBeCalledTimes(0);
 		});
 
 		test("Range with negative start and end", () => {
@@ -465,7 +495,7 @@ describe("range", () => {
 				fn(index);
 			}
 
-			expect(fn).toBeCalledTimes(3);
+			expect(fn).toBeCalledTimes(2);
 
 			const calls = fn.mock.results;
 
@@ -475,7 +505,6 @@ describe("range", () => {
 
 			expect(calls[0].value).toBe(-3);
 			expect(calls[1].value).toBe(-2);
-			expect(calls[2].value).toBe(-1);
 		});
 
 		test("Range with a non-integer step", () => {
@@ -483,74 +512,6 @@ describe("range", () => {
 
 			for (const index of range(0, 2, {
 				step: 0.5,
-			})) {
-				fn(index);
-			}
-
-			expect(fn).toBeCalledTimes(5);
-
-			const calls = fn.mock.results;
-
-			for (const call of calls) {
-				expect(call.type).toBe("return");
-			}
-
-			expect(calls[0].value).toBe(0);
-			expect(calls[1].value).toBe(0.5);
-			expect(calls[2].value).toBe(1);
-			expect(calls[3].value).toBe(1.5);
-			expect(calls[4].value).toBe(2);
-		});
-
-		test("Range with a length and options only (no explicit end)", () => {
-			const fn = mock((i) => i);
-
-			for (const index of range(4, undefined, {
-				step: 2,
-			})) {
-				fn(index);
-			}
-
-			expect(fn).toBeCalledTimes(3);
-
-			const calls = fn.mock.results;
-
-			for (const call of calls) {
-				expect(call.type).toBe("return");
-			}
-
-			expect(calls[0].value).toBe(0);
-			expect(calls[1].value).toBe(2);
-			expect(calls[2].value).toBe(4);
-		});
-
-		test("Descending range (start greater than end)", () => {
-			const fn = mock((i) => i);
-
-			for (const index of range(4, 0)) {
-				fn(index);
-			}
-
-			expect(fn).toBeCalledTimes(5);
-
-			const calls = fn.mock.results;
-
-			for (const call of calls) {
-				expect(call.type).toBe("return");
-			}
-
-			expect(calls[0].value).toBe(4);
-			expect(calls[1].value).toBe(3);
-			expect(calls[2].value).toBe(2);
-			expect(calls[3].value).toBe(1);
-			expect(calls[4].value).toBe(0);
-		});
-
-		test("Descending range with a matching negative step", () => {
-			const fn = mock((i) => i);
-
-			for (const index of range(6, 0, {
-				step: -2,
 			})) {
 				fn(index);
 			}
@@ -563,10 +524,74 @@ describe("range", () => {
 				expect(call.type).toBe("return");
 			}
 
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(0.5);
+			expect(calls[2].value).toBe(1);
+			expect(calls[3].value).toBe(1.5);
+		});
+
+		test("Range with a length and options only (no explicit end)", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(4, undefined, {
+				step: 2,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(2);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(2);
+		});
+
+		test("Descending range (start greater than end)", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(4, 0)) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(4);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(4);
+			expect(calls[1].value).toBe(3);
+			expect(calls[2].value).toBe(2);
+			expect(calls[3].value).toBe(1);
+		});
+
+		test("Descending range with a matching negative step", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(6, 0, {
+				step: -2,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
 			expect(calls[0].value).toBe(6);
 			expect(calls[1].value).toBe(4);
 			expect(calls[2].value).toBe(2);
-			expect(calls[3].value).toBe(0);
 		});
 
 		test("Descending range with a mapping function", () => {
@@ -578,7 +603,7 @@ describe("range", () => {
 				fn(value);
 			}
 
-			expect(fn).toBeCalledTimes(3);
+			expect(fn).toBeCalledTimes(2);
 
 			const calls = fn.mock.results;
 
@@ -588,7 +613,6 @@ describe("range", () => {
 
 			expect(calls[0].value).toBe("foo-2");
 			expect(calls[1].value).toBe("foo-1");
-			expect(calls[2].value).toBe("foo-0");
 		});
 
 		test("Range with a step of zero throws a RangeUtilError", () => {
@@ -646,7 +670,7 @@ describe("range", () => {
 		});
 
 		describe("Data parsing", () => {
-			test.each(testParameters)("$name", ({ rangeType, start, end, step, hasMapper }) => {
+			test.each(testParameters)("$name", ({ rangeType, start, end, step, hasMapper, inclusiveEnd }) => {
 				let currentRange: Range;
 
 				if (typeof rangeType === "string") {
@@ -655,11 +679,14 @@ describe("range", () => {
 					currentRange = range(rangeType.start, rangeType.end, {
 						step: rangeType.step,
 						valueMapper: rangeType.mapper,
+						inclusiveStart: rangeType.inclusiveStart,
+						inclusiveEnd: rangeType.inclusiveEnd,
 					});
 				}
 
 				expect(currentRange.details.start).toBe(start);
 				expect(currentRange.details.end).toBe(end);
+				expect(currentRange.details.inclusiveEnd).toBe(inclusiveEnd);
 				expect(currentRange.details.step).toBe(step);
 
 				if (hasMapper) {
@@ -681,6 +708,8 @@ describe("range", () => {
 						currentRange = range(rangeType.start, rangeType.end, {
 							step: rangeType.step,
 							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
 						});
 					}
 
@@ -704,6 +733,8 @@ describe("range", () => {
 						currentRange = range(rangeType.start, rangeType.end, {
 							step: rangeType.step,
 							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
 						});
 					}
 
