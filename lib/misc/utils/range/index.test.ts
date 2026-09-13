@@ -1,8 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 import { RangeUtilError, range } from ".";
 
-// TODO: update test that expect a generator + add new tests for new functionality
-
 describe("range", () => {
 	test("Simple range", () => {
 		const fn = mock((i) => i);
@@ -343,10 +341,11 @@ describe("range", () => {
 
 	test("Range with a step of zero throws a RangeUtilError", () => {
 		try {
-			const generator = range(0, 2, {
+			for (const _ of range(0, 2, {
 				step: 0,
-			});
-			generator.next();
+			})) {
+			}
+
 			expect().fail("Expected range to throw");
 		} catch (err) {
 			expect(err).toBeInstanceOf(RangeUtilError);
@@ -359,9 +358,11 @@ describe("range", () => {
 
 	test("Ascending range with a negative step throws a RangeUtilError", () => {
 		try {
-			const generator = range(0, 4, {
+			for (const _ of range(0, 4, {
 				step: -1,
-			});
+			})) {
+			}
+
 			generator.next();
 			expect().fail("Expected range to throw");
 		} catch (err) {
@@ -375,10 +376,11 @@ describe("range", () => {
 
 	test("Descending range with a positive step throws a RangeUtilError", () => {
 		try {
-			const generator = range(4, 0, {
+			for (const _ of range(4, 0, {
 				step: 1,
-			});
-			generator.next();
+			})) {
+			}
+
 			expect().fail("Expected range to throw");
 		} catch (err) {
 			expect(err).toBeInstanceOf(RangeUtilError);
