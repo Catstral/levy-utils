@@ -88,7 +88,7 @@ cluster([1, 2, 3, 4, 5], 2);
 ```
 
 #### `concat(...values)`
-Returns an array based on the given values or values inside a given array.
+Concatenates values and arrays into a new array.
 
 ```ts
 concat(1, [2, 3], 4);
