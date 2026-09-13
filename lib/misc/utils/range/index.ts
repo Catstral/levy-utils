@@ -103,7 +103,7 @@ export class Range<const T = number> {
 
 	public isBetween(value: number): boolean {
 		const isIncremental =
-			typeof this.#start === "number" && typeof this.#end === "number" ? this.#start > this.#end : true;
+			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
 		const currentStart = isIncremental ? this.#start : this.#end;
 		const currentEnd = isIncremental ? this.#end : this.#start;
 
@@ -128,7 +128,7 @@ export class Range<const T = number> {
 
 	public isOutside(value: number): boolean {
 		const isIncremental =
-			typeof this.#start === "number" && typeof this.#end === "number" ? this.#start > this.#end : true;
+			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
 		const currentStart = isIncremental ? this.#start : this.#end;
 		const currentEnd = isIncremental ? this.#end : this.#start;
 
