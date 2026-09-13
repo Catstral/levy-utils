@@ -1143,7 +1143,7 @@ describe("range", () => {
 			});
 
 			test("Simple range with static mapper", () => {
-				const range = new Range("1..=10").map("foo");
+				const range = new Range("1..=10").map<"foo">("foo");
 				const arr = range.toArray();
 
 				expect(arr).toBeArray();
