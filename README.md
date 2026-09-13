@@ -26,6 +26,7 @@ import { range, sift, toggle } from "@catstral/levy-utils";
 A list of all the utilities supported:
 - [Array utilities](#array-utilities)
   - [cluster](#clusteritems-size)
+  - [concat](#concatvalues)
   - [counting](#countinglist-identity)
   - [fork](#forklist-condition)
   - [list](#liststartorlength-end-options)
@@ -84,6 +85,15 @@ Clusters a list of items into a list of lists, each limited to a specified size.
 cluster([1, 2, 3, 4, 5], 2);
 // Expected output:
 // [[1, 2], [3, 4], [5]]
+```
+
+#### `concat(...values)`
+Concatenates values and arrays into a new array.
+
+```ts
+concat(1, [2, 3], 4);
+// Expected output:
+// [1, 2, 3, 4]
 ```
 
 #### `counting(list, identity)`
