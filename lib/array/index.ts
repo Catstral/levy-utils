@@ -3,6 +3,8 @@ export * from "./utils/concat";
 export * from "./utils/counting";
 export * from "./utils/fork";
 export * from "./utils/list";
+export * from "./utils/max";
+export * from "./utils/min";
 export * from "./utils/select";
 export * from "./utils/sift";
 export * from "./utils/sum";
