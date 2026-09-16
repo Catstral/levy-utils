@@ -25,14 +25,8 @@ interface MinEntry {
  * @param {MinOptions} options Options to define how the smallest number is decided
  * @returns {T | undefined} The smallest item from a list
  */
-export function min<const T extends number>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MinOptions): T;
-export function min<const T extends number>(
-	list: T[],
-	mapper?: (item: T) => number,
-	options?: MinOptions,
-): T | undefined;
-export function min<const T>(list: [T, ...T[]], mapper: (item: T) => number, options?: MinOptions): T;
-export function min<const T>(list: T[], mapper: (item: T) => number, options?: MinOptions): T | undefined;
+export function min<const T>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MinOptions): T;
+export function min<const T>(list: T[], mapper?: (item: T) => number, options?: MinOptions): T | undefined;
 export function min<const T>(list: T[], mapper?: (item: T) => number, options?: MinOptions): T | undefined {
 	if (list.length === 0) {
 		return undefined;

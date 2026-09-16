@@ -25,14 +25,8 @@ interface MaxEntry {
  * @param {MaxOptions} options Options to define how the largest number is decided
  * @returns {T | undefined} The smallest item from a list
  */
-export function max<const T extends number>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MaxOptions): T;
-export function max<const T extends number>(
-	list: T[],
-	mapper?: (item: T) => number,
-	options?: MaxOptions,
-): T | undefined;
-export function max<const T>(list: [T, ...T[]], mapper: (item: T) => number, options?: MaxOptions): T;
-export function max<const T>(list: T[], mapper: (item: T) => number, options?: MaxOptions): T | undefined;
+export function max<const T>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MaxOptions): T;
+export function max<const T>(list: T[], mapper?: (item: T) => number, options?: MaxOptions): T | undefined;
 export function max<const T>(list: T[], mapper?: (item: T) => number, options?: MaxOptions): T | undefined {
 	if (list.length === 0) {
 		return undefined;
