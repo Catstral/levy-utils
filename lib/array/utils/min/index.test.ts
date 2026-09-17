@@ -51,7 +51,7 @@ describe("min", () => {
 		expect(smallest).toBe(5);
 	});
 
-	test("Returns undefined-like result when list has no numeric values and no mapper", () => {
+	test("Returns the first item when list has no numeric values and no mapper", () => {
 		const list = ["a", "b", "c"];
 		const smallest = min(list);
 
