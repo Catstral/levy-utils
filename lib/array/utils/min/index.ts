@@ -64,12 +64,14 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 
 	return list[reduceMethod]<MinEntry>(
 		(acc, value) => {
-			const target = typeof value === "number" ? value : Infinity;
+			if (typeof value !== "number") {
+				return acc;
+			}
 
-			if (target < acc.target) {
+			if (value < acc.target) {
 				return {
 					value,
-					target,
+					target: value,
 				};
 			}
 
