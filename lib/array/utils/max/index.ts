@@ -25,7 +25,8 @@ interface MaxEntry {
  * @param {MaxOptions} options Options to define how the largest number is decided
  * @returns {T | undefined} The smallest item from a list
  */
-export function max<const T>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MaxOptions): T;
+export function max<const T>(list: [T, ...T[]], mapper: (item: T) => number, options?: MaxOptions): T;
+export function max<const T extends number>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MaxOptions): T;
 export function max<const T>(list: T[], mapper?: (item: T) => number, options?: MaxOptions): T | undefined;
 export function max<const T>(list: T[], mapper?: (item: T) => number, options?: MaxOptions): T | undefined {
 	if (list.length === 0) {
@@ -33,12 +34,6 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 	}
 
 	const direction = options?.direction ?? "ASCENDING";
-	const initialValue = list.at(direction === "DESCENDING" ? -1 : 0) as T;
-
-	if (list.length === 1) {
-		return initialValue;
-	}
-
 	const reduceMethod: "reduce" | "reduceRight" = direction === "DESCENDING" ? "reduceRight" : "reduce";
 
 	if (mapper) {
@@ -56,7 +51,7 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 				return acc;
 			},
 			{
-				value: initialValue,
+				value: list.at(direction === "DESCENDING" ? -1 : 0),
 				target: -Infinity,
 			},
 		).value as T | undefined;
@@ -68,7 +63,7 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 				return acc;
 			}
 
-			if (value > acc.target) {
+			if (value >= acc.target) {
 				return {
 					value,
 					target: value,
@@ -78,7 +73,7 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 			return acc;
 		},
 		{
-			value: initialValue,
+			value: undefined,
 			target: -Infinity,
 		},
 	).value as T | undefined;

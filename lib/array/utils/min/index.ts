@@ -25,7 +25,8 @@ interface MinEntry {
  * @param {MinOptions} options Options to define how the smallest number is decided
  * @returns {T | undefined} The smallest item from a list
  */
-export function min<const T>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MinOptions): T;
+export function min<const T>(list: [T, ...T[]], mapper: (item: T) => number, options?: MinOptions): T;
+export function min<const T extends number>(list: [T, ...T[]], mapper?: (item: T) => number, options?: MinOptions): T;
 export function min<const T>(list: T[], mapper?: (item: T) => number, options?: MinOptions): T | undefined;
 export function min<const T>(list: T[], mapper?: (item: T) => number, options?: MinOptions): T | undefined {
 	if (list.length === 0) {
@@ -33,12 +34,6 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 	}
 
 	const direction = options?.direction ?? "ASCENDING";
-	const initialValue = list.at(direction === "DESCENDING" ? -1 : 0) as T;
-
-	if (list.length === 1) {
-		return initialValue;
-	}
-
 	const reduceMethod: "reduce" | "reduceRight" = direction === "DESCENDING" ? "reduceRight" : "reduce";
 
 	if (mapper) {
@@ -56,10 +51,10 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 				return acc;
 			},
 			{
-				value: initialValue,
+				value: list.at(direction === "DESCENDING" ? -1 : 0),
 				target: Infinity,
 			},
-		).value as T;
+		).value as T | undefined;
 	}
 
 	return list[reduceMethod]<MinEntry>(
@@ -68,7 +63,7 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 				return acc;
 			}
 
-			if (value < acc.target) {
+			if (value <= acc.target) {
 				return {
 					value,
 					target: value,
@@ -78,8 +73,8 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 			return acc;
 		},
 		{
-			value: initialValue,
+			value: undefined,
 			target: Infinity,
 		},
-	).value as T;
+	).value as T | undefined;
 }
