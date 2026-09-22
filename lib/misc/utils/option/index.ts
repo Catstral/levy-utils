@@ -77,7 +77,7 @@ export function safe<const T extends Promisable<unknown>>(
  * @template {Promisable<?>} T
  * @param {...[option: Option<T>, fallback?: F]} args The callback to wrap the value
  * @returns {T extends Promise<infer V> ? Promise<Option<V>> : Option<T>} The result wrapped in an `Option`
- * @throws {?} If the option is not a success and no `fallback` was provided
+ * @throws If the option is not a success and no `fallback` was provided
  *
  * @see {@link Option} for more details about an option value
  */
