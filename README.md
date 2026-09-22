@@ -45,6 +45,24 @@ A list of all the utilities supported:
   - [isEmpty](#isemptyvalue)
   - [isPrimitive](#isprimitivevalue)
   - [match](#matchvalue-clause-fallback)
+  - [Range (class)](#rangerangestring)
+    - [static from](#static-fromrange)
+    - [details (getter)](#details-getter)
+      - [start (getter)](#start-getter)
+      - [end (getter)](#end-getter)
+      - [step (getter)](#step-getter)
+      - [mapper (getter)](#mapper-getter)
+    - [start](#startstart)
+    - [end](#endend)
+    - [step](#stepstep)
+    - [map](#mapmapper)
+    - [isOn](#isonvalue)
+    - [isBetween](#isbetweenvalue)
+    - [isBetweenOrOn](#isbetweenoronvalue)
+    - [isOutside](#isoutsidevalue)
+    - [isOutsideOrOn](#isoutsideoronvalue)
+    - [toArray](#toarray)
+    - [clone](#clone)
   - [range](#rangestartorlength-end-options)
   - [sleep](#sleepdelay)
   - [values](#valuestarget)
@@ -142,6 +160,10 @@ list(0, 3, {
 // Expected output:
 // ["foo-0", "foo-1", "foo-2", "foo-3"]
 ```
+
+options:
+- `step` - The steps used to generate the array.
+- `valueMapper` - A mapper function to map a step to a value.
 
 <!-- TODO -->
 #### `select(list, filter, mapper)`
@@ -391,8 +413,126 @@ fn("C");
 // -1
 ```
 
+#### `Range(rangeString?)`
+> The constructor of this has an overload:  
+> `Range(details)`
+> 
+> Details:
+> - `start` - The start value of the range.
+> - `end` - The end value of the range.
+> - `step` - The step value of the range.
+> - `mapper` - The mapper of the range, this maps a step to a value.
+
+This is a class representing a range value, it is an iterable and generates values based on a start and end value (if specified).
+
+If no start of end value is specified the range will work as expected with methods, but trying to iterate over it will throw an error.
+
+It can also be given a `step` and a `mapper` to define how it should be generating a value.
+
+If the argument given is a string, then it is expected to have that string match the [range expression from rust](https://doc.rust-lang.org/reference/expressions/range-expr.html#r-expr.range.behavior).
+
+Here is a simple table explaining the different types of range strings:
+| Syntax                      | Name               | Range           | Is iterable |
+| --------------------------- | ------------------ | --------------- | ----------- |
+| `<start>..<end>`            | Range              | start ≤ x < end | Yes         |
+| `<start>..=<end>`           | Range inclusive    | start ≤ x ≤ end | Yes         |
+| `..` \| `..=`               | Full range         | -               | No          |
+| `<start>..` \| `<start>..=` | Range from         | start ≤ x       | No          |
+| `..<end>`                   | Range to           | x < end         | No          |
+| `..=<end>`                  | Range to inclusive | x ≤ end         | No          |
+
+If a value is not iterable, that means it will throw an error on attempting to iterate the range.  
+A full range is a range without bounds, this mostly exists for completeness and would effect how certain methods of the range work, see the methods for more details on how they are effected.
+
+> This class can also be gotten from the [range](#rangestartorlength-end-options) utility function.
+
+##### `static from(range)`
+Creates a new range with the details from the specified range.
+
+> This does the same as [Range.clone](#clone)
+
+##### `details (getter)`
+Gets the internal details of the Range.
+
+> This is a getter, no value can be set here.
+
+###### `start (getter)`
+Gets the start value of range.
+
+> This is a getter, no value can be set here.
+
+###### `end (getter)`
+Gets the end value of range.
+
+> This is a getter, no value can be set here.
+
+###### `step (getter)`
+Gets the step value of range.
+
+> This is a getter, no value can be set here.
+
+###### `mapper (getter)`
+Gets the mapper value of range.
+
+> This is a getter, no value can be set here.
+
+##### `start(start?)`
+Creates a new Range with a given start value set.
+
+##### `end(end?)`
+Creates a new Range with a given end value set.
+
+##### `step(step?)`
+Creates a new Range with a given step value set.
+
+##### `map(mapper)`
+Creates a new Range with a given mapper set.
+
+##### `isOn(value)`
+Returns a boolean to signal if the given value is on the edges of the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return false.
+> - `NaN` will **always** return false.
+
+##### `isBetween(value)`
+Returns a boolean to signal if the given value is between the edges of the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return true.
+> - `NaN` will **always** return false (unless the range is a full range).
+
+##### `isBetweenOrOn(value)`
+Returns a boolean to signal if the given value is between or on the edges of the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return true.
+> - `NaN` will **always** return false (unless the range is a full range).
+
+##### `isOutside(value)`
+Returns a boolean to signal if the given value is outside the edges of the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return false.
+> - `NaN` will **always** return false.
+
+##### `isOutsideOrOn(value)`
+Returns a boolean to signal if the given value is outside or on the edges of the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return false.
+> - `NaN` will **always** return false.
+
+##### `toArray()`
+Returns an array based on the values of the range.
+
+##### `clone()`
+Returns a new Range with same details.
+
+> This does the same as [static Range.from](#static-fromrange)
+
 #### `range(startOrLength, end?, options?)`
-Returns a generator that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
+Returns a [Range](#rangerangestring) that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
 
 ```ts
 for (const value of range(3)) {
@@ -423,6 +563,10 @@ for (const value of range(0, 3, {
 // Expected output:
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
 ```
+
+Options:
+- `step` - The step of the range.
+- `valueMapper` - A value/mapper that is used to turn a step into a values.
 
 #### `sleep(delay)`
 Returns a promise that resolves after the specified delay (in milliseconds).
@@ -677,7 +821,7 @@ capitalize("some value");
 Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
 
 > NOTE:  
-  This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
+> This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
 
 ```ts
 customCase("someValue", {
