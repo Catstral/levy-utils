@@ -45,6 +45,9 @@ A list of all the utilities supported:
   - [isEmpty](#isemptyvalue)
   - [isPrimitive](#isprimitivevalue)
   - [match](#matchvalue-clause-fallback)
+  - [option](#optiont)
+    - [safe](#safecallback)
+    - [unwrap](#unwrapoption-fallback)
   - [range](#rangestartorlength-end-options)
   - [sleep](#sleepdelay)
   - [values](#valuestarget)
@@ -389,6 +392,50 @@ fn("B");
 fn("C");
 // Expected output:
 // -1
+```
+
+#### `option<T>`
+A value that represents a wrapped result with varying success.
+
+##### `safe(callback)`
+Executes the given callback and returns an option of the result.
+
+```ts
+safe(() => {
+    return "Hello world";
+});
+// Expected output:
+// {
+//     success: true,
+//     value: "Hello world",
+// }
+
+safe(() => {  
+    throw "Goodbye world";
+});
+// Expected output:
+// {
+//     success: false,
+//     error: "Goodbye world",
+// }
+```
+
+##### `unwrap(option, fallback?)`
+Directly returns or throws an option's value or error.
+An option's error won't be thrown when a fallback is provided.
+
+```ts
+const option = safe(() => {
+    throw "Goodbye world";
+});
+
+unwrap(option);
+// Expected to throw:
+// "Goodbye world"
+
+unwrap(option, null);
+// Expected output:
+// null
 ```
 
 #### `range(startOrLength, end?, options?)`
