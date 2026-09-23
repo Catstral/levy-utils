@@ -45,11 +45,10 @@ A list of all the utilities supported:
   - [isEmpty](#isemptyvalue)
   - [isPrimitive](#isprimitivevalue)
   - [match](#matchvalue-clause-fallback)
-  - [option](#optiont)
-    - [safe](#safecallback)
-    - [unwrap](#unwrapoption-fallback)
   - [range](#rangestartorlength-end-options)
+  - [safe](#safecallback)
   - [sleep](#sleepdelay)
+  - [unwrap](#unwrapoption-fallback)
   - [values](#valuestarget)
 - [Number utilities](#number-utilities)
   - [toFloat](#tofloatvalue-fallback)
@@ -394,50 +393,6 @@ fn("C");
 // -1
 ```
 
-#### `option<T>`
-A value that represents a wrapped result with varying success.
-
-##### `safe(callback)`
-Executes the given callback and returns an option of the result.
-
-```ts
-safe(() => {
-    return "Hello world";
-});
-// Expected output:
-// {
-//     success: true,
-//     value: "Hello world",
-// }
-
-safe(() => {  
-    throw new Error("Goodbye world");
-});
-// Expected output:
-// {
-//     success: false,
-//     error: Error("Goodbye world"),
-// }
-```
-
-##### `unwrap(option, fallback?)`
-Directly returns the option's value, or throws the option's error.
-An option's error won't be thrown when a fallback is provided.
-
-```ts
-const option = safe(() => {
-    throw new Error("Goodbye world");
-});
-
-unwrap(option);
-// Expected to throw:
-// Error("Goodbye world")
-
-unwrap(option, null);
-// Expected output:
-// null
-```
-
 #### `range(startOrLength, end?, options?)`
 Returns a generator that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
 
@@ -471,6 +426,29 @@ for (const value of range(0, 3, {
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
 ```
 
+#### `safe(callback)`
+Executes the given callback and returns an option of the result.
+
+```ts
+safe(() => {
+    return "Hello world";
+});
+// Expected output:
+// {
+//     success: true,
+//     value: "Hello world",
+// }
+
+safe(() => {  
+    throw new Error("Goodbye world");
+});
+// Expected output:
+// {
+//     success: false,
+//     error: Error("Goodbye world"),
+// }
+```
+
 #### `sleep(delay)`
 Returns a promise that resolves after the specified delay (in milliseconds).
 
@@ -478,6 +456,24 @@ Returns a promise that resolves after the specified delay (in milliseconds).
 await sleep(1000);
 // Expected output:
 // waits 1 second
+```
+
+#### `unwrap(option, fallback?)`
+Directly returns the option's value, or throws the option's error.
+An option's error won't be thrown when a fallback is provided.
+
+```ts
+const option = safe(() => {
+    throw new Error("Goodbye world");
+});
+
+unwrap(option);
+// Expected to throw:
+// Error("Goodbye world")
+
+unwrap(option, null);
+// Expected output:
+// null
 ```
 
 #### `values(target)`
