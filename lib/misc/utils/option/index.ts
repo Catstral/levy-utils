@@ -69,7 +69,7 @@ export function safe<const T extends Promisable<unknown>>(
 }
 
 /**
- * Directly returns or throws an option's value or error.
+ * Directly returns the option's value, or throws the option's error.
  * An option's error won't be thrown when a fallback is provided.
  *
  * The time complexity for this is `O(1)`.
