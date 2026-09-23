@@ -421,7 +421,7 @@ safe(() => {
 ```
 
 ##### `unwrap(option, fallback?)`
-Directly returns or throws an option's value or error.
+Directly returns the option's value, or throws the option's error.
 An option's error won't be thrown when a fallback is provided.
 
 ```ts
