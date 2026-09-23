@@ -411,12 +411,12 @@ safe(() => {
 // }
 
 safe(() => {  
-    throw "Goodbye world";
+    throw new Error("Goodbye world");
 });
 // Expected output:
 // {
 //     success: false,
-//     error: "Goodbye world",
+//     error: Error("Goodbye world"),
 // }
 ```
 
@@ -426,12 +426,12 @@ An option's error won't be thrown when a fallback is provided.
 
 ```ts
 const option = safe(() => {
-    throw "Goodbye world";
+    throw new Error("Goodbye world");
 });
 
 unwrap(option);
 // Expected to throw:
-// "Goodbye world"
+// Error("Goodbye world")
 
 unwrap(option, null);
 // Expected output:
