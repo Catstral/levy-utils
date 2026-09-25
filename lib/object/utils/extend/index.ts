@@ -18,7 +18,7 @@ export type Extend<T extends Record<Key, unknown>, U extends Mask<T>> = Omit<T, 
  * @template {Partial<T> & Record<Key, unknown>} U
  * @param {T} value The object to extend
  * @param {U} other The object to override or extend properties of `value` with
- * @returns {Extend<T, U>} An object where `value` is extesnded by `other`
+ * @returns {Extend<T, U>} An object where `value` is extended by `other`
  */
 export function extend<const T extends Record<Key, unknown>, const U extends Mask<T>>(
 	value: T,
