@@ -173,4 +173,43 @@ describe("extend", () => {
 
 		expect(extended[symbolKey]).toBe("overridden");
 	});
+
+	test("Non-configurable properties from the original object are preserved", () => {
+		const original = Object.defineProperty({ foo: "bar" }, "hidden", {
+			value: "secret",
+			configurable: false,
+		}) as { foo: string; hidden: string };
+
+		const extended = extend(original, { key: "value" });
+
+		expect(extended.hidden).toBe("secret");
+		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.configurable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("hidden");
+	});
+
+	test("Non-configurable properties from the other object are added and remain non-configurable", () => {
+		const other = Object.defineProperty({}, "hidden", {
+			value: "secret",
+			configurable: false,
+		}) as { hidden: string };
+
+		const extended = extend({ foo: "bar" }, other);
+
+		expect(extended.hidden).toBe("secret");
+		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.configurable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("hidden");
+	});
+
+	test("A non-configurable property on the other object overrides an configurable one on the original", () => {
+		const original = { foo: "bar" };
+		const other = Object.defineProperty({}, "foo", {
+			value: "baz",
+			configurable: false,
+		});
+
+		const extended = extend(original, other);
+
+		expect(extended.foo).toBe("baz");
+		expect(Object.getOwnPropertyDescriptor(extended, "foo")?.configurable).toBe(false);
+	});
 });
