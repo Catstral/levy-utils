@@ -175,29 +175,29 @@ describe("extend", () => {
 	});
 
 	test("Non-configurable properties from the original object are preserved", () => {
-		const original = Object.defineProperty({ foo: "bar" }, "hidden", {
-			value: "secret",
+		const original = Object.defineProperty({ foo: "bar" }, "locked", {
+			value: "can't touch",
 			configurable: false,
-		}) as { foo: string; hidden: string };
+		}) as { foo: string; locked: string };
 
 		const extended = extend(original, { key: "value" });
 
-		expect(extended.hidden).toBe("secret");
-		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.configurable).toBe(false);
-		expect(Object.keys(extended)).not.toContain("hidden");
+		expect(extended.locked).toBe("can't touch");
+		expect(Object.getOwnPropertyDescriptor(extended, "locked")?.configurable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("locked");
 	});
 
 	test("Non-configurable properties from the other object are added and remain non-configurable", () => {
-		const other = Object.defineProperty({}, "hidden", {
-			value: "secret",
+		const other = Object.defineProperty({}, "locked", {
+			value: "can't touch",
 			configurable: false,
-		}) as { hidden: string };
+		}) as { locked: string };
 
 		const extended = extend({ foo: "bar" }, other);
 
-		expect(extended.hidden).toBe("secret");
-		expect(Object.getOwnPropertyDescriptor(extended, "hidden")?.configurable).toBe(false);
-		expect(Object.keys(extended)).not.toContain("hidden");
+		expect(extended.locked).toBe("can't touch");
+		expect(Object.getOwnPropertyDescriptor(extended, "locked")?.configurable).toBe(false);
+		expect(Object.keys(extended)).not.toContain("locked");
 	});
 
 	test("A non-configurable property on the other object overrides an configurable one on the original", () => {
@@ -211,5 +211,21 @@ describe("extend", () => {
 
 		expect(extended.foo).toBe("baz");
 		expect(Object.getOwnPropertyDescriptor(extended, "foo")?.configurable).toBe(false);
+	});
+
+	test("A non-configurable property gets overriden to be configurable", () => {
+		const original = Object.defineProperty({}, "foo", {
+			value: "bar",
+			configurable: false,
+		}) as { foo: string };
+		const other = Object.defineProperty({}, "foo", {
+			value: "baz",
+			configurable: true,
+		});
+
+		const extended = extend(original, other);
+
+		expect(extended.foo).toBe("baz");
+		expect(Object.getOwnPropertyDescriptor(extended, "foo")?.configurable).toBe(true);
 	});
 });
