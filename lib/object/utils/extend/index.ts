@@ -3,7 +3,7 @@ import type { Key } from "~/types";
 /**
  * @private
  */
-type Mask<T extends Record<Key, unknown>> = (Partial<T> & Record<Key, unknown>) | Record<Key, unknown>
+type Mask<T extends Record<Key, unknown>> = (Partial<T> & Record<Key, unknown>) | Record<Key, unknown>;
 
 export type Extend<T extends Record<Key, unknown>, U extends Mask<T>> = Omit<T, keyof U> & U;
 
@@ -30,10 +30,7 @@ export function extend<const T extends Record<Key, unknown>, const U extends Mas
 		delete descriptors[key];
 	}
 
-	const result = Object.create(
-		Object.getPrototypeOf(value),
-		descriptors,
-	);
+	const result = Object.create(Object.getPrototypeOf(value), descriptors);
 
 	Object.defineProperties(result, Object.getOwnPropertyDescriptors(other));
 
