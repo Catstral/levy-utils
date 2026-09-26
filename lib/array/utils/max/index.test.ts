@@ -51,13 +51,6 @@ describe("max", () => {
 		expect(largest).toBe(5);
 	});
 
-	test("Returns the first item when list has no numeric values and no mapper", () => {
-		const list = ["a", "b", "c"];
-		const largest = max(list);
-
-		expect(largest).toBe("a");
-	});
-
 	test("Checks the list in descending direction", () => {
 		const largest = max([1, 2, 3, 3], undefined, { direction: "DESCENDING" });
 

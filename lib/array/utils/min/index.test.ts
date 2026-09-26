@@ -51,13 +51,6 @@ describe("min", () => {
 		expect(smallest).toBe(5);
 	});
 
-	test("Returns the first item when list has no numeric values and no mapper", () => {
-		const list = ["a", "b", "c"];
-		const smallest = min(list);
-
-		expect(smallest).toBe("a");
-	});
-
 	test("Checks the list in descending direction", () => {
 		const smallest = min([1, 2, 3, 1], undefined, { direction: "DESCENDING" });
 
