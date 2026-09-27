@@ -5,8 +5,8 @@
  *
  * The time complexity for this is `O(1)`.
  *
- * @param value The number to return the sign of
- * @returns A number indicating whether the given number is positive, negative or zero
+ * @param {number} value The number to return the sign of
+ * @returns {-1 | 0 | 1} A number indicating whether the given number is positive, negative or zero
  */
 export function sign(value: number): -1 | 0 | 1 {
 	if (Number.isNaN(value) || value === 0) {
