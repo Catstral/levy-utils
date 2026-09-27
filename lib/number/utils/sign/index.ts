@@ -1,3 +1,7 @@
+import type { IsNegative } from "../negative";
+
+export type Sign<T extends number> = T extends 0 ? 0 : IsNegative<T> extends true ? -1 : 1
+
 /**
  * Returns the sign of the given number.
  *
@@ -5,13 +9,14 @@
  *
  * The time complexity for this is `O(1)`.
  *
- * @param {number} value The number to return the sign of
- * @returns {-1 | 0 | 1} A number indicating whether the given number is positive, negative or zero
+ * @template {number} T
+ * @param {T} value The number to return the sign of
+ * @returns {Sign<T>} A number indicating whether the given number is positive, negative or zero
  */
-export function sign(value: number): -1 | 0 | 1 {
+export function sign<const T extends number>(value: T): Sign<T> {
 	if (Number.isNaN(value) || value === 0) {
-		return 0;
+		return 0 as Sign<T>;
 	}
 
-	return Math.sign(value) as -1 | 0 | 1;
+	return Math.sign(value) as Sign<T>;
 }
