@@ -11,7 +11,7 @@ describe("trunc", () => {
 	});
 
 	test("Positive fraction digits", () => {
-		expect(trunc(123.456, 2)).toBe(123.46);
+		expect(trunc(123.456, 2)).toBe(123.45);
 	});
 
 	test("Zero fraction digits", () => {
@@ -23,7 +23,7 @@ describe("trunc", () => {
 	});
 
 	test("Negative number with fraction digits", () => {
-		expect(trunc(-123.456, 2)).toBe(-123.46);
+		expect(trunc(-123.456, 2)).toBe(-123.45);
 	});
 
 	test("More fraction digits than available", () => {
