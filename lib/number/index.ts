@@ -1,5 +1,7 @@
 export * from "./utils/clamp";
+export * from "./utils/isDecimal";
 export * from "./utils/isEven";
+export * from "./utils/isInteger";
 export * from "./utils/isOdd";
 export * from "./utils/mod";
 export * from "./utils/negative";

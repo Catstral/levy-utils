@@ -1,4 +1,4 @@
-export type Integer<T extends number> = `${T}` extends `${string}.${string}` ? never : T;
+export type Integer<T extends number> = `${T}` extends `${infer V extends number}.${string}` ? V : T;
 
 /**
  * Turns a value into an integer where invalid values, `NaN` or `Infinity` will return a fallback.
