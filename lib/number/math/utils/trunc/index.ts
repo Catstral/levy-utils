@@ -27,7 +27,7 @@ export function trunc<const T extends number>(
 		throw new RangeError("Fraction digits must be between 0 and 100");
 	}
 
-	const factor = 10 ** fractionDigits;
+	const [integer, fraction = ""] = value.toString().split(".");
 
-	return Math.trunc(value * factor) / factor;
+	return Number.parseFloat(`${integer}.${fraction.slice(0, fractionDigits)}`);
 }
