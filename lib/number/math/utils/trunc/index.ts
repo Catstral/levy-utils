@@ -13,6 +13,8 @@ import type { PositiveInteger } from "~/number/types";
  * @returns {number} The truncated number
  * @throws {RangeError} If `fractionDigits` is less than `0` or greater than `100`
  */
+export function trunc(value: number): number;
+export function trunc<const T extends number>(value: number, fractionDigits: PositiveInteger<T>): number;
 export function trunc<const T extends number>(
 	value: number,
 	fractionDigits: PositiveInteger<T> = 0 as PositiveInteger<T>,
