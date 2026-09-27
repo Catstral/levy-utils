@@ -30,6 +30,8 @@ A list of all the utilities supported:
   - [counting](#countinglist-identity)
   - [fork](#forklist-condition)
   - [list](#liststartorlength-end-options)
+  - [max](#maxlist-mapper-options)
+  - [min](#maxlist-mapper-options)
   - [select](#selectlist-filter-mapper)
   - [sift](#siftlist)
   - [sum](#sumlist-mapper)
@@ -143,6 +145,70 @@ list(0, 3, {
 })
 // Expected output:
 // ["foo-0", "foo-1", "foo-2", "foo-3"]
+```
+
+#### `max(list, mapper?, options?)`
+Returns the largest item from a list.
+
+```ts
+max([1, 2, 3]);
+// Expected output:
+// 3
+
+max(
+    [
+        {
+            name: "Bob"
+            weight: 54
+        },
+        {
+            name: "Paul"
+            weight: 87
+        },
+        {
+            name: "Jane"
+            weight: 63
+        },
+    ],
+    (item) => item.weight,
+);
+// Expected output:
+// {
+//     name: "Paul",
+//     weight: 87,
+// }
+```
+
+#### `min(list, mapper?, options?)`
+Returns the smallest item from a list.
+
+```ts
+min([1, 2, 3]);
+// Expected output:
+// 1
+
+min(
+    [
+        {
+            name: "Bob"
+            weight: 54
+        },
+        {
+            name: "Paul"
+            weight: 87
+        },
+        {
+            name: "Jane"
+            weight: 63
+        },
+    ],
+    (item) => item.weight,
+);
+// Expected output:
+// {
+//     name: "Bob",
+//     weight: 54,
+// }
 ```
 
 <!-- TODO -->
