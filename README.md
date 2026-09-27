@@ -53,6 +53,11 @@ A list of all the utilities supported:
   - [unwrap](#unwrapoption-fallback)
   - [values](#valuestarget)
 - [Number utilities](#number-utilities)
+  - [Math utilities](#math-utilities)
+    - [isPrime](#isPrimevalue)
+    - [mod](#moddividend-divisor)
+    - [trunc](#truncvalue-fractiondigits)
+  - [clamp](#clampmin-value-max)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
 - [Object utilities](#object-utilities)
@@ -575,6 +580,79 @@ values(new Map([
 <!-- SECTION: Number utils -->
 
 ### Number utilities
+#### Math utilities
+##### `isPrime(value)`
+Checks if the given value is a prime number.
+
+```ts
+isPrime(11);
+// Expected output:
+// true
+
+isPrime(4);
+// Expected output:
+// false
+
+[2, 3, 5, 13, 17, 101, 103].every((n) => isPrime(n));
+// Expected output:
+// true
+
+[0, 8, 1.5, -2, 200, NaN, Infinity].some((n) => isPrime(n));
+// Expected output:
+// false
+```
+
+##### `mod(dividend, divisor)`
+Returns the modulo of a dividend and a divisor.
+
+```ts
+mod(10, 5);
+// Expected output:
+// 0
+
+mod(-2, 4);
+// Expected output:
+// 2
+
+mod(6, 10);
+// Expected output:
+// 6
+```
+
+##### `trunc(value, fractionDigits?)`
+Truncates a number to the specified number of fraction digits.
+
+```ts
+trunc(1.58);
+// Expected output:
+// 1
+
+trunc(1.456, 2);
+// Expected output:
+// 1.45
+
+trunc(1.789, 10)
+// Expected output:
+// 1.789
+```
+
+#### `clamp(min, value, max)`
+Clamps a number between a minimum and maximum value.
+
+```ts
+clamp(-5, 0, 5);
+// Expected output:
+// 0
+
+clamp(-5, 20, 5);
+// Expected output:
+// 5
+
+clamp(-5, -20, 5);
+// Expected output:
+// -5
+```
+
 #### `toFloat(value, fallback?)`
 Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
 
