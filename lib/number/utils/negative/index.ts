@@ -6,8 +6,6 @@ export type IsNegative<T extends number> = T extends Negative<T> ? true : false
 /**
  * Converts a number into a negative number.
  *
- * `-0` is returned if the given value is `NaN`.
- *
  * The time complexity for this is `O(1)`.
  *
  * @template {number} T
@@ -15,7 +13,7 @@ export type IsNegative<T extends number> = T extends Negative<T> ? true : false
  * @returns {Negative<T>} A negative number
  */
 export function negative<const T extends number>(value: T): Negative<T> {
-	return (Number.isNaN(value) ? -0 : -Math.abs(value)) as Negative<T>
+	return -Math.abs(value) as Negative<T>
 }
 
 /**

@@ -17,10 +17,6 @@ describe("positive", () => {
 		expect(positive(Infinity)).toBe(Infinity);
 	});
 
-	test("NaN falls back to zero", () => {
-		expect(positive(NaN)).toBe(0);
-	})
-
 	test("Negative zero is converted into positive zero", () => {
 		expect(positive(-0)).toBe(0);
 	})

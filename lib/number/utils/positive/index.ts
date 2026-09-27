@@ -4,8 +4,6 @@ export type IsPositive<T extends number> = T extends Positive<T> ? true : false
 /**
  * Converts a number into a positive number.
  *
- * `0` is returned if the given value is `NaN`.
- *
  * The time complexity for this is `O(1)`.
  *
  * @template {number} T
@@ -13,7 +11,7 @@ export type IsPositive<T extends number> = T extends Positive<T> ? true : false
  * @returns {Positive<T>} A positive number
  */
 export function positive<const T extends number>(value: T): Positive<T> {
-	return (Number.isNaN(value) ? 0 : Math.abs(value)) as Positive<T>
+	return Math.abs(value) as Positive<T>
 }
 
 /**
