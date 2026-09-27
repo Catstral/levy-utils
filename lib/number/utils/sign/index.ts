@@ -9,7 +9,7 @@
  * @returns A number indicating whether the given number is positive, negative or zero
  */
 export function sign(value: number): -1 | 0 | 1 {
-	if (Number.isNaN(value)) {
+	if (Number.isNaN(value) || value === 0) {
 		return 0;
 	}
 
