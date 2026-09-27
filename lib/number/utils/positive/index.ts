@@ -1,5 +1,4 @@
-export type Positive<T extends number> = `${T}` extends `-${infer V extends number}` ? V : T
-export type IsPositive<T extends number> = T extends Positive<T> ? true : false
+import type { IsPositive, Positive } from "~/number";
 
 /**
  * Converts a number into a positive number.

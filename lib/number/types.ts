@@ -1,0 +1,8 @@
+export type Integer<T extends number> = `${T}` extends `${infer V extends number}.${string}` ? V : T;
+export type Positive<T extends number> = `${T}` extends `-${infer V extends number}` ? V : T;
+export type IsPositive<T extends number> = T extends Positive<T> ? true : false;
+export type Negative<T extends number> = T extends 0 ? -0 : `-${T}` extends `${infer N extends number}` ? N : T;
+export type IsNegative<T extends number> = T extends Negative<T> ? true : false;
+export type PositiveInteger<T extends number> = Integer<Positive<T>>
+export type NegativeInteger<T extends number> = Integer<Negative<T>>;
+export type NonZero<T extends number> = Exclude<T, 0>;

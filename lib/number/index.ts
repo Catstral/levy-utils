@@ -1,4 +1,5 @@
 export * from "./math";
+export * from "./types";
 export * from "./utils/clamp";
 export * from "./utils/isDecimal";
 export * from "./utils/isEven";

@@ -1,7 +1,4 @@
-export type Negative<T extends number> = T extends 0 ? -0 : `-${T}` extends `${infer N extends number}`
-	? N
-	: T;
-export type IsNegative<T extends number> = T extends Negative<T> ? true : false
+import type { IsNegative, Negative } from "~/number";
 
 /**
  * Converts a number into a negative number.
@@ -13,7 +10,7 @@ export type IsNegative<T extends number> = T extends Negative<T> ? true : false
  * @returns {Negative<T>} A negative number
  */
 export function negative<const T extends number>(value: T): Negative<T> {
-	return -Math.abs(value) as Negative<T>
+	return -Math.abs(value) as Negative<T>;
 }
 
 /**
@@ -24,7 +21,7 @@ export function negative<const T extends number>(value: T): Negative<T> {
  * @param {number} value The value to check if it is a negative number
  * @returns {boolean} A boolean that signals if the given number is negative
  */
-export function isNegative<const T extends number>(value: T): IsNegative<T>
+export function isNegative<const T extends number>(value: T): IsNegative<T>;
 export function isNegative<const T extends number>(value: T): boolean {
 	return value < 0 || Object.is(value, -0);
 }
