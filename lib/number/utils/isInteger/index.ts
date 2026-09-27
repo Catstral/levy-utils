@@ -1,4 +1,4 @@
-import type { Integer } from "../toInt";
+import type { Integer } from "~/number";
 
 export type IsInteger<T extends number> = T extends Integer<T> ? true : false;
 
