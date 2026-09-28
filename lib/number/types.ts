@@ -1,3 +1,4 @@
+export type Zero = 0 | -0; // NOTE: Typescript resolves `-0` to `0` but is included in this type anyways
 export type Integer<T extends number> = `${T}` extends `${infer V extends number}.${string}` ? V : T;
 export type Positive<T extends number> = T extends 0 | -0 ? 0 : `${T}` extends `-${infer V extends number}` ? V : T;
 export type IsPositive<T extends number> = T extends Positive<T> ? true : false;
