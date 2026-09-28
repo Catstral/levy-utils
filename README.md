@@ -58,6 +58,13 @@ A list of all the utilities supported:
     - [mod](#moddividend-divisor)
     - [trunc](#truncvalue-fractiondigits)
   - [clamp](#clampmin-value-max)
+  - [isDecimal](#isdecimalvalue)
+  - [isEven](#isevenvalue)
+  - [isInteger](#isintegervalue)
+  - [isOdd](#isoddvalue)
+  - [negative / isNegative](#negativevalue--isnegativevalue)
+  - [positive / isPositive](#positivevalue--ispositivevalue)
+  - [sign](#signvalue)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
 - [Object utilities](#object-utilities)
@@ -651,6 +658,141 @@ clamp(-5, 20, 5);
 clamp(-5, -20, 5);
 // Expected output:
 // -5
+```
+
+#### `isDecimal(value)`
+Checks if the given value is a number with decimals.
+
+```ts
+isDecimal(1.1);
+// Expected output:
+// true
+
+isDecimal(1);
+// Expected output:
+// false
+
+isDecimal(NaN);
+// Expected output:
+// false
+```
+
+#### `isEven(value)`
+Checks if the given value is an even number.
+
+```ts
+isEven(4);
+// Expected output:
+// true
+
+isEven(3);
+// Expected output:
+// false
+
+isEven(0.5);
+// Expected output:
+// false
+```
+
+#### `isInteger(value)`
+Checks if the given value is an integer.
+
+```ts
+isInteger(4);
+// Expected output:
+// true
+
+isInteger(4.5);
+// Expected output:
+// false
+```
+
+#### `isOdd(value)`
+Checks if the given value is an odd number.
+
+```ts
+isOdd(3);
+// Expected output:
+// true
+
+isOdd(4);
+// Expected output:
+// false
+
+isOdd(0.5);
+// Expected output:
+// false
+```
+
+#### `negative(value)` / `isNegative(value)`
+`negative` converts a number into a negative number. `isNegative` checks if a number is negative (`-0` is considered negative).
+
+```ts
+negative(5);
+// Expected output:
+// -5
+
+negative(-5);
+// Expected output:
+// -5
+
+isNegative(-5);
+// Expected output:
+// true
+
+isNegative(5);
+// Expected output:
+// false
+
+isNegative(-0);
+// Expected output:
+// true
+```
+
+#### `positive(value)` / `isPositive(value)`
+`positive` converts a number into a positive number. `isPositive` checks if a number is positive (`0` is considered positive).
+
+```ts
+positive(-5);
+// Expected output:
+// 5
+
+positive(5);
+// Expected output:
+// 5
+
+isPositive(5);
+// Expected output:
+// true
+
+isPositive(-5);
+// Expected output:
+// false
+
+isPositive(0);
+// Expected output:
+// true
+```
+
+#### `sign(value)`
+Returns the sign of the given number: `1` if positive, `-1` if negative, `0` if zero (`NaN` is converted into zero).
+
+```ts
+sign(5);
+// Expected output:
+// 1
+
+sign(-5);
+// Expected output:
+// -1
+
+sign(0);
+// Expected output:
+// 0
+
+sign(NaN);
+// Expected output:
+// 0
 ```
 
 #### `toFloat(value, fallback?)`
