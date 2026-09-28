@@ -12,25 +12,21 @@ import { type Computable, compute } from "~/misc";
  * @param {Computable<Params, Args>} parameters The parameters or callback that computes parameters to preset
  * @returns {(...args: Args) => ReturnType<T>} A callback that runs the input `callback` with the preset parameters
  */
-export function preset<const T extends (...args: never[]) => unknown>(
-	callback: T,
-	parameters: Parameters<T>,
-): () => ReturnType<T>;
-export function preset<const T extends (...args: never[]) => unknown>(
-	callback: T,
-	parameters: () => Parameters<T>,
-): () => ReturnType<T>;
-export function preset<const T extends (...args: never[]) => unknown, const Args extends unknown[] = never[]>(
-	callback: T,
-	parameters: (...args: Args) => Parameters<T>,
-): (...args: Args) => ReturnType<T>;
-export function preset<const T extends (...args: never[]) => unknown, const Args extends unknown[] = never[]>(
-	callback: T,
-	parameters: Computable<Parameters<T>, Args>,
-): (...args: Args) => ReturnType<T> {
-	return (...args: Args): ReturnType<T> => {
+export function preset<const Args extends unknown[] = never[], const R = unknown>(
+	callback: (...args: Args) => R,
+	parameters: Args,
+): () => R;
+export function preset<const Args extends unknown[] = never[], const R = unknown, const P extends unknown[] = never[]>(
+	callback: (...args: Args) => R,
+	parameters: (...args: P) => Args,
+): (...args: P) => R;
+export function preset<const Args extends unknown[] = never[], const R = unknown, const P extends unknown[] = never[]>(
+	callback: (...args: Args) => R,
+	parameters: Computable<Args, P>,
+): (...args: P) => R {
+	return (...args) => {
 		const params = compute(parameters, ...args);
 
-		return callback(...params) as ReturnType<T>;
+		return callback(...params) as R;
 	};
 }
