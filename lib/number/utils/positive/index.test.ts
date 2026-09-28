@@ -19,8 +19,8 @@ describe("positive", () => {
 
 	test("Negative zero is converted into positive zero", () => {
 		expect(positive(-0)).toBe(0);
-	})
-})
+	});
+});
 
 describe("isPositive", () => {
 	test("Positive values return true", () => {
@@ -44,5 +44,5 @@ describe("isPositive", () => {
 
 	test("Minus zero is treated as a non-positive", () => {
 		expect(isPositive(-0)).toBeFalse();
-	})
-})
+	});
+});

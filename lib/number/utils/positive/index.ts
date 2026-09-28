@@ -10,7 +10,7 @@ import type { IsPositive, Positive } from "~/number";
  * @returns {Positive<T>} A positive number
  */
 export function positive<const T extends number>(value: T): Positive<T> {
-	return Math.abs(value) as Positive<T>
+	return Math.abs(value) as Positive<T>;
 }
 
 /**
@@ -21,7 +21,7 @@ export function positive<const T extends number>(value: T): Positive<T> {
  * @param {number} value The value to check if it is a positive number
  * @returns {boolean} A boolean that signals if the given number is positive
  */
-export function isPositive<const T extends number>(value: T): IsPositive<T>
+export function isPositive<const T extends number>(value: T): IsPositive<T>;
 export function isPositive<const T extends number>(value: T): boolean {
 	return value > 0 || Object.is(value, 0);
 }
