@@ -10,3 +10,4 @@ export * from "./utils/positive";
 export * from "./utils/sign";
 export * from "./utils/toFloat";
 export * from "./utils/toInt";
+export * from "./utils/trunc";
