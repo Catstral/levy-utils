@@ -23,10 +23,14 @@ export function preset<const Args extends unknown[] = never[], const R = unknown
 export function preset<const Args extends unknown[] = never[], const R = unknown, const P extends unknown[] = never[]>(
 	callback: (...args: Args) => R,
 	parameters: Computable<Args, P>,
-): (...args: P) => R {
+): (...args: P) => R;
+export function preset<const T extends (...args: never[]) => unknown, const Args extends unknown[] = never[]>(
+	callback: T,
+	parameters: Computable<Parameters<T>, Args>,
+): (...args: Args) => ReturnType<T> {
 	return (...args) => {
 		const params = compute(parameters, ...args);
 
-		return callback(...params) as R;
+		return callback(...params) as ReturnType<T>;
 	};
 }
