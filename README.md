@@ -56,7 +56,6 @@ A list of all the utilities supported:
   - [Math utilities](#math-utilities)
     - [isPrime](#isPrimevalue)
     - [mod](#moddividend-divisor)
-    - [trunc](#truncvalue-fractiondigits)
   - [clamp](#clampmin-value-max)
   - [isDecimal](#isdecimalvalue)
   - [isEven](#isevenvalue)
@@ -69,6 +68,7 @@ A list of all the utilities supported:
   - [sign](#signvalue)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
+  - [trunc](#truncvalue-fractiondigits)
 - [Object utilities](#object-utilities)
   - [entries](#entriesvalue)
   - [extend](#extendvalue-other)
@@ -628,23 +628,6 @@ mod(6, 10);
 // 6
 ```
 
-##### `trunc(value, fractionDigits?)`
-Truncates a number to the specified number of fraction digits.
-
-```ts
-trunc(1.58);
-// Expected output:
-// 1
-
-trunc(1.456, 2);
-// Expected output:
-// 1.45
-
-trunc(1.789, 10)
-// Expected output:
-// 1.789
-```
-
 #### `clamp(min, value, max)`
 Clamps a number between a minimum and maximum value.
 
@@ -839,6 +822,23 @@ toInt(true);
 toInt("not a number", -1);
 // Expected output:
 // -1
+```
+
+#### `trunc(value, fractionDigits?)`
+Truncates a number to the specified number of fraction digits.
+
+```ts
+trunc(1.58);
+// Expected output:
+// 1
+
+trunc(1.456, 2);
+// Expected output:
+// 1.45
+
+trunc(1.789, 10)
+// Expected output:
+// 1.789
 ```
 
 <!-- !SECTION -->
