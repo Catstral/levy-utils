@@ -18,10 +18,10 @@ export function positive<const T extends number>(value: T): Positive<T> {
  *
  * The time complexity for this is `O(1)`.
  *
- * @param {number} value The value to check if it is a positive number
- * @returns {boolean} A boolean that signals if the given number is positive
+ * @template {number} T
+ * @param {T} value The value to check if it is a positive number
+ * @returns {IsPositive<T>} A boolean that signals if the given number is positive
  */
-export function isPositive<const T extends number>(value: T): IsPositive<T>;
-export function isPositive<const T extends number>(value: T): boolean {
-	return value > 0 || Object.is(value, 0);
+export function isPositive<const T extends number>(value: T): IsPositive<T> {
+	return (value > 0 || Object.is(value, 0)) as IsPositive<T>;
 }

@@ -18,10 +18,10 @@ export function negative<const T extends number>(value: T): Negative<T> {
  *
  * The time complexity for this is `O(1)`.
  *
- * @param {number} value The value to check if it is a negative number
- * @returns {boolean} A boolean that signals if the given number is negative
+ * @template {number} T
+ * @param {T} value The value to check if it is a negative number
+ * @returns {IsNegative<T>} A boolean that signals if the given number is negative
  */
-export function isNegative<const T extends number>(value: T): IsNegative<T>;
-export function isNegative<const T extends number>(value: T): boolean {
-	return value < 0 || Object.is(value, -0);
+export function isNegative<const T extends number>(value: T): IsNegative<T> {
+	return (value < 0 || Object.is(value, -0)) as IsNegative<T>;
 }
