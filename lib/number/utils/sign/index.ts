@@ -1,6 +1,12 @@
-import type { IsNegative } from "~/number";
+import type { IsNegative, Zero } from "~/number";
 
-export type Sign<T extends number> = T extends 0 ? 0 : IsNegative<T> extends true ? -1 : 1;
+export type Sign<T extends number> = number extends T
+	? -1 | 0 | 1
+	: T extends Zero
+		? 0
+		: IsNegative<T> extends true
+			? -1
+			: 1;
 
 /**
  * Returns the sign of the given number.
