@@ -19,30 +19,25 @@ describe("positive", () => {
 
 	test("Negative zero is converted into positive zero", () => {
 		expect(positive(-0)).toBe(0);
-	})
-})
+	});
+});
 
 describe("isPositive", () => {
-	test("Positive values return true", () => {
-		expect(isPositive(1)).toBeTrue();
-		expect(isPositive(0.5)).toBeTrue();
-		expect(isPositive(0)).toBeTrue();
-		expect(isPositive(Number.MAX_SAFE_INTEGER)).toBeTrue();
-		expect(isPositive(Infinity)).toBeTrue();
+	// Positive values return true
+	test.each([1, 0.5, 0, Number.MAX_SAFE_INTEGER, Infinity])("%d returns true", (value) => {
+		expect(isPositive(value)).toBeTrue();
 	});
 
-	test("Negative values return false", () => {
-		expect(isPositive(-1)).toBeFalse();
-		expect(isPositive(-0.5)).toBeFalse();
-		expect(isPositive(Number.MIN_SAFE_INTEGER)).toBeFalse();
-		expect(isPositive(-Infinity)).toBeFalse();
+	// Negative values return false
+	test.each([-1, -0.5, Number.MIN_SAFE_INTEGER, -Infinity])("%d returns false", (value) => {
+		expect(isPositive(value)).toBeFalse();
 	});
 
 	test("NaN returns false", () => {
 		expect(isPositive(NaN)).toBeFalse();
 	});
 
-	test("Minus zero is treated as a non-positive", () => {
+	test("Negative zero is treated as a non-positive", () => {
 		expect(isPositive(-0)).toBeFalse();
-	})
-})
+	});
+});
