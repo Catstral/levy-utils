@@ -40,8 +40,10 @@ A list of all the utilities supported:
   - [chain](#chaincallbacks)
   - [compose](#composecallbacks)
   - [defer](#defercallback)
+  - [pipe](#pipevalue-callback)
   - [preset](#presetcallback-parameters)
   - [retry](#retrycallback-options)
+  - [task](#taskcallback)
 - [Miscellaneous utilities](#miscellaneous-utilities)
   - [compute / isComputation](#computevalue-args--iscomputationvalue)
   - [isEmpty](#isemptyvalue)
@@ -330,6 +332,19 @@ Defers a callback to the next execution cycle.
 defer(() => console.log("runs after the current call stack clears"));
 ```
 
+#### `pipe(value, callback)`
+Pipes a value into a callback and returns its result.
+
+```ts
+pipe(5, (n) => n * 2);
+// Expected output:
+// 10
+
+pipe("Levy", (name) => `${name} utils`);
+// Expected output:
+// "Levy utils"
+```
+
 #### `preset(callback, parameters)`
 Presets the parameters of a callback with a callback that computes its arguments.
 
@@ -346,6 +361,10 @@ fn("10");
 fn("3.2");
 // Expected output:
 // 3
+
+preset(Number.parseInt, ["0", 10])();
+// Expected output:
+// 0
 ```
 
 #### `retry(callback, options?)`
@@ -365,6 +384,19 @@ Options:
 - `delay` - delay between retries in milliseconds (default `1000`)
 - `backoff` - whether to double the delay after each retry (default `false`)
 - `onRetry` - callback invoked with the error and attempt number on each failed attempt
+
+#### `task(callback?)`
+Executes the given callback in asynchronous context.
+
+```ts
+// This yields execution to the microtask queue.
+await task();
+
+// A task that has a seperate asynchronous flow 
+task(async () => {
+    await doSomething();
+});
+```
 
 <!-- !SECTION -->
 <!-- SECTION: Misc utils -->
