@@ -3,7 +3,7 @@ import type { Promisable } from "~/types";
 /**
  * Executes the given callback in asynchronous context.
  *
- * If no callback is given, it yields execution to the microtask queue
+ * If no callback is given, it yields execution to the microtask queue.
  *
  * The time complexity for this is `O(1)`.
  *
