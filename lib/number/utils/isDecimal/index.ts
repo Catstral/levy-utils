@@ -1,4 +1,8 @@
-export type IsDecimal<T extends number> = `${T}` extends `${string}.${string}` ? true : false;
+export type IsDecimal<T extends number> = number extends T
+	? boolean
+	: `${T}` extends `${string}.${string}`
+		? true
+		: false;
 
 /**
  * Checks if the given value is a number with decimals.
