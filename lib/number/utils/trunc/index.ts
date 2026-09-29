@@ -15,10 +15,7 @@ import type { PositiveInteger } from "~/number/types";
  */
 export function trunc(value: number): number;
 export function trunc<const T extends number>(value: number, fractionDigits: PositiveInteger<T>): number;
-export function trunc<const T extends number>(
-	value: number,
-	fractionDigits: PositiveInteger<T> = 0 as PositiveInteger<T>,
-): number {
+export function trunc(value: number, fractionDigits: number = 0): number {
 	if (fractionDigits === 0) {
 		return Math.trunc(value);
 	}
