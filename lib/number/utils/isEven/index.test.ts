@@ -2,28 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { isEven } from ".";
 
 describe("isEven", () => {
-	// Positive even numbers return true
-	test.each([2, 4, 60, 174, 8991223104])("%d returns true", (value) => {
+	// Even numbers return true
+	test.each([2, 4, 60, 174, 8991223104, -2, -4, -60, -174, -8991223104])("%d returns true", (value) => {
 		expect(isEven(value)).toBeTrue();
 	});
 
-	// Negative even numbers return true
-	test.each([-2, -4, -60, -174, -8991223104])("%d returns true", (value) => {
-		expect(isEven(value)).toBeTrue();
-	});
-
-	// Positive odd numbers return false
-	test.each([1, 3, 59, 173, 8991223103])("%d returns false", (value) => {
-		expect(isEven(value)).toBeFalse();
-	});
-
-	// Negative odd numbers return false
-	test.each([-1, -3, -59, -173, -8991223103])("%d returns false", (value) => {
-		expect(isEven(value)).toBeFalse();
-	});
-
-	// Decimal numbers return false
-	test.each([0.5, 1.5, 60.1, 20.001, 4201.3, -1.2, -4.62, 9.002])("%d returns false", (value) => {
+	// Odd and/or decimal numbers return false
+	test.each([
+		1, 3, 59, 173, 8991223103, -1, -3, -59, -173, -8991223103, 0.5, 1.5, 60.1, 20.001, 4201.3, -1.2, -4.62, 9.002,
+	])("%d returns false", (value) => {
 		expect(isEven(value)).toBeFalse();
 	});
 
