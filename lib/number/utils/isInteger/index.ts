@@ -1,6 +1,4 @@
-import type { Integer } from "~/number";
-
-export type IsInteger<T extends number> = T extends Integer<T> ? true : false;
+import type { IsInteger } from "~/number";
 
 /**
  * Checks if the given value is an integer.

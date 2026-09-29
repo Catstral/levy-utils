@@ -1,6 +1,6 @@
 export type IsDecimal<T extends number> = number extends T
 	? boolean
-	: `${T}` extends `${string}.${string}`
+	: `${T}` extends `${number}.${number}`
 		? true
 		: false;
 
