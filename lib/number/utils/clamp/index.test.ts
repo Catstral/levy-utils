@@ -29,7 +29,7 @@ describe("clamp", () => {
 		[NaN, 0, NaN],
 		[NaN, NaN, 5],
 		[NaN, NaN, NaN],
-	])("Returns NaN if the argument are [%d, %d, %d]", (min, value, max) => {
+	])("Returns NaN if any argument of [%d, %d, %d] is NaN", (min, value, max) => {
 		expect(clamp(min, value, max)).toBeNaN();
 	});
 
