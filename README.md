@@ -61,9 +61,11 @@ A list of all the utilities supported:
   - [isDecimal](#isdecimalvalue)
   - [isEven](#isevenvalue)
   - [isInteger](#isintegervalue)
+  - [isNegative](#isnegativevalue)
   - [isOdd](#isoddvalue)
-  - [negative / isNegative](#negativevalue--isnegativevalue)
-  - [positive / isPositive](#positivevalue--ispositivevalue)
+  - [isPositive](#ispositivevalue)
+  - [negative](#negativevalue)
+  - [positive](#positivevalue)
   - [sign](#signvalue)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
@@ -600,11 +602,11 @@ isPrime(4);
 // Expected output:
 // false
 
-[2, 3, 5, 13, 17, 101, 103].every((n) => isPrime(n));
+isPrime(103);
 // Expected output:
 // true
 
-[0, 8, 1.5, -2, 200, NaN, Infinity].some((n) => isPrime(n));
+isPrime(-9.2);
 // Expected output:
 // false
 ```
@@ -707,6 +709,23 @@ isInteger(4.5);
 // false
 ```
 
+#### `isNegative(value)`
+Checks if the given value is a negative number.
+
+```ts
+isNegative(-5);
+// Expected output:
+// true
+
+isNegative(5);
+// Expected output:
+// false
+
+isNegative(-0);
+// Expected output:
+// true
+```
+
 #### `isOdd(value)`
 Checks if the given value is an odd number.
 
@@ -724,43 +743,10 @@ isOdd(0.5);
 // false
 ```
 
-#### `negative(value)` / `isNegative(value)`
-`negative` converts a number into a negative number. `isNegative` checks if a number is negative (`-0` is considered negative).
+#### `isPositive(value)`
+Checks if the given value is a positive number.
 
 ```ts
-negative(5);
-// Expected output:
-// -5
-
-negative(-5);
-// Expected output:
-// -5
-
-isNegative(-5);
-// Expected output:
-// true
-
-isNegative(5);
-// Expected output:
-// false
-
-isNegative(-0);
-// Expected output:
-// true
-```
-
-#### `positive(value)` / `isPositive(value)`
-`positive` converts a number into a positive number. `isPositive` checks if a number is positive (`0` is considered positive).
-
-```ts
-positive(-5);
-// Expected output:
-// 5
-
-positive(5);
-// Expected output:
-// 5
-
 isPositive(5);
 // Expected output:
 // true
@@ -772,6 +758,32 @@ isPositive(-5);
 isPositive(0);
 // Expected output:
 // true
+```
+
+#### `negative(value)`
+Converts a number into a negative number.
+
+```ts
+negative(5);
+// Expected output:
+// -5
+
+negative(-5);
+// Expected output:
+// -5
+```
+
+#### `positive(value)`
+Converts a number into a positive number.
+
+```ts
+positive(-5);
+// Expected output:
+// 5
+
+positive(5);
+// Expected output:
+// 5
 ```
 
 #### `sign(value)`
