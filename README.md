@@ -55,8 +55,22 @@ A list of all the utilities supported:
   - [unwrap](#unwrapoption-fallback)
   - [values](#valuestarget)
 - [Number utilities](#number-utilities)
+  - [Math utilities](#math-utilities)
+    - [isPrime](#isPrimevalue)
+    - [mod](#moddividend-divisor)
+  - [clamp](#clampmin-value-max)
+  - [isDecimal](#isdecimalvalue)
+  - [isEven](#isevenvalue)
+  - [isInteger](#isintegervalue)
+  - [isNegative](#isnegativevalue)
+  - [isOdd](#isoddvalue)
+  - [isPositive](#ispositivevalue)
+  - [negative](#negativevalue)
+  - [positive](#positivevalue)
+  - [sign](#signvalue)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
+  - [trunc](#truncvalue-fractiondigits)
 - [Object utilities](#object-utilities)
   - [entries](#entriesvalue)
   - [extend](#extendvalue-other)
@@ -607,6 +621,207 @@ values(new Map([
 <!-- SECTION: Number utils -->
 
 ### Number utilities
+#### Math utilities
+##### `isPrime(value)`
+Checks if the given value is a prime number.
+
+```ts
+isPrime(11);
+// Expected output:
+// true
+
+isPrime(4);
+// Expected output:
+// false
+
+isPrime(103);
+// Expected output:
+// true
+
+isPrime(-9.2);
+// Expected output:
+// false
+```
+
+##### `mod(dividend, divisor)`
+Returns the modulo of a dividend and a divisor.
+
+```ts
+mod(10, 5);
+// Expected output:
+// 0
+
+mod(-2, 4);
+// Expected output:
+// 2
+
+mod(6, 10);
+// Expected output:
+// 6
+```
+
+#### `clamp(min, value, max)`
+Clamps a number between a minimum and maximum value.
+
+```ts
+clamp(-5, 0, 5);
+// Expected output:
+// 0
+
+clamp(-5, 20, 5);
+// Expected output:
+// 5
+
+clamp(-5, -20, 5);
+// Expected output:
+// -5
+```
+
+#### `isDecimal(value)`
+Checks if the given value is a number with decimals.
+
+```ts
+isDecimal(1.1);
+// Expected output:
+// true
+
+isDecimal(1);
+// Expected output:
+// false
+
+isDecimal(NaN);
+// Expected output:
+// false
+```
+
+#### `isEven(value)`
+Checks if the given value is an even number.
+
+```ts
+isEven(4);
+// Expected output:
+// true
+
+isEven(3);
+// Expected output:
+// false
+
+isEven(0.5);
+// Expected output:
+// false
+```
+
+#### `isInteger(value)`
+Checks if the given value is an integer.
+
+```ts
+isInteger(4);
+// Expected output:
+// true
+
+isInteger(4.5);
+// Expected output:
+// false
+```
+
+#### `isNegative(value)`
+Checks if the given value is a negative number.
+
+```ts
+isNegative(-5);
+// Expected output:
+// true
+
+isNegative(5);
+// Expected output:
+// false
+
+isNegative(-0);
+// Expected output:
+// true
+```
+
+#### `isOdd(value)`
+Checks if the given value is an odd number.
+
+```ts
+isOdd(3);
+// Expected output:
+// true
+
+isOdd(4);
+// Expected output:
+// false
+
+isOdd(0.5);
+// Expected output:
+// false
+```
+
+#### `isPositive(value)`
+Checks if the given value is a positive number.
+
+```ts
+isPositive(5);
+// Expected output:
+// true
+
+isPositive(-5);
+// Expected output:
+// false
+
+isPositive(0);
+// Expected output:
+// true
+```
+
+#### `negative(value)`
+Converts a number into a negative number.
+
+```ts
+negative(5);
+// Expected output:
+// -5
+
+negative(-5);
+// Expected output:
+// -5
+```
+
+#### `positive(value)`
+Converts a number into a positive number.
+
+```ts
+positive(-5);
+// Expected output:
+// 5
+
+positive(5);
+// Expected output:
+// 5
+```
+
+#### `sign(value)`
+Returns the sign of the given number: `1` if positive, `-1` if negative, `0` if zero (`NaN` is converted into zero).
+
+```ts
+sign(5);
+// Expected output:
+// 1
+
+sign(-5);
+// Expected output:
+// -1
+
+sign(0);
+// Expected output:
+// 0
+
+sign(NaN);
+// Expected output:
+// 0
+```
+
 #### `toFloat(value, fallback?)`
 Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
 
@@ -639,6 +854,23 @@ toInt(true);
 toInt("not a number", -1);
 // Expected output:
 // -1
+```
+
+#### `trunc(value, fractionDigits?)`
+Truncates a number to the specified number of fraction digits.
+
+```ts
+trunc(1.58);
+// Expected output:
+// 1
+
+trunc(1.456, 2);
+// Expected output:
+// 1.45
+
+trunc(1.789, 10)
+// Expected output:
+// 1.789
 ```
 
 <!-- !SECTION -->
