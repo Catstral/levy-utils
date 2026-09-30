@@ -7,9 +7,9 @@ import type { Promisable } from "~/types";
  *
  * The time complexity for this is `O(1)`.
  *
- * @param {() => Promisable<void>} [callback=(() => {})] An optional callback to execute
+ * @param {() => Promisable<void>} [callback] An optional callback to execute
  * @returns {Promise<void>} A Promise that resolves after the callback has completed or execution has yielded to the microtask queue
  */
-export async function task(callback: () => Promisable<void> = () => {}): Promise<void> {
-	await callback();
+export async function task(callback?: () => Promisable<void>): Promise<void> {
+	await callback?.();
 }
