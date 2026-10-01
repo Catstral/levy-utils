@@ -76,8 +76,7 @@ describe("cluster", () => {
 	test("Empty items list", () => {
 		const clustered = cluster([], 3);
 
-		expect(clustered).toBeArrayOfSize(1);
-		expect(clustered[0]).toBeArrayOfSize(0);
+		expect(clustered).toBeArrayOfSize(0);
 	});
 
 	test("Length is an exact multiple of size", () => {

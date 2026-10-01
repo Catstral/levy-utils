@@ -25,6 +25,10 @@ export function cluster<const T>(items: T[], size: number): T[][] {
 		throw new ClusterUtilError("Items must be an array");
 	}
 
+	if (items.length === 0) {
+		return [];
+	}
+
 	const clustered: T[][] = [[]];
 
 	let index = 0;
