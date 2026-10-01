@@ -8,6 +8,14 @@ export class UuidV4UtilError extends UtilError {
 
 export interface UuidV4Options extends UuidRNGOptions {}
 
+/**
+ * Returns a Cryptographically secure random V4 UUID string.
+ *
+ * The time complexity for this is `O(1)`.
+ *
+ * @param {UuidV1Options} [options] The options to decide how to generate the UUID
+ * @returns {string} A V4 UUID string
+ */
 export function uuidV4(options?: UuidV4Options): string {
 	// If possible and no options are given, use the build in secure UUID generation
 	if (!options && crypto && "randomUUID" in crypto && typeof crypto.randomUUID === "function") {

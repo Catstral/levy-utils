@@ -8,7 +8,15 @@ export class UuidV1UtilError extends UtilError {
 
 export interface UuidV1Options extends UuidRNGOptions {}
 
-export function uuidV1(options?: UuidV1Options) {
+/**
+ * Returns a Cryptographically secure random V1 UUID string.
+ *
+ * The time complexity for this is `O(1)`.
+ *
+ * @param {UuidV1Options} [options] The options to decide how to generate the UUID
+ * @returns {string} A V1 UUID string
+ */
+export function uuidV1(options?: UuidV1Options): string {
 	const random = getRNG(options);
 
 	if (!random) {
@@ -68,5 +76,13 @@ export function uuidV1(options?: UuidV1Options) {
 		offset += 1;
 	}
 
-	return stringifyBytes(buffer);
+	const stringified = stringifyBytes(buffer);
+
+	if (!stringified) {
+		throw new UuidV1UtilError("Something went wrong generating the UUID, a malformed UUID was detected.");
+	}
+
+	return stringified;
 }
+
+export { uuidV1 as v1 };
