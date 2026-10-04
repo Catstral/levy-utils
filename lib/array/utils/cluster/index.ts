@@ -13,7 +13,7 @@ export class ClusterUtilError extends UtilError {
  * @param {T[]} items The items to cluster
  * @param size The max size for each list
  * @returns {T[][]} An array of arrays with a max size of the specified size
- * @throws {ClusterUtilError} If the cluster size is less then 1
+ * @throws {ClusterUtilError} If the cluster size is less than 1
  * @throws {ClusterUtilError} If the given items are not an array
  */
 export function cluster<const T>(items: [T, ...T[]], size: number): [T[], ...T[][]];
