@@ -13,17 +13,17 @@ import type { Promisable } from "~/types";
  */
 export function map<const T, const R>(
 	list: readonly T[],
-	callback: (item: T, index: number, list: readonly T[]) => Promisable<R>,
+	callback: (item: T, index: number, list: readonly T[]) => Promise<R>,
 ): Promise<R[]>;
 export function map<const T, const R>(
 	list: readonly T[],
 	callback: (item: T, index: number, list: readonly T[]) => R,
 ): R[];
-export function map<const T, const R>(
-	list: readonly T[],
-	callback: (item: T, index: number, list: readonly T[]) => R,
-): Promisable<R[]> {
-	const result: R[] = [];
+export function map(
+	list: readonly unknown[],
+	callback: (item: unknown, index: number, list: readonly unknown[]) => unknown,
+): Promisable<unknown[]> {
+	const result: unknown[] = [];
 
 	let isPromise = false;
 

@@ -23,13 +23,13 @@ export function filter<const T, const R extends T>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => unknown,
 ): R[];
-export function filter<const T, const R extends T>(
-	list: readonly T[],
-	predicate: (item: T, index: number, list: readonly T[]) => Promisable<unknown>,
-): Promisable<R[]> {
-	const values: R[] = [];
+export function filter(
+	list: readonly unknown[],
+	predicate: (item: unknown, index: number, list: readonly unknown[]) => Promisable<unknown>,
+): Promisable<unknown[]> {
+	const values: unknown[] = [];
 
-	let entries: Promisable<[boolean, T]>[] = [];
+	let entries: Promisable<[boolean, unknown]>[] = [];
 	let isPromise = false;
 
 	for (const [index, value] of list.entries()) {
@@ -46,22 +46,22 @@ export function filter<const T, const R extends T>(
 		}
 
 		if (result instanceof Promise) {
-			entries = values.map((value) => [true, value] as [boolean, T]);
+			entries = values.map((value) => [true, value]);
 			isPromise = true;
 
 			values.length = 0;
 		} else if (result) {
-			values.push(value as R);
+			values.push(value);
 		}
 	}
 
 	if (isPromise) {
 		return Promise.all(entries).then((values) => {
-			const result: R[] = [];
+			const result: unknown[] = [];
 
 			for (const [passed, value] of values) {
 				if (passed) {
-					result.push(value as R);
+					result.push(value);
 				}
 			}
 
