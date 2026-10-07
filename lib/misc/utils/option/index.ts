@@ -29,19 +29,28 @@ export type Option<T> =
  * The time complexity for this is `O(1)`.
  *
  * @template {Promisable<?>} T
- * @param {() => T} callback The callback to wrap the value
+ * @template {?[]} [Args=never[]]
+ * @param {(...args: Args) => T} callback The callback to wrap the value
+ * @param {...Args} parameters Parameters to pass to the given callback
  * @returns {T extends Promise<infer V> ? Promise<Option<V>> : Option<T>} The result wrapped in an `Option`
  *
  * @see {@link Option} for more details about an option value
  * @see {@link unwrap} for a utility that handles option values
  */
-export function safe<const T>(callback: () => T): Option<T>;
-export function safe<const T extends Promise<unknown>>(callback: () => T): Promise<Option<Awaited<T>>>;
-export function safe<const T extends Promisable<unknown>>(
-	callback: () => T,
+export function safe<const T, const Args extends unknown[] = never[]>(
+	callback: (...args: Args) => T,
+	...parameters: Args
+): Option<T>;
+export function safe<const T extends Promise<unknown>, const Args extends unknown[] = never[]>(
+	callback: (...args: Args) => T,
+	...parameters: Args
+): Promise<Option<Awaited<T>>>;
+export function safe<const T extends Promisable<unknown>, const Args extends unknown[] = never[]>(
+	callback: (...args: Args) => T,
+	...parameters: Args
 ): T extends Promise<infer V> ? Promise<Option<V>> : Option<T> {
 	try {
-		const value = callback();
+		const value = callback(...parameters);
 
 		if (value instanceof Promise) {
 			return value.then(

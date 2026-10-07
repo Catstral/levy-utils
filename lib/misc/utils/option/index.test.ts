@@ -35,6 +35,8 @@ describe("option", () => {
 			expect(succesfulFn).toBeCalledTimes(1);
 			expect(failedFn).toBeCalledTimes(1);
 		});
+
+		// TODO: write tests for new parameter behaviour
 	});
 
 	describe("unwrap", () => {
