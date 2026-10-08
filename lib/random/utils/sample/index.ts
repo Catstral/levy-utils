@@ -1,9 +1,4 @@
-import { UtilError } from "~/error";
 import { getCryptoSecureRandomNumber } from "~/random/helper";
-
-export class SampleUtilError extends UtilError {
-	public readonly util = "sample";
-}
 
 /**
  * Returns a random item from a given array or `undefined` if the array length is 0.
@@ -23,5 +18,5 @@ export function sample(array: readonly unknown[]): unknown {
 		return undefined;
 	}
 
-	return array[getCryptoSecureRandomNumber(array.length, SampleUtilError)];
+	return array[getCryptoSecureRandomNumber(array.length)];
 }

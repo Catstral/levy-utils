@@ -1,9 +1,4 @@
-import { UtilError } from "~/error";
 import { getCryptoSecureRandomNumber } from "~/random/helper";
-
-export class ShuffleUtilError extends UtilError {
-	public readonly util = "shuffle";
-}
 
 /**
  * Returns a new Array from a given array, with every item moved to a random position.
@@ -20,7 +15,7 @@ export function shuffle<const T>(array: readonly T[]): T[] {
 	const cloned = [...array];
 
 	for (let index = cloned.length - 1; index !== 1; index -= 1) {
-		const swapIndex = getCryptoSecureRandomNumber(index, ShuffleUtilError);
+		const swapIndex = getCryptoSecureRandomNumber(index);
 
 		[cloned[swapIndex], cloned[index]] = [cloned[index], cloned[swapIndex]];
 	}
