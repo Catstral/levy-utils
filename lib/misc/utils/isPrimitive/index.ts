@@ -7,9 +7,9 @@ export type Primitive = string | number | boolean | symbol | null | undefined;
  * - string
  * - number
  * - boolean
- * - null
- * - undefined
  * - symbol
+ * - `null`
+ * - `undefined`
  *
  * The time complexity for this is `O(1)`.
  *
