@@ -6,7 +6,12 @@ export class UuidV1UtilError extends UtilError {
 	public readonly util = "uuidV1";
 }
 
-export interface UuidV1Options extends UuidRNGOptions {}
+export interface UuidV1Options extends UuidRNGOptions {
+	miliseconds?: number;
+	nanoseconds?: number;
+	clockSequence?: number;
+	node?: Uint8Array;
+}
 
 /**
  * Returns a Cryptographically secure random V1 UUID string.
@@ -26,11 +31,11 @@ export function uuidV1(options?: UuidV1Options): string {
 	// NOTE: the milis and nanos split is because it requires 57+ bit numbers, but JS doesn't offer that precision.
 	// Offset to Gregorian epoch
 	// https://www.rfc-editor.org/rfc/rfc9562.html#section-5.1-1
-	const milis = Date.now() + 12219292800000;
-	const nanos = 0;
-	const clockSequence = ((random[8] << 8) | random[9]) & 0x3fff;
+	const milis = (options?.miliseconds ?? Date.now()) + 12219292800000;
+	const nanos = options?.nanoseconds ?? 0;
+	const clockSequence = options?.clockSequence ?? ((random[8] << 8) | random[9]) & 0x3fff;
 	const buffer = new Uint8Array(16);
-	const node = random.slice(10, 16);
+	const node = options?.node ?? random.slice(10, 16);
 
 	// Set multicast bit
 	// https://www.rfc-editor.org/rfc/rfc9562.html#section-6.10-3

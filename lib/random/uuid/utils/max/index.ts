@@ -1,5 +1,5 @@
 /**
- * Returns a max UUID string that is all 'f' (or ones in byte form).
+ * Returns a max UUID string that is all 'f' (or ones in bit form).
  *
  * The time complexity for this is `O(1)`.
  *
