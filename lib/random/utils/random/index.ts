@@ -3,6 +3,8 @@
  *
  * Returns `NaN` if the minimum and maximum contradict each other.
  *
+ * NOTE: this is the only random utility in this library that is **NOT** cryptographically secure.
+ *
  * The time complexity for this is `O(1)`.
  *
  * @param {number} [min=0] The minimum random value
