@@ -17,7 +17,7 @@ export interface UuidV7Options extends UuidRNGOptions {
  * The time complexity for this is `O(1)`.
  *
  * @param {UuidV7Options} [options] The options to decide how to generate the UUID
- * @returns {string} A V1 UUID string
+ * @returns {string} A V7 UUID string
  */
 export function uuidV7(options?: UuidV7Options): string {
 	const random = getRNG(options);
