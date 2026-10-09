@@ -11,7 +11,7 @@ describe("uuidV1", () => {
 
 		const uuid = uuidV1({
 			random: Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 0, clockSequence >> 8, clockSequence & 0xff, ...node),
-			miliseconds: 0x17f22e279b0,
+			milliseconds: 0x17f22e279b0,
 			nanoseconds: 0,
 			clockSequence,
 			node,
