@@ -41,44 +41,31 @@ export function uuidV1(options?: UuidV1Options): string {
 	// https://www.rfc-editor.org/rfc/rfc9562.html#section-6.10-3
 	node[0] | 0x01;
 
-	let offset = 0;
-
 	const timestamp = (milis & 0xfffffff) * 10000 + nanos;
 	const timeLow = timestamp >>> 0;
 
-	buffer[offset] = (timeLow >>> 24) & 0xff;
-	offset += 1;
-	buffer[offset] = (timeLow >>> 16) & 0xff;
-	offset += 1;
-	buffer[offset] = (timeLow >>> 8) & 0xff;
-	offset += 1;
-	buffer[offset] = timeLow & 0xff;
-	offset += 1;
+	buffer[0] = (timeLow >>> 24) & 0xff;
+	buffer[1] = (timeLow >>> 16) & 0xff;
+	buffer[2] = (timeLow >>> 8) & 0xff;
+	buffer[3] = timeLow & 0xff;
 
 	const timeMid = (((milis / 0x10000000) | 0) * 625 + ((timestamp / 0x100000000) | 0)) & 0xfffffff;
 
-	buffer[offset] = (timeMid >>> 8) & 0xff;
-	offset += 1;
-	buffer[offset] = timeMid & 0xff;
-	offset += 1;
+	buffer[4] = (timeMid >>> 8) & 0xff;
+	buffer[5] = timeMid & 0xff;
 
 	// `time_high_and_version`
-	buffer[offset] = ((timeMid >>> 24) & 0xf) | 0x10; // include version
-	offset += 1;
-	buffer[offset] = (timeMid >>> 16) & 0xff;
-	offset += 1;
+	buffer[6] = ((timeMid >>> 24) & 0xf) | 0x10; // include version
+	buffer[7] = (timeMid >>> 16) & 0xff;
 
 	// `clock_seq_hi_and_reserved` | variant
-	buffer[offset] = (clockSequence >>> 8) | 0x80;
-	offset += 1;
+	buffer[8] = (clockSequence >>> 8) | 0x80;
 
 	// `clock_seq_low`
-	buffer[offset] = clockSequence & 0xff;
-	offset += 1;
+	buffer[9] = clockSequence & 0xff;
 
 	for (let index = 0; index < 6; index += 1) {
-		buffer[offset] = node[index];
-		offset += 1;
+		buffer[10 + index] = node[index];
 	}
 
 	const stringified = stringifyBytes(buffer);
