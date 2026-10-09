@@ -7,7 +7,7 @@ export class UuidV7UtilError extends UtilError {
 }
 
 export interface UuidV7Options extends UuidRNGOptions {
-	miliseconds?: number;
+	milliseconds?: number;
 	sequence?: number;
 }
 
@@ -26,8 +26,7 @@ export function uuidV7(options?: UuidV7Options): string {
 		throw new UuidV7UtilError("Random byte length must at least be 16");
 	}
 
-	// NOTE: the milis and nanos split is because it requires 57+ bit numbers, but JS doesn't offer that precision.
-	const milis = options?.miliseconds ?? Date.now();
+	const milis = options?.milliseconds ?? Date.now();
 	const sequence = options?.sequence ?? ((random[6] & 0x7f) << 24) | (random[7] << 16) | (random[8] << 8) | random[9];
 	const buffer = new Uint8Array(16);
 
