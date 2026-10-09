@@ -6,7 +6,6 @@ describe("uuidV7", () => {
 	test("UUID V7 test vector as defined in spec", () => {
 		const expected = "017f22e2-79b0-7cc3-98c4-dc0c0c07398f";
 
-		// TODO: fix byte sequence to  value as per example vector
 		const uuid = uuidV7({
 			random: Uint8Array.of(
 				0x10,
@@ -26,7 +25,8 @@ describe("uuidV7", () => {
 				0x39,
 				0x8f,
 			),
-			miliseconds: 0x017f22e279b0,
+			sequence: 0xcc363137,
+			milliseconds: 0x017f22e279b0,
 		});
 
 		expect(uuid).toBe(expected);
