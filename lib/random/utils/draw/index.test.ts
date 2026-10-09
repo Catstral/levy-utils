@@ -1,24 +1,24 @@
 import { describe, expect, test } from "bun:test";
-import { sample } from ".";
+import { draw } from ".";
 
-describe("sample", () => {
+describe("draw", () => {
 	test("Returns a value from inside the given list", () => {
 		const list = [0, 1, 2, 3, 4, 5] as const;
-		const sampled = sample(list);
+		const drawn = draw(list);
 
-		expect(list).toContain(sampled);
+		expect(list).toContain(drawn);
 	});
 
 	test("Returns undefined if an empty array is given", () => {
 		const list = [] as const;
-		const sampled = sample(list);
+		const drawn = draw(list);
 
-		expect(sampled).toBe(undefined);
+		expect(drawn).toBe(undefined);
 	});
 
 	test("Leaves the input unmodified", () => {
 		const list = [0, 1, 2, 3, 4, 5];
-		sample(list);
+		draw(list);
 
 		expect(list).toEqual([0, 1, 2, 3, 4, 5]);
 	});

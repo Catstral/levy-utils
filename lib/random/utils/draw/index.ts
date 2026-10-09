@@ -9,11 +9,11 @@ import { getCryptoSecureRandomNumber } from "~/random/helper";
  * @param {T[]} array The array to pick a random item from
  * @returns {T | undefined} The random item
  */
-export function sample<T>(array: [T, ...T[]]): T;
-export function sample<T>(array: T[]): T | undefined;
-export function sample<T>(array: readonly [T, ...T[]]): T;
-export function sample<T>(array: readonly T[]): T | undefined;
-export function sample(array: readonly unknown[]): unknown {
+export function draw<T>(array: [T, ...T[]]): T;
+export function draw<T>(array: T[]): T | undefined;
+export function draw<T>(array: readonly [T, ...T[]]): T;
+export function draw<T>(array: readonly T[]): T | undefined;
+export function draw(array: readonly unknown[]): unknown {
 	if (array.length === 0) {
 		return undefined;
 	}
