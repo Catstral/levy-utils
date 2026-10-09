@@ -23,11 +23,10 @@ export interface ReduceOptions<Acc = unknown, R = Acc> {
  *
  * @template T
  * @template Acc
- * @template [R=Acc]
  * @param {readonly T[]} list The array to reduce items from
  * @param {Acc} initial The initial value of the accumulator
  * @param {ReduceCallback<T, Acc>} callback A callback that passed the current item and returns a new accumulator
- * @returns {R} The accumulated result of the given list
+ * @returns {Acc} The accumulated result of the given list
  */
 export function reduce<const T, Acc>(list: T[], initial: Acc, callback: ReduceCallback<T, Acc>): Acc;
 /**
