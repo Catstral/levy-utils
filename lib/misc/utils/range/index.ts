@@ -539,7 +539,7 @@ export interface RangeOptions<T> {
 	/**
 	 * wether the end value is considered inclusive.
 	 *
-	 * @default false
+	 * @default true
 	 */
 	inclusiveEnd?: boolean;
 }
@@ -658,7 +658,7 @@ export function range<const T = number>(
 		start: startValue,
 		inclusiveStart: options?.inclusiveStart,
 		end: endValue,
-		inclusiveEnd: options?.inclusiveEnd,
+		inclusiveEnd: options?.inclusiveEnd ?? true,
 		step: options?.step,
 		mapper: options?.valueMapper,
 	});
