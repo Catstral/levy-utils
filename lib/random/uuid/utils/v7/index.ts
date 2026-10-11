@@ -7,7 +7,15 @@ export class UuidV7UtilError extends UtilError {
 }
 
 export interface UuidV7Options extends UuidRNGOptions {
+	/**
+	 * The amount of milliseconds that have past since the EPOCH (01-01-1970).
+	 *
+	 * @default `Date.now()`
+	 */
 	milliseconds?: number;
+	/**
+	 * The clock sequence used for generation.
+	 */
 	sequence?: number;
 }
 

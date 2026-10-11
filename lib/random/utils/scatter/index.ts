@@ -4,7 +4,7 @@ export interface ScatterOptions {
 	/**
 	 * The bias of the split.
 	 *
-	 * @default "ROUND"
+	 * @default `"ROUND"`
 	 */
 	bias?: "FLOOR" | "ROUND" | "CEIL";
 }
@@ -13,13 +13,15 @@ export interface ScatterOptions {
  * Returns an array split into a specified percentage of the original length with the original values
  * assigned to either side at random.
  *
+ * *NOTE: The first array of the returned tuple will be in a random order, while the second array will have the order preserved.*
+ *
  * The time complexity of this is `O(n + n**2)` where `n` is the amount of items in the list.
  *
  * *NOTE: The time complexity of this is `O(n)` if the split is outside the specified range.*
  *
  * @template T
  * @param {T[]} list The list to scatter
- * @param {number} [split=0.5] The percentage to split the array into (scale: 0 - 1)
+ * @param {number} [split=0.5] The percentage to split the array into (scale: 0 - 1) (default = `0.5`)
  * @param {ScatterOptions} [options] The options given to scatter the array
  * @returns {[T[], T[]]} A split of the original array
  */

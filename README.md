@@ -76,6 +76,20 @@ A list of all the utilities supported:
   - [keys](#keysvalue)
   - [omit](#omitobject-keys)
   - [pick](#pickobject-keys)
+- [Randomization utilities](#randomization-utilities)
+  - [UUID utilities](#uuid-utilities)
+    - [uuidMax](#uuidmax)
+    - [uuidNil](#uuidnil)
+    - [uuidV1 / v1](#uuidv1options)
+    - [uuidV4 / v4 / uuid](#uuidv4options)
+    - [uuidV7 / v7](#uuidv7options)
+  - [chance](#chancepercentage)
+  - [draw](#drawlist)
+  - [maybe](#maybe)
+  - [random](#randommin-max)
+  - [scatter](#scatterlist-split-options)
+  - [shuffle](#shufflearray)
+  - [uid](#uidlength-charset)
 - [String utilities](#string-utilities)
   - [Casing utilities](#casing-utilities)
     - [camelCase](#camelcasestr-options)
@@ -963,6 +977,235 @@ pick(
 //     a: 1,
 //     c: 3
 // }
+```
+
+<!-- !SECTION -->
+<!-- SECTION: Random utils -->
+### Randomization utilities
+Almost all utilites that generate someting at random are done with a cryptographically secure pseudorandom number generator (called from now own **CSPRNG**) and utilizes the [`crypto.getRandomValues`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) method. If a utility does not use this, it will be mentioned in the description of that utility.
+
+#### UUID utilities
+##### `uuidMax()`
+Returns the max UUID string possible.
+
+```ts
+uuidMax();
+// Expected output:
+// "ffffffff-ffff-ffff-ffff-ffffffffffff"
+```
+
+##### `uuidNil()`
+Returns the nil UUID string.
+
+```ts
+uuidNil();
+// Expected output:
+// "00000000-0000-0000-0000-000000000000"
+```
+
+#### `uuidV1(options?)`
+> This is also aliased to `v1`
+
+Returns a randomly generated UUID V1 string.
+
+```ts
+uuidV1();
+// Possible output:
+// c232ab00-9414-11ec-b3c8-9f68deced846
+
+uuidV1({
+    random: Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 0, 0x33c8 >> 8, 0x33c8 & 0xff, 0x9f, 0x68, 0xde, 0xce, 0xd8, 0x46),
+    milliseconds: 0x17f22e279b0,
+    nanoseconds: 0,
+    clockSequence: 0x33c8,
+    node: Uint8Array.of(0x9f, 0x68, 0xde, 0xce, 0xd8, 0x46),
+})
+// Expected output:
+// c232ab00-9414-11ec-b3c8-9f68deced846
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `nanoseconds` - A number that represents tha amount of nanoseconds have elapsed in the specified millisecond (This will always be 0 if not defined, javascript does not measure beyond the millisecond range).
+- `clockSequence` - The current clock sequence used for generation.
+- `node` - A list of random bytes used to complete the UUID V1.
+
+#### `uuidV4(options?)`
+> This is also aliased to `v4` or `uuid`
+
+Returns a randomly generated UUID V4 string.
+
+```ts
+uuidV4();
+// Possible output:
+// 919108f7-52d1-4320-9bac-f847db4148a8
+
+uuidV4({
+    random: Uint8Array.of(0x91, 0x91, 0x08, 0xf7, 0x52, 0xd1, 0x43, 0x20, 0x9b, 0xac, 0xf8, 0x47, 0xdb, 0x41, 0x48, 0xa8),
+})
+// Expected output:
+// 919108f7-52d1-4320-9bac-f847db4148a8
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+
+#### `uuidV7(options?)`
+> This is also aliased to `v7`
+
+Returns a randomly generated UUID V7 string.
+
+```ts
+uuidV7();
+// Possible output:
+// 017f22e2-79b0-7cc3-98c4-dc0c0c07398f
+
+uuidV1({
+    random: Uint8Array.of(0x10, 0x7f, 0x22, 0xe2, 0x79, 0xb0, 0x7c, 0xc3, 0x98, 0xc4, 0xdc, 0x0c, 0x0c, 0x07, 0x39, 0x8f),
+    milliseconds: 0x017f22e279b0,
+    sequence: 0xcc363137,
+})
+// Expected output:
+// 017f22e2-79b0-7cc3-98c4-dc0c0c07398f
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `sequence` - The current clock sequence used for generation.
+
+#### `chance(percentage)`
+Returns a random boolean based on the specified percentage.  
+The percentage must be a number between 0 and 1. If it is not inside that range it will return a fixed value according to that percentage, so if percentage is more than or equal to 1 it will always return true and if percentage is less than or equal to 0 it will always return false.
+
+```ts
+chance(0.5);
+// Expected output:
+// true | false
+
+chance(1);
+// Expected output:
+// true
+
+chance(0);
+// Expected output:
+// false
+```
+
+#### `draw(list)`
+Returns a random item from a specified list (or `undefined` if the list is empty).
+
+```ts
+draw([0, 1, 2, 3]);
+// Expected output:
+// 0 | 1 | 2 | 3
+
+draw([]);
+// Expected output:
+// undefined
+```
+
+#### `maybe()`
+Returns a random boolean.
+
+```ts
+maybe();
+// Expected output:
+// true | false
+```
+
+#### `random(min?, max?)`
+Returns a random value between a specified minimum and maximum value.
+
+If the minimum and maximum values contradict each other, then this function will return `NaN`.
+
+> NOTE: this utility does **NOT** use [CSPRNG](#randomization-utilities).
+
+```ts
+random();
+// Expected output:
+// n where n > 0 and n < 1
+
+random(10, 20);
+// Expected output:
+// n where n > 10 and n < 20
+
+random(1, 0);
+// Expected output:
+// NaN
+```
+
+#### `scatter(list, split?, options?)`
+Given an array, splits that array into 2 given a hard split and devides the items at random into the 2 given lists.  
+The split must be a number between 0 and 1. If it is not inside that range it will return a fixed sized array according to that split, so if percentage is more than or equal to 1 it will always return `[list, []]` and if percentage is less than or equal to 0 it will always return `[[], list]` (Do note that these are handled as exception cases, meaning if this is the case then the first list will not be in a random order, but preserved order instead).
+
+> NOTE: the first array will be in a random order, while the second array will have the order preserved.
+
+```ts
+scatter([0, 1, 2, 3, 4]);
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.6);
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.4);
+// Possible output:
+// [[2, 4], [0, 1, 3]]
+
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "FLOOR",
+});
+// Possible output:
+// [[2, 4], [0, 1, 3]]
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "ROUND",
+});
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "CEIL",
+});
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+```
+
+options:
+- `bias` - When the split does not work exactly for the given array length, this will decide how to split the final item (e.g. given an array of 5 items and a split of `0.5` (50%), the bias will decide if the split will be `3 - 2` or `2 - 3`) (default = `"ROUND"`)
+
+#### `shuffle(array)`
+Shuffles the array into a new array will all the items in a random order.
+
+```ts
+shuffle([0, 1, 2, 3, 4]);
+// Possible output:
+// [2, 4, 0, 1, 3]
+```
+
+#### `uid(length?, charset?)`
+Returns a random string of characters gotten from a specified charset that can be used for ids.  
+The default length is `8` and the default charset is `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`.
+
+```ts
+uid();
+// Possible output:
+// "Dae3pmZH"
+
+uid(12);
+// Possible output:
+// "9lqD8Mp3CUrK"
+
+uid(8, "Aa");
+// Possible output:
+// "AaAAAaAA"
 ```
 
 <!-- !SECTION -->

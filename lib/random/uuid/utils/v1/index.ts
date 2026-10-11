@@ -7,9 +7,25 @@ export class UuidV1UtilError extends UtilError {
 }
 
 export interface UuidV1Options extends UuidRNGOptions {
+	/**
+	 * The amount of milliseconds that have past since the EPOCH (01-01-1970).
+	 *
+	 * @default `Date.now()`
+	 */
 	milliseconds?: number;
+	/**
+	 * The amount of nanoseconds that have elapsed in the current millisecond.
+	 *
+	 * @default `0`
+	 */
 	nanoseconds?: number;
+	/**
+	 * The clock sequence used for generation.
+	 */
 	clockSequence?: number;
+	/**
+	 * A list of random bytes used to complete the UUID.
+	 */
 	node?: Uint8Array;
 }
 

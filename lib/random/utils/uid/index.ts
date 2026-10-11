@@ -5,8 +5,8 @@
  * - `n` is the length of the uid.
  * - `m` is the length of the charset.
  *
- * @param {number} [length=8] The length of de uid
- * @param {string} [charset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"] The characters used for generation
+ * @param {number} [length=8] The length of de uid (default = `8`)
+ * @param {string} [charset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"] The characters used for generation (default = `"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"`)
  * @returns {string} A random string of characters from the charset, with the specified length
  */
 export function uid(
