@@ -21,4 +21,8 @@ describe("maybe", () => {
 	test("Percentage of less than 0 is always false", () => {
 		expect(chance(-1)).toBeFalse();
 	});
+
+	test("Percentage of NaN is always false", () => {
+		expect(chance(NaN)).toBeFalse();
+	});
 });
