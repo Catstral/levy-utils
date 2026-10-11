@@ -37,9 +37,11 @@ export function uuidV1(options?: UuidV1Options): string {
 	const buffer = new Uint8Array(16);
 	const node = options?.node ?? random.slice(10, 16);
 
-	// Set multicast bit
-	// https://www.rfc-editor.org/rfc/rfc9562.html#section-6.10-3
-	node[0] | 0x01;
+	if (!options?.node) {
+		// Set multicast bit
+		// https://www.rfc-editor.org/rfc/rfc9562.html#section-6.10-3
+		node[0] |= 0x01;
+	}
 
 	const timestamp = (milis & 0xfffffff) * 10000 + nanos;
 	const timeLow = timestamp >>> 0;
