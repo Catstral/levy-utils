@@ -33,6 +33,7 @@ export interface UuidV7Options extends UuidRNGOptions {
  *
  * @param {UuidV7Options} [options] The options to decide how to generate the UUID
  * @returns {string} A V7 UUID string
+ * @throws {UuidV7UtilError} If the length of the specified random bytes is less then 16
  */
 export function uuidV7(options?: UuidV7Options): string {
 	const random = getRNG(options);

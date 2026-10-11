@@ -20,6 +20,7 @@ export interface UuidV4Options extends UuidRNGOptions {}
  *
  * @param {UuidV1Options} [options] The options to decide how to generate the UUID
  * @returns {string} A V4 UUID string
+ * @throws {UuidV4UtilError} If the length of the specified random bytes is less then 16
  */
 export function uuidV4(options?: UuidV4Options): string {
 	// If possible and no options are given, use the build in secure UUID generation
