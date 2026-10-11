@@ -13,8 +13,8 @@ export function uid(
 	length: number = 8,
 	charset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
 ): string {
-	if (charset.length === 0) {
-		throw new Error();
+	if (charset.length <= 0) {
+		return "";
 	}
 
 	const charLength = charset.length;
