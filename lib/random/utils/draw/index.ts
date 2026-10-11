@@ -6,17 +6,17 @@ import { getCryptoSecureRandomNumber } from "~/random/helper";
  * The time complexity for this is `O(1)`.
  *
  * @template T
- * @param {T[]} array The array to pick a random item from
+ * @param {T[]} list The array to pick a random item from
  * @returns {T | undefined} The random item
  */
-export function draw<T>(array: [T, ...T[]]): T;
-export function draw<T>(array: T[]): T | undefined;
-export function draw<T>(array: readonly [T, ...T[]]): T;
-export function draw<T>(array: readonly T[]): T | undefined;
-export function draw(array: readonly unknown[]): unknown {
-	if (array.length === 0) {
+export function draw<T>(list: [T, ...T[]]): T;
+export function draw<T>(list: T[]): T | undefined;
+export function draw<T>(list: readonly [T, ...T[]]): T;
+export function draw<T>(list: readonly T[]): T | undefined;
+export function draw(list: readonly unknown[]): unknown {
+	if (list.length === 0) {
 		return undefined;
 	}
 
-	return array[getCryptoSecureRandomNumber(array.length)];
+	return list[getCryptoSecureRandomNumber(list.length)];
 }
