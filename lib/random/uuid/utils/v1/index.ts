@@ -95,13 +95,7 @@ export function uuidV1(options?: UuidV1Options): string {
 		buffer[10 + index] = node[index];
 	}
 
-	const stringified = stringifyBytes(buffer);
-
-	if (!stringified) {
-		throw new UuidV1UtilError("Something went wrong generating the UUID, a malformed UUID was detected.");
-	}
-
-	return stringified;
+	return stringifyBytes(buffer);
 }
 
 export { uuidV1 as v1 };

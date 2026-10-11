@@ -18,14 +18,7 @@ export function getRNG(options?: UuidRNGOptions): Uint8Array | null {
 	return random;
 }
 
-export function validateUuid(uuid: string): boolean {
-	const validUuidRegex =
-		/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/i;
-
-	return validUuidRegex.test(uuid);
-}
-
-export function stringifyBytes(bytes: Uint8Array): string | null {
+export function stringifyBytes(bytes: Uint8Array): string {
 	const byteToHex: string[] = [];
 
 	for (let i = 0; i < 256; ++i) {
@@ -55,11 +48,6 @@ export function stringifyBytes(bytes: Uint8Array): string | null {
 		byteToHex[bytes[14]] +
 		byteToHex[bytes[15]]
 	).toLowerCase();
-
-	// Make that given even given unique RNG gen, this will still generate a valid uuid string
-	if (!validateUuid(stringified)) {
-		return null;
-	}
 
 	return stringified;
 }

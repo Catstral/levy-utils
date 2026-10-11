@@ -68,13 +68,7 @@ export function uuidV7(options?: UuidV7Options): string {
 	buffer[14] = random[14];
 	buffer[15] = random[15];
 
-	const stringified = stringifyBytes(buffer);
-
-	if (!stringified) {
-		throw new UuidV7UtilError("Something went wrong generating the UUID, a malformed UUID was detected.");
-	}
-
-	return stringified;
+	return stringifyBytes(buffer);
 }
 
 export { uuidV7 as v7 };

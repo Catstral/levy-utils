@@ -37,13 +37,7 @@ export function uuidV4(options?: UuidV4Options): string {
 	random[6] = (random[6] & 0x0f) | 0x40;
 	random[8] = (random[8] & 0x3f) | 0x80;
 
-	const stringified = stringifyBytes(random);
-
-	if (!stringified) {
-		throw new UuidV4UtilError("Something went wrong generating the UUID, a malformed UUID was detected.");
-	}
-
-	return stringified;
+	return stringifyBytes(random);
 }
 
 export { uuidV4 as v4, uuidV4 as uuid };
