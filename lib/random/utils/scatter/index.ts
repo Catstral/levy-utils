@@ -1,5 +1,10 @@
 import { getCryptoSecureRandomNumber } from "~/random/helper";
 
+/**
+ * @typedef {Object} ScatterOptions
+ * @prop {"FLOOR" | "ROUND" | "CEIL"} [bias="ROUND"] The bias of the split
+ */
+
 export interface ScatterOptions {
 	/**
 	 * The bias of the split.
