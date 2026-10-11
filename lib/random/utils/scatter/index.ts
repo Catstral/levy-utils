@@ -11,7 +11,7 @@ export interface ScatterOptions {
 	 *
 	 * @default `"ROUND"`
 	 */
-	bias?: "FLOOR" | "ROUND" | "CEIL";
+	bias?: "FLOOR" | "ROUND" | "CEILING";
 }
 
 /**
@@ -58,7 +58,7 @@ export function scatter<const T>(list: readonly T[], split: number = 0.5, option
 
 			break;
 		}
-		case "CEIL": {
+		case "CEILING": {
 			largeSize = Math.ceil(list.length * split);
 
 			break;

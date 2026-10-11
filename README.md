@@ -1172,7 +1172,7 @@ scatter([0, 1, 2, 3, 4], 0.5, {
 // [[3, 2, 4], [0, 1]]
 
 scatter([0, 1, 2, 3, 4], 0.5, {
-    bias: "CEIL",
+    bias: "CEILING",
 });
 // Possible output:
 // [[3, 2, 4], [0, 1]]
