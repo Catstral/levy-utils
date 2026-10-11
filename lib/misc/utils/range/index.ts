@@ -121,7 +121,9 @@ export class Range<const T = number> {
 	static from<const T>(range: Range<T>): Range<T> {
 		return new Range({
 			start: range.#start,
+			inclusiveStart: range.#inclusiveStart,
 			end: range.#end,
+			inclusiveEnd: range.#inclusiveEnd,
 			step: range.#step,
 			mapper: range.#mapper,
 		});
