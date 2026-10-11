@@ -24,6 +24,16 @@ describe("range", () => {
 			inclusiveEnd: false,
 		},
 		{
+			name: "Range with exclusive start (string)",
+			rangeType: "1>..",
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
 			name: "Range with end (string)",
 			rangeType: "..10",
 			start: undefined,
@@ -54,6 +64,16 @@ describe("range", () => {
 			inclusiveEnd: false,
 		},
 		{
+			name: "Range with exclusive start and end (string)",
+			rangeType: "1>..10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
 			name: "Range with start and inclusive end (string)",
 			rangeType: "1..=10",
 			start: 1,
@@ -61,6 +81,16 @@ describe("range", () => {
 			step: undefined,
 			hasMapper: false,
 			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with exclusive start and inclusive end (string)",
+			rangeType: "1>..=10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
 			inclusiveEnd: true,
 		},
 
@@ -286,6 +316,356 @@ describe("range", () => {
 			step: 2,
 			hasMapper: true,
 			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+
+		{
+			name: "Full range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+
+		{
+			name: "Full range with inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+
+		{
+			name: "Full range with inclusive start and end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+		},
+		//
+		{
+			name: "Full range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+
+		{
+			name: "Full range without inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+		},
+
+		{
+			name: "Full range without inclusive start and end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
 			inclusiveEnd: false,
 		},
 	] satisfies {
@@ -670,31 +1050,35 @@ describe("range", () => {
 		});
 
 		describe("Data parsing", () => {
-			test.each(testParameters)("$name", ({ rangeType, start, end, step, hasMapper, inclusiveEnd }) => {
-				let currentRange: Range;
+			test.each(testParameters)(
+				"$name",
+				({ rangeType, start, end, step, hasMapper, inclusiveStart, inclusiveEnd }) => {
+					let currentRange: Range;
 
-				if (typeof rangeType === "string") {
-					currentRange = range(rangeType);
-				} else {
-					currentRange = range(rangeType.start, rangeType.end, {
-						step: rangeType.step,
-						valueMapper: rangeType.mapper,
-						inclusiveStart: rangeType.inclusiveStart,
-						inclusiveEnd: rangeType.inclusiveEnd,
-					});
-				}
+					if (typeof rangeType === "string") {
+						currentRange = range(rangeType);
+					} else {
+						currentRange = range(rangeType.start, rangeType.end, {
+							step: rangeType.step,
+							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
+						});
+					}
 
-				expect(currentRange.details.start).toBe(start);
-				expect(currentRange.details.end).toBe(end);
-				expect(currentRange.details.inclusiveEnd).toBe(inclusiveEnd);
-				expect(currentRange.details.step).toBe(step);
+					expect(currentRange.details.start).toBe(start);
+					expect(currentRange.details.inclusiveStart).toBe(inclusiveStart);
+					expect(currentRange.details.end).toBe(end);
+					expect(currentRange.details.inclusiveEnd).toBe(inclusiveEnd);
+					expect(currentRange.details.step).toBe(step);
 
-				if (hasMapper) {
-					expect(currentRange.details.mapper).not.toBeUndefined();
-				} else {
-					expect(currentRange.details.mapper).toBeUndefined();
-				}
-			});
+					if (hasMapper) {
+						expect(currentRange.details.mapper).not.toBeUndefined();
+					} else {
+						expect(currentRange.details.mapper).toBeUndefined();
+					}
+				},
+			);
 		});
 
 		describe("Cloning", () => {
@@ -717,7 +1101,9 @@ describe("range", () => {
 
 					expect(currentRange).not.toBe(cloned);
 					expect(currentRange.details.start).toBe(cloned.details.start);
+					expect(currentRange.details.inclusiveStart).toBe(cloned.details.inclusiveStart);
 					expect(currentRange.details.end).toBe(cloned.details.end);
+					expect(currentRange.details.inclusiveEnd).toBe(cloned.details.inclusiveEnd);
 					expect(currentRange.details.step).toBe(cloned.details.step);
 					expect(currentRange.details.mapper).toBe(cloned.details.mapper);
 				});
@@ -742,7 +1128,9 @@ describe("range", () => {
 
 					expect(currentRange).not.toBe(cloned);
 					expect(currentRange.details.start).toBe(cloned.details.start);
+					expect(currentRange.details.inclusiveStart).toBe(cloned.details.inclusiveStart);
 					expect(currentRange.details.end).toBe(cloned.details.end);
+					expect(currentRange.details.inclusiveEnd).toBe(cloned.details.inclusiveEnd);
 					expect(currentRange.details.step).toBe(cloned.details.step);
 					expect(currentRange.details.mapper).toBe(cloned.details.mapper);
 				});
@@ -1097,6 +1485,15 @@ describe("range", () => {
 					expect(updateRange.details.start).toBe(1);
 				});
 
+				test("Setting inclusive start", () => {
+					const range = new Range();
+					const updateRange = range.inclusiveStart(false);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.inclusiveStart).toBeTrue();
+					expect(updateRange.details.inclusiveStart).toBeFalse();
+				});
+
 				test("Setting end", () => {
 					const range = new Range();
 					const updateRange = range.end(1);
@@ -1104,6 +1501,15 @@ describe("range", () => {
 					expect(range).not.toBe(updateRange);
 					expect(range.details.end).toBeUndefined();
 					expect(updateRange.details.end).toBe(1);
+				});
+
+				test("Setting inclusive end", () => {
+					const range = new Range();
+					const updateRange = range.inclusiveEnd(true);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.inclusiveEnd).toBeFalse();
+					expect(updateRange.details.inclusiveEnd).toBeTrue();
 				});
 
 				test("Setting step", () => {
