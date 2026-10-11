@@ -61,10 +61,10 @@ describe("scatter", () => {
 		expect(scattered[1]).toBeArrayOfSize(3);
 	});
 
-	test("Splits a list of 5 items 3-2 with 50/50 split and bias CEIL", () => {
+	test("Splits a list of 5 items 3-2 with 50/50 split and bias CEILING", () => {
 		const list = [0, 1, 2, 3, 4] as const;
 		const scattered = scatter(list, 0.5, {
-			bias: "CEIL",
+			bias: "CEILING",
 		});
 
 		expect(scattered[0]).toBeArrayOfSize(3);
