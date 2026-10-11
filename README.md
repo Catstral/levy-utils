@@ -26,9 +26,12 @@ import { range, sift, toggle } from "@catstral/levy-utils";
 A list of all the utilities supported:
 - [Array utilities](#array-utilities)
   - [cluster](#clusteritems-size)
+  - [concat](#concatvalues)
   - [counting](#countinglist-identity)
   - [fork](#forklist-condition)
   - [list](#liststartorlength-end-options)
+  - [max](#maxlist-mapper-options)
+  - [min](#maxlist-mapper-options)
   - [select](#selectlist-filter-mapper)
   - [sift](#siftlist)
   - [sum](#sumlist-mapper)
@@ -63,11 +66,27 @@ A list of all the utilities supported:
     - [toArray](#toarray)
     - [clone](#clone)
   - [range](#rangestartorlength-end-options)
+  - [safe](#safecallback)
   - [sleep](#sleepdelay)
+  - [unwrap](#unwrapoption-fallback)
   - [values](#valuestarget)
 - [Number utilities](#number-utilities)
+  - [Math utilities](#math-utilities)
+    - [isPrime](#isPrimevalue)
+    - [mod](#moddividend-divisor)
+  - [clamp](#clampmin-value-max)
+  - [isDecimal](#isdecimalvalue)
+  - [isEven](#isevenvalue)
+  - [isInteger](#isintegervalue)
+  - [isNegative](#isnegativevalue)
+  - [isOdd](#isoddvalue)
+  - [isPositive](#ispositivevalue)
+  - [negative](#negativevalue)
+  - [positive](#positivevalue)
+  - [sign](#signvalue)
   - [toFloat](#tofloatvalue-fallback)
   - [toInt](#tointvalue-fallback)
+  - [trunc](#truncvalue-fractiondigits)
 - [Object utilities](#object-utilities)
   - [entries](#entriesvalue)
   - [extend](#extendvalue-other)
@@ -102,6 +121,15 @@ Clusters a list of items into a list of lists, each limited to a specified size.
 cluster([1, 2, 3, 4, 5], 2);
 // Expected output:
 // [[1, 2], [3, 4], [5]]
+```
+
+#### `concat(...values)`
+Concatenates values and arrays into a new array.
+
+```ts
+concat(1, [2, 3], 4);
+// Expected output:
+// [1, 2, 3, 4]
 ```
 
 #### `counting(list, identity)`
@@ -151,9 +179,69 @@ list(0, 3, {
 // ["foo-0", "foo-1", "foo-2", "foo-3"]
 ```
 
-options:
-- `step` - The steps used to generate the array.
-- `valueMapper` - A mapper function to map a step to a value.
+#### `max(list, mapper?, options?)`
+Returns the largest item from a list.
+
+```ts
+max([1, 2, 3]);
+// Expected output:
+// 3
+
+max(
+    [
+        {
+            name: "Bob"
+            weight: 54
+        },
+        {
+            name: "Paul"
+            weight: 87
+        },
+        {
+            name: "Jane"
+            weight: 63
+        },
+    ],
+    (item) => item.weight,
+);
+// Expected output:
+// {
+//     name: "Paul",
+//     weight: 87,
+// }
+```
+
+#### `min(list, mapper?, options?)`
+Returns the smallest item from a list.
+
+```ts
+min([1, 2, 3]);
+// Expected output:
+// 1
+
+min(
+    [
+        {
+            name: "Bob"
+            weight: 54
+        },
+        {
+            name: "Paul"
+            weight: 87
+        },
+        {
+            name: "Jane"
+            weight: 63
+        },
+    ],
+    (item) => item.weight,
+);
+// Expected output:
+// {
+//     name: "Bob",
+//     weight: 54,
+// }
+```
 
 <!-- TODO -->
 #### `select(list, filter, mapper)`
@@ -554,9 +642,28 @@ for (const value of range(0, 3, {
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
 ```
 
-Options:
-- `step` - The step of the range.
-- `valueMapper` - A value/mapper that is used to turn a step into a values.
+#### `safe(callback)`
+Executes the given callback and returns an option of the result.
+
+```ts
+safe(() => {
+    return "Hello world";
+});
+// Expected output:
+// {
+//     success: true,
+//     value: "Hello world",
+// }
+
+safe(() => {  
+    throw new Error("Goodbye world");
+});
+// Expected output:
+// {
+//     success: false,
+//     error: Error("Goodbye world"),
+// }
+```
 
 #### `sleep(delay)`
 Returns a promise that resolves after the specified delay (in milliseconds).
@@ -565,6 +672,24 @@ Returns a promise that resolves after the specified delay (in milliseconds).
 await sleep(1000);
 // Expected output:
 // waits 1 second
+```
+
+#### `unwrap(option, fallback?)`
+Directly returns the option's value, or throws the option's error.
+An option's error won't be thrown when a fallback is provided.
+
+```ts
+const option = safe(() => {
+    throw new Error("Goodbye world");
+});
+
+unwrap(option);
+// Expected to throw:
+// Error("Goodbye world")
+
+unwrap(option, null);
+// Expected output:
+// null
 ```
 
 #### `values(target)`
@@ -600,6 +725,207 @@ values(new Map([
 <!-- SECTION: Number utils -->
 
 ### Number utilities
+#### Math utilities
+##### `isPrime(value)`
+Checks if the given value is a prime number.
+
+```ts
+isPrime(11);
+// Expected output:
+// true
+
+isPrime(4);
+// Expected output:
+// false
+
+isPrime(103);
+// Expected output:
+// true
+
+isPrime(-9.2);
+// Expected output:
+// false
+```
+
+##### `mod(dividend, divisor)`
+Returns the modulo of a dividend and a divisor.
+
+```ts
+mod(10, 5);
+// Expected output:
+// 0
+
+mod(-2, 4);
+// Expected output:
+// 2
+
+mod(6, 10);
+// Expected output:
+// 6
+```
+
+#### `clamp(min, value, max)`
+Clamps a number between a minimum and maximum value.
+
+```ts
+clamp(-5, 0, 5);
+// Expected output:
+// 0
+
+clamp(-5, 20, 5);
+// Expected output:
+// 5
+
+clamp(-5, -20, 5);
+// Expected output:
+// -5
+```
+
+#### `isDecimal(value)`
+Checks if the given value is a number with decimals.
+
+```ts
+isDecimal(1.1);
+// Expected output:
+// true
+
+isDecimal(1);
+// Expected output:
+// false
+
+isDecimal(NaN);
+// Expected output:
+// false
+```
+
+#### `isEven(value)`
+Checks if the given value is an even number.
+
+```ts
+isEven(4);
+// Expected output:
+// true
+
+isEven(3);
+// Expected output:
+// false
+
+isEven(0.5);
+// Expected output:
+// false
+```
+
+#### `isInteger(value)`
+Checks if the given value is an integer.
+
+```ts
+isInteger(4);
+// Expected output:
+// true
+
+isInteger(4.5);
+// Expected output:
+// false
+```
+
+#### `isNegative(value)`
+Checks if the given value is a negative number.
+
+```ts
+isNegative(-5);
+// Expected output:
+// true
+
+isNegative(5);
+// Expected output:
+// false
+
+isNegative(-0);
+// Expected output:
+// true
+```
+
+#### `isOdd(value)`
+Checks if the given value is an odd number.
+
+```ts
+isOdd(3);
+// Expected output:
+// true
+
+isOdd(4);
+// Expected output:
+// false
+
+isOdd(0.5);
+// Expected output:
+// false
+```
+
+#### `isPositive(value)`
+Checks if the given value is a positive number.
+
+```ts
+isPositive(5);
+// Expected output:
+// true
+
+isPositive(-5);
+// Expected output:
+// false
+
+isPositive(0);
+// Expected output:
+// true
+```
+
+#### `negative(value)`
+Converts a number into a negative number.
+
+```ts
+negative(5);
+// Expected output:
+// -5
+
+negative(-5);
+// Expected output:
+// -5
+```
+
+#### `positive(value)`
+Converts a number into a positive number.
+
+```ts
+positive(-5);
+// Expected output:
+// 5
+
+positive(5);
+// Expected output:
+// 5
+```
+
+#### `sign(value)`
+Returns the sign of the given number: `1` if positive, `-1` if negative, `0` if zero (`NaN` is converted into zero).
+
+```ts
+sign(5);
+// Expected output:
+// 1
+
+sign(-5);
+// Expected output:
+// -1
+
+sign(0);
+// Expected output:
+// 0
+
+sign(NaN);
+// Expected output:
+// 0
+```
+
 #### `toFloat(value, fallback?)`
 Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
 
@@ -632,6 +958,23 @@ toInt(true);
 toInt("not a number", -1);
 // Expected output:
 // -1
+```
+
+#### `trunc(value, fractionDigits?)`
+Truncates a number to the specified number of fraction digits.
+
+```ts
+trunc(1.58);
+// Expected output:
+// 1
+
+trunc(1.456, 2);
+// Expected output:
+// 1.45
+
+trunc(1.789, 10)
+// Expected output:
+// 1.789
 ```
 
 <!-- !SECTION -->
