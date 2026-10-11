@@ -6,6 +6,13 @@ export class UuidV7UtilError extends UtilError {
 	public readonly util = "uuidV7";
 }
 
+/**
+ * @typedef {Object} UuidV7Options
+ * @extends UuidRNGOptions
+ * @prop {number} [milliseconds=Date.now()] The amount of milliseconds that have past since the EPOCH (01-01-1970)
+ * @prop {number} [clockSequence] The clock sequence used for generation
+ */
+
 export interface UuidV7Options extends UuidRNGOptions {
 	/**
 	 * The amount of milliseconds that have past since the EPOCH (01-01-1970).

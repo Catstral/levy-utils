@@ -6,6 +6,15 @@ export class UuidV1UtilError extends UtilError {
 	public readonly util = "uuidV1";
 }
 
+/**
+ * @typedef {Object} UuidV1Options
+ * @extends UuidRNGOptions
+ * @prop {number} [milliseconds=Date.now()] The amount of milliseconds that have past since the EPOCH (01-01-1970)
+ * @prop {number} [nanoseconds=0] The amount of nanoseconds that have elapsed in the current millisecond
+ * @prop {number} [clockSequence] The clock sequence used for generation
+ * @prop {Uint8Array} [node] A list of random bytes used to complete the UUID
+ */
+
 export interface UuidV1Options extends UuidRNGOptions {
 	/**
 	 * The amount of milliseconds that have past since the EPOCH (01-01-1970).

@@ -6,6 +6,11 @@ export class UuidV4UtilError extends UtilError {
 	public readonly util = "uuidV4";
 }
 
+/**
+ * @typedef {Object} UuidV4Options
+ * @extends UuidRNGOptions
+ */
+
 export interface UuidV4Options extends UuidRNGOptions {}
 
 /**
