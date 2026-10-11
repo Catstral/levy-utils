@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { chance } from ".";
 
-describe("maybe", () => {
+describe("chance", () => {
 	test("Returns a boolean", () => {
 		expect(chance(0.5)).toBeBoolean();
 	});
