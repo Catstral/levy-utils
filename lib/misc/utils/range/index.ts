@@ -656,6 +656,7 @@ export function range<const T = number>(
 
 	return new Range<T>({
 		start: startValue,
+		inclusiveStart: options?.inclusiveStart,
 		end: endValue,
 		inclusiveEnd: options?.inclusiveEnd,
 		step: options?.step,
