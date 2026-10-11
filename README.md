@@ -497,13 +497,15 @@ fn("C");
 
 #### `Range(rangeString?)`
 > The constructor of this has an overload:  
-> `Range(details)`
+> `Range(details?)`
 > 
 > Details:
-> - `start` - The start value of the range.
-> - `end` - The end value of the range.
-> - `step` - The step value of the range.
-> - `mapper` - The mapper of the range, this maps a step to a value.
+> - `start` - The start value of the range (optional).
+> - `inclusiveStart` - If the range should consider the `start` to be inclusive (optional).
+> - `end` - The end value of the range (optional)
+> - `inclusiveEnd` - If the range should consider the `end` to be inclusive (optional).
+> - `step` - The step value of the range (optional).
+> - `mapper` - The mapper of the range, this maps a step to a value (optional).
 
 This is a class representing a range value, it is an iterable and generates values based on a start and end value (if specified).
 
@@ -511,17 +513,25 @@ If no start of end value is specified the range will work as expected with metho
 
 It can also be given a `step` and a `mapper` to define how it should be generating a value.
 
-If the argument given is a string, then it is expected to have that string match the [range expression from rust](https://doc.rust-lang.org/reference/expressions/range-expr.html#r-expr.range.behavior).
+If the argument given is a string, then it is expected to have that string match the following definition:
+`S?>?..=?E?` where:
+* `S` - The start of the range (optional)
+* `E` - The end of the range (optional)
+* `>` - If the start value is exclusive of this range (optional)
+* `=` - If the end value is inclusive of this range (optional)
 
 Here is a simple table explaining the different types of range strings:
-| Syntax                      | Name               | Range           | Is iterable |
-| --------------------------- | ------------------ | --------------- | ----------- |
-| `<start>..<end>`            | Range              | start ≤ x < end | Yes         |
-| `<start>..=<end>`           | Range inclusive    | start ≤ x ≤ end | Yes         |
-| `..` \| `..=`               | Full range         | -               | No          |
-| `<start>..` \| `<start>..=` | Range from         | start ≤ x       | No          |
-| `..<end>`                   | Range to           | x < end         | No          |
-| `..=<end>`                  | Range to inclusive | x ≤ end         | No          |
+| Syntax             | Range           | Is iterable |
+| -------------------| --------------- | ----------- |
+| `[start]..[end]`   | start ≤ x < end | Yes         |
+| `[start]>..[end]`  | start < x < end | Yes         |
+| `[start]..=[end]`  | start ≤ x ≤ end | Yes         |
+| `[start]>..=[end]` | start < x ≤ end | Yes         |
+| `..`               | -               | No          |
+| `[start]..`        | start ≤ x       | No          |
+| `[start]>..`       | start < x       | No          |
+| `..[end]`          | x < end         | No          |
+| `..=[end]`         | x ≤ end         | No          |
 
 If a value is not iterable, that means it will throw an error on attempting to iterate the range.  
 A full range is a range without bounds, this mostly exists for completeness and would effect how certain methods of the range work, see the methods for more details on how they are effected.
@@ -561,8 +571,14 @@ Gets the mapper value of range.
 ##### `start(start?)`
 Creates a new Range with a given start value set.
 
+##### `inclusiveStart(inclusiveStart)`
+Creates a new Range with a given inclusive start value set.
+
 ##### `end(end?)`
 Creates a new Range with a given end value set.
+
+##### `inclusiveEnd(inclusiveEnd)`
+Creates a new Range with a given inclusive  end value set.
 
 ##### `step(step?)`
 Creates a new Range with a given step value set.
@@ -644,11 +660,31 @@ for (const value of range(0, 3, {
 }
 // Expected output:
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
+
+for (const value of range(0, 3, {
+    inclusiveStart: false,
+})) {
+    console.log(value);
+}
+// Expected output:
+// logs 1, 2, 3
+
+for (const value of range(0, 3, {
+    inclusiveEnd: false,
+})) {
+    console.log(value);
+}
+// Expected output:
+// logs 0, 1, 2
 ```
 
 options:
 - `step` - The steps used to generate the array.
 - `valueMapper` - A mapper function to map a step to a value.
+- `inclusiveStart` - Wether the start value is considered inclusive.
+- `inclusiveEnd` - Wether the end value is considered inclusive.
+
+> NOTE: `inclusiveEnd` default value here differs from the `inclusiveEnd` value set by [`Range`](#rangerangestring), this is for backwards compatibility.
 
 #### `safe(callback)`
 Executes the given callback and returns an option of the result.
