@@ -88,7 +88,7 @@ A list of all the utilities supported:
   - [maybe](#maybe)
   - [random](#randommin-max)
   - [scatter](#scatterlist-split-options)
-  - [shuffle](#shufflearray)
+  - [shuffle](#shufflelist)
   - [uid](#uidlength-charset)
 - [String utilities](#string-utilities)
   - [Casing utilities](#casing-utilities)
@@ -1181,7 +1181,7 @@ scatter([0, 1, 2, 3, 4], 0.5, {
 options:
 - `bias` - When the split does not work exactly for the given array length, this will decide how to split the final item (e.g. given an array of 5 items and a split of `0.5` (50%), the bias will decide if the split will be `3 - 2` or `2 - 3`) (default = `"ROUND"`)
 
-#### `shuffle(array)`
+#### `shuffle(list)`
 Shuffles the array into a new array will all the items in a random order.
 
 ```ts
