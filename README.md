@@ -179,6 +179,10 @@ list(0, 3, {
 // ["foo-0", "foo-1", "foo-2", "foo-3"]
 ```
 
+options:
+- `step` - The steps used to generate the array.
+- `valueMapper` - A mapper function to map a step to a value.
+
 #### `max(list, mapper?, options?)`
 Returns the largest item from a list.
 
@@ -641,6 +645,10 @@ for (const value of range(0, 3, {
 // Expected output:
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
 ```
+
+options:
+- `step` - The steps used to generate the array.
+- `valueMapper` - A mapper function to map a step to a value.
 
 #### `safe(callback)`
 Executes the given callback and returns an option of the result.
