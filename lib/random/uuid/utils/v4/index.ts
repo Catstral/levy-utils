@@ -1,0 +1,44 @@
+import { UtilError } from "~/error";
+import { getRNG, stringifyBytes } from "../../helpers";
+import type { UuidRNGOptions } from "../../types";
+
+export class UuidV4UtilError extends UtilError {
+	public readonly util = "uuidV4";
+}
+
+/**
+ * @typedef {Object} UuidV4Options
+ * @extends UuidRNGOptions
+ */
+
+export interface UuidV4Options extends UuidRNGOptions {}
+
+/**
+ * Returns a Cryptographically secure random V4 UUID string.
+ *
+ * The time complexity for this is `O(1)`.
+ *
+ * @param {UuidV1Options} [options] The options to decide how to generate the UUID
+ * @returns {string} A V4 UUID string
+ * @throws {UuidV4UtilError} If the length of the specified random bytes is less then 16
+ */
+export function uuidV4(options?: UuidV4Options): string {
+	// If possible and no options are given, use the build in secure UUID generation
+	if (!options && crypto && "randomUUID" in crypto && typeof crypto.randomUUID === "function") {
+		return crypto.randomUUID();
+	}
+
+	const random = getRNG(options);
+
+	if (!random) {
+		throw new UuidV4UtilError("Random byte length must at least be 16");
+	}
+
+	// Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+	random[6] = (random[6] & 0x0f) | 0x40;
+	random[8] = (random[8] & 0x3f) | 0x80;
+
+	return stringifyBytes(random);
+}
+
+export { uuidV4 as v4, uuidV4 as uuid };
