@@ -10,17 +10,17 @@
  * @param {(item: T, index: number, originalIndex: number) => R} mapper A mapper to convert the filtered values
  * @returns {R[]} A new list with all filtered and mapped values
  */
-export function select<const T, const V extends T, const R>(
+export function filterMap<const T, const V extends T, const R>(
 	list: T[] | readonly T[],
 	filter: (item: T, index: number) => item is V,
-	mapper: (item: V, index: number) => R,
+	mapper: (item: V, index: number, originalIndex: number) => R,
 ): R[];
-export function select<const T, const R>(
+export function filterMap<const T, const R>(
 	list: T[] | readonly T[],
 	filter: (item: T, index: number) => boolean,
 	mapper: (item: T, index: number, originalIndex: number) => R,
 ): R[];
-export function select<const T, const R>(
+export function filterMap<const T, const R>(
 	list: T[] | readonly T[],
 	filter: (item: T, index: number) => boolean,
 	mapper: (item: T, index: number, originalIndex: number) => R,

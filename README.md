@@ -28,11 +28,11 @@ A list of all the utilities supported:
   - [cluster](#clusteritems-size)
   - [concat](#concatvalues)
   - [counting](#countinglist-identity)
+  - [filterMap](#filtermaplist-filter-mapper)
   - [fork](#forklist-condition)
   - [list](#liststartorlength-end-options)
   - [max](#maxlist-mapper-options)
   - [min](#maxlist-mapper-options)
-  - [select](#selectlist-filter-mapper)
   - [sift](#siftlist)
   - [sum](#sumlist-mapper)
   - [toggle](#togglelist-itemtotoggle-options)
@@ -156,6 +156,10 @@ counting(["a", "b", "a", "c", "a"], (item) => item);
 // }
 ```
 
+<!-- TODO -->
+#### `filterMap(list, filter, mapper)`
+Returns a new list of items based on filtered and mapped values of a given list.
+
 #### `fork(list, condition)`
 Splits a list into a tuple of two arrays based on a condition: items that pass, and items that don't.
 
@@ -257,10 +261,6 @@ min(
 //     weight: 54,
 // }
 ```
-
-<!-- TODO -->
-#### `select(list, filter, mapper)`
-Returns a new list of items based on filtered and mapped values of a given list.
 
 #### `sift(list)`
 Filters all falsy values out of a list.

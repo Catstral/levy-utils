@@ -1,9 +1,9 @@
 import { describe, expect, mock, test } from "bun:test";
-import { select } from ".";
+import { filterMap } from ".";
 
 describe("fork", () => {
 	test("Simple filter and mapper", () => {
-		const selected = select(
+		const selected = filterMap(
 			["foo", "bar"],
 			(val) => val === "foo",
 			(val) => val,
@@ -14,7 +14,7 @@ describe("fork", () => {
 	});
 
 	test("Empty list", () => {
-		const selected = select(
+		const selected = filterMap(
 			[] as number[],
 			(val) => val > 0,
 			(val) => val,
@@ -24,7 +24,7 @@ describe("fork", () => {
 	});
 
 	test("All items pass the condition", () => {
-		const selected = select(
+		const selected = filterMap(
 			[1, 2, 3],
 			() => true,
 			(val) => val,
@@ -35,7 +35,7 @@ describe("fork", () => {
 	});
 
 	test("All items fail the condition", () => {
-		const selected = select(
+		const selected = filterMap(
 			[1, 2, 3],
 			() => false,
 			(val) => val,
@@ -45,7 +45,7 @@ describe("fork", () => {
 	});
 
 	test("Preserves relative order within each resulting list", () => {
-		const selected = select(
+		const selected = filterMap(
 			[1, 2, 3, 4, 5],
 			(val) => val % 2 === 1,
 			(val) => val,
@@ -58,7 +58,7 @@ describe("fork", () => {
 		const filter = mock((val: number) => val > 2);
 		const mapper = mock((val: number) => val.toString());
 
-		select([1, 2, 3, 4], filter, mapper);
+		filterMap([1, 2, 3, 4], filter, mapper);
 
 		expect(filter).toBeCalledTimes(4);
 		expect(mapper).toBeCalledTimes(2);
@@ -67,7 +67,7 @@ describe("fork", () => {
 	test("Does not mutate the input list", () => {
 		const list = [1, 2, 3];
 
-		select(
+		filterMap(
 			list,
 			(val) => val > 1,
 			(val) => val.toString(),
