@@ -40,6 +40,7 @@ A list of all the utilities supported:
   - [chain](#chaincallbacks)
   - [compose](#composecallbacks)
   - [defer](#defercallback)
+  - [noop](#noop)
   - [pipe](#pipevalue-callback)
   - [preset](#presetcallback-parameters)
   - [retry](#retrycallback-options)
@@ -379,6 +380,15 @@ Defers a callback to the next execution cycle.
 defer(() => console.log("runs after the current call stack clears"));
 ```
 
+#### `noop()`
+No operation, this function does nothing. Useful for placeholder code.
+
+```ts
+noop();
+// Expected output:
+// undefined
+```
+
 #### `pipe(value, callback)`
 Pipes a value into a callback and returns its result.
 
@@ -387,9 +397,9 @@ pipe(5, (n) => n * 2);
 // Expected output:
 // 10
 
-pipe("Levy", (name) => `${name} utils`);
+pipe("Foo", (value) => `${value} Bar`);
 // Expected output:
-// "Levy utils"
+// "Foo Bar"
 ```
 
 #### `preset(callback, parameters)`
