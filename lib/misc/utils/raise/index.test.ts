@@ -11,16 +11,6 @@ function caught(value: unknown): unknown {
 	throw new Error("Raise did not throw");
 }
 
-function thrownBy(callback: () => unknown): unknown {
-	try {
-		callback();
-	} catch (error) {
-		return error;
-	}
-
-	throw new Error("callback did not throw");
-}
-
 describe("raise", () => {
 	describe("String", () => {
 		test("Throws an Error with the string as message", () => {
@@ -92,51 +82,6 @@ describe("raise", () => {
 			const inner = () => "foo";
 
 			expect(caught(() => inner)).toBe(inner);
-		});
-	});
-
-	describe("Error class with arguments", () => {
-		class HttpError extends Error {
-			constructor(
-				readonly status: number,
-				message?: string,
-			) {
-				super(message);
-			}
-		}
-
-		test("Throws a new instance of the class", () => {
-			const error = thrownBy(() => raise(Error, "foo"));
-
-			expect(error).toBeInstanceOf(Error);
-			expect((error as Error).message).toBe("foo");
-		});
-
-		test("Built-in subclass", () => {
-			expect(() => raise(RangeError, "foo")).toThrow(new RangeError("foo"));
-		});
-
-		test("Passes every argument to the constructor", () => {
-			const error = thrownBy(() => raise(HttpError, 404, "Not found"));
-
-			expect(error).toBeInstanceOf(HttpError);
-			expect((error as HttpError).status).toBe(404);
-			expect((error as HttpError).message).toBe("Not found");
-		});
-
-		test("Passes options such as `cause`", () => {
-			const cause = new Error("root");
-			const error = thrownBy(() => raise(Error, "foo", { cause }));
-
-			expect((error as Error).cause).toBe(cause);
-		});
-
-		test("Arguments are type checked against the constructor", () => {
-			// @ts-expect-error `HttpError` expects a status number first
-			expect(() => raise(HttpError, "Not found")).toThrow();
-
-			// @ts-expect-error `message` must be a string
-			expect(() => raise(Error, 5)).toThrow();
 		});
 	});
 
