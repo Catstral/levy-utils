@@ -544,7 +544,7 @@ export interface RangeOptions<T> {
 	inclusiveEnd?: boolean;
 }
 
-export function range(strings: TemplateStringsArray, ...values: (string | number)[]): Range<number>
+export function range(strings: TemplateStringsArray, ...values: (string | number)[]): Range<number>;
 export function range<const T = number>(range: RangeString, options?: RangeOptions<T>): Range<T>;
 /**
  * Returns a Range that returns values from a specified range.
@@ -615,24 +615,26 @@ export function range<const T = number>(
 	options?: RangeOptions<T>,
 ): Range<T>;
 export function range<const T = number>(
-	...args: [
-	startOrLengthOrRange?: number | RangeString | null,
-	endOrOptions?: number | RangeOptions<T> | null,
-	options?: RangeOptions<T>
-	] | [strings: TemplateStringsArray, ...values: (string | number)[]]
+	...args:
+		| [
+				startOrLengthOrRange?: number | RangeString | null,
+				endOrOptions?: number | RangeOptions<T> | null,
+				options?: RangeOptions<T>,
+		  ]
+		| [strings: TemplateStringsArray, ...values: (string | number)[]]
 ): Range<T> {
 	if (Array.isArray(args[0])) {
 		const [string, ...values] = args as [strings: TemplateStringsArray, ...values: (string | number)[]];
 		const rangeString = String.raw(string, ...values).trim() as RangeString;
 
-		return new Range<T>(rangeString)
+		return new Range<T>(rangeString);
 	}
 
 	const [startOrLengthOrRange, endOrOptions, options] = args as [
 		startOrLengthOrRange?: number | RangeString | null,
 		endOrOptions?: number | RangeOptions<T> | null,
-		options?: RangeOptions<T>
-	]
+		options?: RangeOptions<T>,
+	];
 
 	if (typeof startOrLengthOrRange === "string") {
 		if (typeof endOrOptions === "number") {
