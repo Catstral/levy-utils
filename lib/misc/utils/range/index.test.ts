@@ -1214,6 +1214,79 @@ describe("range", () => {
 				});
 			});
 		});
+
+		describe("Template literal", () => {
+			test("Range without interpolation", () => {
+				expect(range`0..=4`.toArray()).toEqual([0, 1, 2, 3, 4]);
+			});
+
+			test("Range with interpolated numbers", () => {
+				const start = 2;
+				const end = 4;
+
+				expect(range`${start}..=${end}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with interpolated strings", () => {
+				expect(range`${"2"}..=${"4"}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with interpolated range string", () => {
+				const rangeString: RangeString = "2..=4";
+
+				expect(range`${rangeString}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with exclusive end", () => {
+				expect(range`0..${4}`.toArray()).toEqual([0, 1, 2, 3]);
+			});
+
+			test("Range with exclusive start", () => {
+				expect(range`${0}>..=${4}`.toArray()).toEqual([1, 2, 3, 4]);
+			});
+
+			test("Range with decimal values", () => {
+				expect(range`${0.5}..=${2.5}`.toArray()).toEqual([0.5, 1.5, 2.5]);
+			});
+
+			test("Descending range", () => {
+				expect(range`${4}..=${0}`.toArray()).toEqual([4, 3, 2, 1, 0]);
+			});
+
+			test("Surrounding whitespace is trimmed", () => {
+				expect(range`  0..=${2}  `.toArray()).toEqual([0, 1, 2]);
+			});
+
+			test("Invalid range string throws a RangeUtilError", () => {
+				try {
+					range`${"foo"}..${"bar"}`;
+
+					expect().fail("Expected range to throw");
+				} catch (err) {
+					expect(err).toBeInstanceOf(RangeUtilError);
+					expect((err as RangeUtilError).util).toBe("range");
+					expect((err as RangeUtilError & { message: string }).message).toBe(
+						"Got a range string, but given range string is not valid",
+					);
+				}
+			});
+
+			describe("Data parsing", () => {
+				test.each(testParameters.filter(({ rangeType }) => typeof rangeType === "string"))(
+					"$name",
+					({ rangeType, start, end, step, inclusiveStart, inclusiveEnd }) => {
+						const currentRange = range`${rangeType as RangeString}`;
+
+						expect(currentRange.details.start).toBe(start);
+						expect(currentRange.details.inclusiveStart).toBe(inclusiveStart);
+						expect(currentRange.details.end).toBe(end);
+						expect(currentRange.details.inclusiveEnd).toBe(inclusiveEnd);
+						expect(currentRange.details.step).toBe(step);
+						expect(currentRange.details.mapper).toBeUndefined();
+					},
+				);
+			});
+		});
 	});
 
 	describe("Class usage", () => {
