@@ -1294,318 +1294,369 @@ describe("range", () => {
 
 		describe("Non-iteration tests", () => {
 			describe("Full range", () => {
-				test("All numbers are between range", () => {
+				test("All numbers are included in range", () => {
 					const range = new Range("..");
 
-					expect(range.isBetween(0)).toBeTrue();
-					expect(range.isBetween(1)).toBeTrue();
-					expect(range.isBetween(-1)).toBeTrue();
-					expect(range.isBetween(Infinity)).toBeTrue();
-					expect(range.isBetween(-Infinity)).toBeTrue();
-					expect(range.isBetween(NaN)).toBeTrue();
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeTrue();
 				});
 
-				test("All numbers are between or on range", () => {
+				test("No numbers are excluded from range", () => {
 					const range = new Range("..");
 
-					expect(range.isBetweenOrOn(0)).toBeTrue();
-					expect(range.isBetweenOrOn(1)).toBeTrue();
-					expect(range.isBetweenOrOn(-1)).toBeTrue();
-					expect(range.isBetweenOrOn(Infinity)).toBeTrue();
-					expect(range.isBetweenOrOn(-Infinity)).toBeTrue();
-					expect(range.isBetweenOrOn(NaN)).toBeTrue();
-				});
-
-				test("No numbers are outside range", () => {
-					const range = new Range("..");
-
-					expect(range.isOutside(0)).toBeFalse();
-					expect(range.isOutside(1)).toBeFalse();
-					expect(range.isOutside(-1)).toBeFalse();
-					expect(range.isOutside(Infinity)).toBeFalse();
-					expect(range.isOutside(-Infinity)).toBeFalse();
-					expect(range.isOutside(NaN)).toBeFalse();
-				});
-
-				test("No numbers are on or outside range", () => {
-					const range = new Range("..");
-
-					expect(range.isOutsideOrOn(0)).toBeFalse();
-					expect(range.isOutsideOrOn(1)).toBeFalse();
-					expect(range.isOutsideOrOn(-1)).toBeFalse();
-					expect(range.isOutsideOrOn(Infinity)).toBeFalse();
-					expect(range.isOutsideOrOn(-Infinity)).toBeFalse();
-					expect(range.isOutsideOrOn(NaN)).toBeFalse();
-				});
-
-				test("No numbers are on range", () => {
-					const range = new Range("..");
-
-					expect(range.isOn(0)).toBeFalse();
-					expect(range.isOn(1)).toBeFalse();
-					expect(range.isOn(-1)).toBeFalse();
-					expect(range.isOn(Infinity)).toBeFalse();
-					expect(range.isOn(-Infinity)).toBeFalse();
-					expect(range.isOn(NaN)).toBeFalse();
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
 				});
 			});
 
 			describe("Range with start", () => {
-				test("Number above start are between range and numbers below or equal to start are not between range", () => {
+				test("Numbers above or equal to start are included in range and numbers below start are not included in range", () => {
 					const range = new Range("0..");
 
-					expect(range.isBetween(0)).toBeFalse();
-					expect(range.isBetween(1)).toBeTrue();
-					expect(range.isBetween(-1)).toBeFalse();
-					expect(range.isBetween(Infinity)).toBeTrue();
-					expect(range.isBetween(-Infinity)).toBeFalse();
-					expect(range.isBetween(NaN)).toBeFalse();
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeFalse();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeFalse();
+					expect(range.includes(NaN)).toBeFalse();
 				});
 
-				test("Number above or equal to start are between or on range and numbers below start are not between or on range", () => {
+				test("All numbers below start are excluded from range and all numbers above or equal to start are not exlcuded from range", () => {
 					const range = new Range("0..");
 
-					expect(range.isBetweenOrOn(0)).toBeTrue();
-					expect(range.isBetweenOrOn(1)).toBeTrue();
-					expect(range.isBetweenOrOn(-1)).toBeFalse();
-					expect(range.isBetweenOrOn(Infinity)).toBeTrue();
-					expect(range.isBetweenOrOn(-Infinity)).toBeFalse();
-					expect(range.isBetweenOrOn(NaN)).toBeFalse();
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeTrue();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeTrue();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with exclusive start", () => {
+				test("Numbers above start are included in range and numbers below or equal to start are not included in range", () => {
+					const range = new Range("0>..");
+
+					expect(range.includes(0)).toBeFalse();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeFalse();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeFalse();
+					expect(range.includes(NaN)).toBeFalse();
 				});
 
-				test("All numbers below start are outside or on range and all numbers above or equal to start are not outside or on range", () => {
-					const range = new Range("0..");
+				test("All numbers below or equal to start are excluded from range and all numbers above start are not exlcuded from range", () => {
+					const range = new Range("0>..");
 
-					expect(range.isOutside(0)).toBeFalse();
-					expect(range.isOutside(1)).toBeFalse();
-					expect(range.isOutside(-1)).toBeTrue();
-					expect(range.isOutside(Infinity)).toBeFalse();
-					expect(range.isOutside(-Infinity)).toBeTrue();
-					expect(range.isOutside(NaN)).toBeFalse();
-				});
-
-				test("All numbers below or equal to start are outside or on range and all numbers above start are not outside or on range", () => {
-					const range = new Range("0..");
-
-					expect(range.isOutsideOrOn(0)).toBeTrue();
-					expect(range.isOutsideOrOn(1)).toBeFalse();
-					expect(range.isOutsideOrOn(-1)).toBeTrue();
-					expect(range.isOutsideOrOn(Infinity)).toBeFalse();
-					expect(range.isOutsideOrOn(-Infinity)).toBeTrue();
-					expect(range.isOutsideOrOn(NaN)).toBeFalse();
-				});
-
-				test("Only value equal to start is on range", () => {
-					const range = new Range("0..");
-
-					expect(range.isOn(0)).toBeTrue();
-					expect(range.isOn(1)).toBeFalse();
-					expect(range.isOn(-1)).toBeFalse();
-					expect(range.isOn(Infinity)).toBeFalse();
-					expect(range.isOn(-Infinity)).toBeFalse();
-					expect(range.isOn(NaN)).toBeFalse();
+					expect(range.excludes(0)).toBeTrue();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeTrue();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeTrue();
+					expect(range.excludes(NaN)).toBeFalse();
 				});
 			});
 
 			describe("Range with end", () => {
-				test("Number below end are between range and numbers above or equal to end are not between range", () => {
-					const range = new Range("..=0");
+				test("Numbers below end are included in range and numbers above or equal to end are not included in range", () => {
+					const range = new Range("..0");
 
-					expect(range.isBetween(0)).toBeFalse();
-					expect(range.isBetween(1)).toBeFalse();
-					expect(range.isBetween(-1)).toBeTrue();
-					expect(range.isBetween(Infinity)).toBeFalse();
-					expect(range.isBetween(-Infinity)).toBeTrue();
-					expect(range.isBetween(NaN)).toBeFalse();
+					expect(range.includes(0)).toBeFalse();
+					expect(range.includes(1)).toBeFalse();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeFalse();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeFalse();
 				});
 
-				test("Number below or equal to end are between or on range and numbers above end are not between or on range", () => {
+				test("All numbers above or equal to end are excluded from range and all numbers below end are not excluded from range", () => {
+					const range = new Range("..0");
+
+					expect(range.excludes(0)).toBeTrue();
+					expect(range.excludes(1)).toBeTrue();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeTrue();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with inclusive end", () => {
+				test("Numbers below or equal to end are icluded in range and numbers above end are not included in range", () => {
 					const range = new Range("..=0");
 
-					expect(range.isBetweenOrOn(0)).toBeTrue();
-					expect(range.isBetweenOrOn(1)).toBeFalse();
-					expect(range.isBetweenOrOn(-1)).toBeTrue();
-					expect(range.isBetweenOrOn(Infinity)).toBeFalse();
-					expect(range.isBetweenOrOn(-Infinity)).toBeTrue();
-					expect(range.isBetweenOrOn(NaN)).toBeFalse();
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeFalse();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeFalse();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeFalse();
 				});
 
-				test("All numbers above end are outside or on range and all numbers below or equal to end are not outside or on range", () => {
+				test("All numbers above end are excluded from range and all numbers below or equal to end are not excluded from range", () => {
 					const range = new Range("..=0");
 
-					expect(range.isOutside(0)).toBeFalse();
-					expect(range.isOutside(1)).toBeTrue();
-					expect(range.isOutside(-1)).toBeFalse();
-					expect(range.isOutside(Infinity)).toBeTrue();
-					expect(range.isOutside(-Infinity)).toBeFalse();
-					expect(range.isOutside(NaN)).toBeFalse();
-				});
-
-				test("All numbers above or equal to end are outside or on range and all numbers below end are not outside or on range", () => {
-					const range = new Range("..=0");
-
-					expect(range.isOutsideOrOn(0)).toBeTrue();
-					expect(range.isOutsideOrOn(1)).toBeTrue();
-					expect(range.isOutsideOrOn(-1)).toBeFalse();
-					expect(range.isOutsideOrOn(Infinity)).toBeTrue();
-					expect(range.isOutsideOrOn(-Infinity)).toBeFalse();
-					expect(range.isOutsideOrOn(NaN)).toBeFalse();
-				});
-
-				test("Only value equal to end is on range", () => {
-					const range = new Range("..=0");
-
-					expect(range.isOn(0)).toBeTrue();
-					expect(range.isOn(1)).toBeFalse();
-					expect(range.isOn(-1)).toBeFalse();
-					expect(range.isOn(Infinity)).toBeFalse();
-					expect(range.isOn(-Infinity)).toBeFalse();
-					expect(range.isOn(NaN)).toBeFalse();
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeTrue();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeTrue();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
 				});
 			});
 
 			describe("Range with start and end", () => {
 				describe("Range moving towards positive infinity", () => {
-					test("All number above start and below end are between range and all numbers below or equal to start or above or equal to end are not between range", () => {
-						const range = new Range("0..=10");
+					test("All numbers above or equal to start and below end are included in range and all numbers below start or above or equal to end are not included in range", () => {
+						const range = new Range("0..10");
 
-						expect(range.isBetween(-1)).toBeFalse();
-						expect(range.isBetween(0)).toBeFalse();
-						expect(range.isBetween(1)).toBeTrue();
-						expect(range.isBetween(9)).toBeTrue();
-						expect(range.isBetween(10)).toBeFalse();
-						expect(range.isBetween(11)).toBeFalse();
-						expect(range.isBetween(Infinity)).toBeFalse();
-						expect(range.isBetween(-Infinity)).toBeFalse();
-						expect(range.isBetween(NaN)).toBeFalse();
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
 					});
 
-					test("All number above or equal to start and below or equal to end are between or on range and all numbers below start or above end are not between or on range", () => {
-						const range = new Range("0..=10");
+					test("All numbers below start or above or equal to end are excluded from range and all numbers above or equal to start and below end are not excluded from range", () => {
+						const range = new Range("0..10");
 
-						expect(range.isBetweenOrOn(-1)).toBeFalse();
-						expect(range.isBetweenOrOn(0)).toBeTrue();
-						expect(range.isBetweenOrOn(1)).toBeTrue();
-						expect(range.isBetweenOrOn(9)).toBeTrue();
-						expect(range.isBetweenOrOn(10)).toBeTrue();
-						expect(range.isBetweenOrOn(11)).toBeFalse();
-						expect(range.isBetweenOrOn(Infinity)).toBeFalse();
-						expect(range.isBetweenOrOn(-Infinity)).toBeFalse();
-						expect(range.isBetweenOrOn(NaN)).toBeFalse();
-					});
-
-					test("All numbers below start or above end are outside of range and all numbers above or equal to start and below or equal to end are not outside range", () => {
-						const range = new Range("0..=10");
-
-						expect(range.isOutside(-1)).toBeTrue();
-						expect(range.isOutside(0)).toBeFalse();
-						expect(range.isOutside(1)).toBeFalse();
-						expect(range.isOutside(9)).toBeFalse();
-						expect(range.isOutside(10)).toBeFalse();
-						expect(range.isOutside(11)).toBeTrue();
-						expect(range.isOutside(Infinity)).toBeTrue();
-						expect(range.isOutside(-Infinity)).toBeTrue();
-						expect(range.isOutside(NaN)).toBeFalse();
-					});
-
-					test("All number below or equal to start or below or equal to end are outside or on range and all numbers above start and below end are not outside or on range", () => {
-						const range = new Range("0..=10");
-
-						expect(range.isOutsideOrOn(-1)).toBeTrue();
-						expect(range.isOutsideOrOn(0)).toBeTrue();
-						expect(range.isOutsideOrOn(1)).toBeFalse();
-						expect(range.isOutsideOrOn(9)).toBeFalse();
-						expect(range.isOutsideOrOn(10)).toBeTrue();
-						expect(range.isOutsideOrOn(11)).toBeTrue();
-						expect(range.isOutsideOrOn(Infinity)).toBeTrue();
-						expect(range.isOutsideOrOn(-Infinity)).toBeTrue();
-						expect(range.isOutsideOrOn(NaN)).toBeFalse();
-					});
-
-					test("Only value equal to start or equal to end is on range", () => {
-						const range = new Range("0..=10");
-
-						expect(range.isOn(-1)).toBeFalse();
-						expect(range.isOn(0)).toBeTrue();
-						expect(range.isOn(1)).toBeFalse();
-						expect(range.isOn(9)).toBeFalse();
-						expect(range.isOn(10)).toBeTrue();
-						expect(range.isOn(11)).toBeFalse();
-						expect(range.isOn(Infinity)).toBeFalse();
-						expect(range.isOn(-Infinity)).toBeFalse();
-						expect(range.isOn(NaN)).toBeFalse();
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
 					});
 				});
 
 				describe("Range moving towards negative infinity", () => {
-					test("All number below start and above end are between range and all numbers above or equal to start or below or equal to end are not between range", () => {
-						const range = new Range("10..=0");
+					test("All numbers below or equal to start and above end are included in range and all numbers above start or below or equal to end are not included in range", () => {
+						const range = new Range("10..0");
 
-						expect(range.isBetween(-1)).toBeFalse();
-						expect(range.isBetween(0)).toBeFalse();
-						expect(range.isBetween(1)).toBeTrue();
-						expect(range.isBetween(9)).toBeTrue();
-						expect(range.isBetween(10)).toBeFalse();
-						expect(range.isBetween(11)).toBeFalse();
-						expect(range.isBetween(Infinity)).toBeFalse();
-						expect(range.isBetween(-Infinity)).toBeFalse();
-						expect(range.isBetween(NaN)).toBeFalse();
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
 					});
 
-					test("All number above or equal to start and below or equal to end are between or on range and all numbers above start or below end are not between or on range", () => {
-						const range = new Range("10..=0");
+					test("All numbers above start or below or equal to end are excluded from range and all numbers below or equal to start and above end are not excluded from range", () => {
+						const range = new Range("10..0");
 
-						expect(range.isBetweenOrOn(-1)).toBeFalse();
-						expect(range.isBetweenOrOn(0)).toBeTrue();
-						expect(range.isBetweenOrOn(1)).toBeTrue();
-						expect(range.isBetweenOrOn(9)).toBeTrue();
-						expect(range.isBetweenOrOn(10)).toBeTrue();
-						expect(range.isBetweenOrOn(11)).toBeFalse();
-						expect(range.isBetweenOrOn(Infinity)).toBeFalse();
-						expect(range.isBetweenOrOn(-Infinity)).toBeFalse();
-						expect(range.isBetweenOrOn(NaN)).toBeFalse();
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with exclusive start and end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above start and below end are included in range and all numbers below or equal to start or above or equal to end are not included in range", () => {
+						const range = new Range("0>..10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
 					});
 
-					test("All numbers above start or below end are outside of range and all numbers below or equal to start and above or equal to end are not outside range", () => {
-						const range = new Range("10..=0");
+					test("All numbers below or equal to start or above or equal to end are exclude from range and all numbers above start and below end are not excluded from range", () => {
+						const range = new Range("0>..10");
 
-						expect(range.isOutside(-1)).toBeTrue();
-						expect(range.isOutside(0)).toBeFalse();
-						expect(range.isOutside(1)).toBeFalse();
-						expect(range.isOutside(9)).toBeFalse();
-						expect(range.isOutside(10)).toBeFalse();
-						expect(range.isOutside(11)).toBeTrue();
-						expect(range.isOutside(Infinity)).toBeTrue();
-						expect(range.isOutside(-Infinity)).toBeTrue();
-						expect(range.isOutside(NaN)).toBeFalse();
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below start and above end are included range and all numbers above or equal to start or below or equal to end are not include in range", () => {
+						const range = new Range("10>..0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
 					});
 
-					test("All number above or equal to start or below or equal to end are outside or on range and all numbers below start and above end are not outside or on range", () => {
-						const range = new Range("10..=0");
+					test("All numbers above or equal to start or below or equal to end are excluded from range and all numbers below start and above end are not excluded from range", () => {
+						const range = new Range("10>..0");
 
-						expect(range.isOutsideOrOn(-1)).toBeTrue();
-						expect(range.isOutsideOrOn(0)).toBeTrue();
-						expect(range.isOutsideOrOn(1)).toBeFalse();
-						expect(range.isOutsideOrOn(9)).toBeFalse();
-						expect(range.isOutsideOrOn(10)).toBeTrue();
-						expect(range.isOutsideOrOn(11)).toBeTrue();
-						expect(range.isOutsideOrOn(Infinity)).toBeTrue();
-						expect(range.isOutsideOrOn(-Infinity)).toBeTrue();
-						expect(range.isOutsideOrOn(NaN)).toBeFalse();
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with start and inclusive end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above or equal to start and below or equal to end are included in range and all numbers below start or above end are not included in range", () => {
+						const range = new Range("0..=10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
 					});
 
-					test("Only value equal to start or equal to end is on range", () => {
+					test("All numbers below start or above end are excluded from range and all numbers above or equal to start and below or equal to end are not excluded from range", () => {
+						const range = new Range("0..=10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below or equal to start and above or equal to end are included in range and all numbers above start or below end are not included in range", () => {
 						const range = new Range("10..=0");
 
-						expect(range.isOn(-1)).toBeFalse();
-						expect(range.isOn(0)).toBeTrue();
-						expect(range.isOn(1)).toBeFalse();
-						expect(range.isOn(9)).toBeFalse();
-						expect(range.isOn(10)).toBeTrue();
-						expect(range.isOn(11)).toBeFalse();
-						expect(range.isOn(Infinity)).toBeFalse();
-						expect(range.isOn(-Infinity)).toBeFalse();
-						expect(range.isOn(NaN)).toBeFalse();
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above start or below end are excluded from range and all numbers below or equal to start and above or equal to end are not excluded from range", () => {
+						const range = new Range("10..=0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with exclusive start and inclusive end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above start and below or equal to end are included in range and all numbers below or equal to start or above end are not included in range", () => {
+						const range = new Range("0>..=10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers below or equal to start or above end are excluded from range and all numbers above start and below or equal to end are not excluded from range", () => {
+						const range = new Range("0>..=10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below start and above or equal to end are included in range and all numbers above or equal to start or below end are not included in range", () => {
+						const range = new Range("10>..=0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above or equal to start or below end are excluded from range and all numbers below start and above or equal to end are not excluded from range", () => {
+						const range = new Range("10>..=0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
 					});
 				});
 			});

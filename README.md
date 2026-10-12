@@ -58,11 +58,8 @@ A list of all the utilities supported:
     - [end](#endend)
     - [step](#stepstep)
     - [map](#mapmapper)
-    - [isOn](#isonvalue)
-    - [isBetween](#isbetweenvalue)
-    - [isBetweenOrOn](#isbetweenoronvalue)
-    - [isOutside](#isoutsidevalue)
-    - [isOutsideOrOn](#isoutsideoronvalue)
+    - [includes](#includesvalue)
+    - [excludes](#excludesvalue)
     - [toArray](#toarray)
     - [clone](#clone)
   - [range](#rangestartorlength-end-options)
@@ -600,36 +597,15 @@ Creates a new Range with a given step value set.
 ##### `map(mapper)`
 Creates a new Range with a given mapper set.
 
-##### `isOn(value)`
-Returns a boolean to signal if the given value is on the edges of the range.
-
-> Notes:
-> - If the range is a full range, then this will **always** return false.
-> - `NaN` will **always** return false.
-
-##### `isBetween(value)`
-Returns a boolean to signal if the given value is between the edges of the range.
+##### `includes(value)`
+Returns a boolean to signal if the given value is included in the range.
 
 > Notes:
 > - If the range is a full range, then this will **always** return true.
 > - `NaN` will **always** return false (unless the range is a full range).
 
-##### `isBetweenOrOn(value)`
-Returns a boolean to signal if the given value is between or on the edges of the range.
-
-> Notes:
-> - If the range is a full range, then this will **always** return true.
-> - `NaN` will **always** return false (unless the range is a full range).
-
-##### `isOutside(value)`
-Returns a boolean to signal if the given value is outside the edges of the range.
-
-> Notes:
-> - If the range is a full range, then this will **always** return false.
-> - `NaN` will **always** return false.
-
-##### `isOutsideOrOn(value)`
-Returns a boolean to signal if the given value is outside or on the edges of the range.
+##### `excludes(value)`
+Returns a boolean to signal if the given value is excluded from the range.
 
 > Notes:
 > - If the range is a full range, then this will **always** return false.

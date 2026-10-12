@@ -322,30 +322,24 @@ export class Range<const T = number> {
 	}
 
 	/**
-	 * Returns a boolean to signal if the given value is on the edges of the range.
-	 *
-	 * Notes:
-	 * - If the range is a full range, then this will **always** return false.
-	 * - `NaN` will **always** return false.
-	 *
-	 * @param {number} value The value to check.
-	 * @returns {boolean} A boolean to signal if the specified value is on the edges of the range.
-	 */
-	public isOn(value: number): boolean {
-		return (this.#inclusiveStart && value === this.#start) || (this.#inclusiveEnd && value === this.#end);
-	}
-
-	/**
-	 * Returns a boolean to signal if the given value is between the edges of the range.
+	 * Returns a boolean to signal if the given value is included in the range.
 	 *
 	 * Notes:
 	 * - If the range is a full range, then this will **always** return true.
 	 * - `NaN` will **always** return false (unless the range is a full range).
 	 *
 	 * @param {number} value The value to check.
-	 * @returns {boolean} A boolean to signal if the specified value is between the edges of the range.
+	 * @returns {boolean} A boolean to signal if the specified value is included in the range.
 	 */
-	public isBetween(value: number): boolean {
+	public includes(value: number): boolean {
+		if (this.#inclusiveStart && value === this.#start) {
+			return true;
+		}
+
+		if (this.#inclusiveEnd && value === this.#end) {
+			return true;
+		}
+
 		const isIncremental =
 			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
 		const currentStart = isIncremental ? this.#start : this.#end;
@@ -367,30 +361,24 @@ export class Range<const T = number> {
 	}
 
 	/**
-	 * Returns a boolean to signal if the given value is between or on the edges of the range.
-	 *
-	 * Notes:
-	 * - If the range is a full range, then this will **always** return true.
-	 * - `NaN` will **always** return false (unless the range is a full range).
-	 *
-	 * @param {number} value The value to check.
-	 * @returns {boolean} A boolean to signal if the specified value is between or on the edges of the range.
-	 */
-	public isBetweenOrOn(value: number): boolean {
-		return this.isBetween(value) || this.isOn(value);
-	}
-
-	/**
-	 * Returns a boolean to signal if the given value is outside the edges of the range.
+	 * Returns a boolean to signal if the given value is excluded from the range.
 	 *
 	 * Notes:
 	 * - If the range is a full range, then this will **always** return false.
 	 * - `NaN` will **always** return false.
 	 *
 	 * @param {number} value The value to check.
-	 * @returns {boolean} A boolean to signal if the specified value is outside the edges of the range.
+	 * @returns {boolean} A boolean to signal if the specified value is excluded from the range.
 	 */
-	public isOutside(value: number): boolean {
+	public excludes(value: number): boolean {
+		if (!this.#inclusiveStart && value === this.#start) {
+			return true;
+		}
+
+		if (!this.#inclusiveEnd && value === this.#end) {
+			return true;
+		}
+
 		const isIncremental =
 			typeof this.#start === "number" && typeof this.#end === "number" ? this.#end > this.#start : true;
 		const currentStart = isIncremental ? this.#start : this.#end;
@@ -409,20 +397,6 @@ export class Range<const T = number> {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Returns a boolean to signal if the given value is outside or on the edges of the range.
-	 *
-	 * Notes:
-	 * - If the range is a full range, then this will **always** return false.
-	 * - `NaN` will **always** return false.
-	 *
-	 * @param {number} value The value to check.
-	 * @returns {boolean} A boolean to signal if the specified value is outside or on the edges of the range.
-	 */
-	public isOutsideOrOn(value: number): boolean {
-		return this.isOutside(value) || this.isOn(value);
 	}
 
 	*[Symbol.iterator](): Generator<T> {
