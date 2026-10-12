@@ -49,6 +49,21 @@ A list of all the utilities supported:
   - [isEmpty](#isemptyvalue)
   - [isPrimitive](#isprimitivevalue)
   - [match](#matchvalue-clause-fallback)
+  - [Range (class)](#rangerangestring)
+    - [static from](#static-fromrange)
+    - [details (getter)](#details-getter)
+      - [start (getter)](#start-getter)
+      - [end (getter)](#end-getter)
+      - [step (getter)](#step-getter)
+      - [mapper (getter)](#mapper-getter)
+    - [start](#startstart)
+    - [end](#endend)
+    - [step](#stepstep)
+    - [map](#mapmapper)
+    - [includes](#includesvalue)
+    - [excludes](#excludesvalue)
+    - [toArray](#toarray)
+    - [clone](#clone)
   - [range](#rangestartorlength-end-options)
   - [safe](#safecallback)
   - [sleep](#sleepdelay)
@@ -78,6 +93,20 @@ A list of all the utilities supported:
   - [keys](#keysvalue)
   - [omit](#omitobject-keys)
   - [pick](#pickobject-keys)
+- [Randomization utilities](#randomization-utilities)
+  - [UUID utilities](#uuid-utilities)
+    - [uuidMax](#uuidmax)
+    - [uuidNil](#uuidnil)
+    - [uuidV1 / v1](#uuidv1options)
+    - [uuidV4 / v4 / uuid](#uuidv4options)
+    - [uuidV7 / v7](#uuidv7options)
+  - [chance](#chancepercentage)
+  - [draw](#drawlist)
+  - [maybe](#maybe)
+  - [random](#randommin-max)
+  - [scatter](#scatterlist-split-options)
+  - [shuffle](#shufflelist)
+  - [uid](#uidlength-charset)
 - [String utilities](#string-utilities)
   - [Casing utilities](#casing-utilities)
     - [camelCase](#camelcasestr-options)
@@ -162,6 +191,10 @@ list(0, 3, {
 // Expected output:
 // ["foo-0", "foo-1", "foo-2", "foo-3"]
 ```
+
+options:
+- `step` - The steps used to generate the array.
+- `valueMapper` - A mapper function to map a step to a value.
 
 #### `max(list, mapper?, options?)`
 Returns the largest item from a list.
@@ -505,8 +538,121 @@ fn("C");
 // -1
 ```
 
+#### `Range(rangeString?)`
+> The constructor of this has an overload:  
+> `Range(details?)`
+> 
+> Details:
+> - `start` - The start value of the range (optional).
+> - `inclusiveStart` - If the range should consider the `start` to be inclusive (optional).
+> - `end` - The end value of the range (optional)
+> - `inclusiveEnd` - If the range should consider the `end` to be inclusive (optional).
+> - `step` - The step value of the range (optional).
+> - `mapper` - The mapper of the range, this maps a step to a value (optional).
+
+This is a class representing a range value, it is an iterable and generates values based on a start and end value (if specified).
+
+If no start of end value is specified the range will work as expected with methods, but trying to iterate over it will throw an error.
+
+It can also be given a `step` and a `mapper` to define how it should be generating a value.
+
+If the argument given is a string, then it is expected to have that string match the following definition:
+`S?>?..=?E?` where:
+* `S` - The start of the range (optional)
+* `E` - The end of the range (optional)
+* `>` - If the start value is exclusive of this range (optional)
+* `=` - If the end value is inclusive of this range (optional)
+
+Here is a simple table explaining the different types of range strings:
+| Syntax             | Range           | Is iterable |
+| -------------------| --------------- | ----------- |
+| `[start]..[end]`   | start ≤ x < end | Yes         |
+| `[start]>..[end]`  | start < x < end | Yes         |
+| `[start]..=[end]`  | start ≤ x ≤ end | Yes         |
+| `[start]>..=[end]` | start < x ≤ end | Yes         |
+| `..`               | -               | No          |
+| `[start]..`        | start ≤ x       | No          |
+| `[start]>..`       | start < x       | No          |
+| `..[end]`          | x < end         | No          |
+| `..=[end]`         | x ≤ end         | No          |
+
+If a value is not iterable, that means it will throw an error on attempting to iterate the range.  
+A full range is a range without bounds, this mostly exists for completeness and would effect how certain methods of the range work, see the methods for more details on how they are effected.
+
+> This class can also be gotten from the [range](#rangestartorlength-end-options) utility function.
+
+##### `static from(range)`
+Creates a new range with the details from the specified range.
+
+> This does the same as [Range.clone](#clone)
+
+##### `details (getter)`
+Gets the internal details of the Range.
+
+> This is a getter, no value can be set here.
+
+###### `start (getter)`
+Gets the start value of range.
+
+> This is a getter, no value can be set here.
+
+###### `end (getter)`
+Gets the end value of range.
+
+> This is a getter, no value can be set here.
+
+###### `step (getter)`
+Gets the step value of range.
+
+> This is a getter, no value can be set here.
+
+###### `mapper (getter)`
+Gets the mapper value of range.
+
+> This is a getter, no value can be set here.
+
+##### `start(start?)`
+Creates a new Range with a given start value set.
+
+##### `inclusiveStart(inclusiveStart)`
+Creates a new Range with a given inclusive start value set.
+
+##### `end(end?)`
+Creates a new Range with a given end value set.
+
+##### `inclusiveEnd(inclusiveEnd)`
+Creates a new Range with a given inclusive  end value set.
+
+##### `step(step?)`
+Creates a new Range with a given step value set.
+
+##### `map(mapper)`
+Creates a new Range with a given mapper set.
+
+##### `includes(value)`
+Returns a boolean to signal if the given value is included in the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return true.
+> - `NaN` will **always** return false (unless the range is a full range).
+
+##### `excludes(value)`
+Returns a boolean to signal if the given value is excluded from the range.
+
+> Notes:
+> - If the range is a full range, then this will **always** return false.
+> - `NaN` will **always** return false.
+
+##### `toArray()`
+Returns an array based on the values of the range.
+
+##### `clone()`
+Returns a new Range with same details.
+
+> This does the same as [static Range.from](#static-fromrange)
+
 #### `range(startOrLength, end?, options?)`
-Returns a generator that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
+Returns a [Range](#rangerangestring) that yields values over a specified range (inclusive), optionally stepped and/or mapped to another value.
 
 ```ts
 for (const value of range(3)) {
@@ -536,7 +682,31 @@ for (const value of range(0, 3, {
 }
 // Expected output:
 // logs "foo-0", "foo-1", "foo-2", "foo-3"
+
+for (const value of range(0, 3, {
+    inclusiveStart: false,
+})) {
+    console.log(value);
+}
+// Expected output:
+// logs 1, 2, 3
+
+for (const value of range(0, 3, {
+    inclusiveEnd: false,
+})) {
+    console.log(value);
+}
+// Expected output:
+// logs 0, 1, 2
 ```
+
+options:
+- `step` - The steps used to generate the array.
+- `valueMapper` - A mapper function to map a step to a value.
+- `inclusiveStart` - Wether the start value is considered inclusive.
+- `inclusiveEnd` - Wether the end value is considered inclusive.
+
+> NOTE: `inclusiveEnd` default value here differs from the `inclusiveEnd` value set by [`Range`](#rangerangestring), this is for backwards compatibility.
 
 #### `safe(callback)`
 Executes the given callback and returns an option of the result.
@@ -998,6 +1168,235 @@ pick(
 ```
 
 <!-- !SECTION -->
+<!-- SECTION: Random utils -->
+### Randomization utilities
+Almost all utilites that generate someting at random are done with a cryptographically secure pseudorandom number generator (called from now own **CSPRNG**) and utilizes the [`crypto.getRandomValues`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues) method. If a utility does not use this, it will be mentioned in the description of that utility.
+
+#### UUID utilities
+##### `uuidMax()`
+Returns the max UUID string possible.
+
+```ts
+uuidMax();
+// Expected output:
+// "ffffffff-ffff-ffff-ffff-ffffffffffff"
+```
+
+##### `uuidNil()`
+Returns the nil UUID string.
+
+```ts
+uuidNil();
+// Expected output:
+// "00000000-0000-0000-0000-000000000000"
+```
+
+#### `uuidV1(options?)`
+> This is also aliased to `v1`
+
+Returns a randomly generated UUID V1 string.
+
+```ts
+uuidV1();
+// Possible output:
+// c232ab00-9414-11ec-b3c8-9f68deced846
+
+uuidV1({
+    random: Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 0, 0x33c8 >> 8, 0x33c8 & 0xff, 0x9f, 0x68, 0xde, 0xce, 0xd8, 0x46),
+    milliseconds: 0x17f22e279b0,
+    nanoseconds: 0,
+    clockSequence: 0x33c8,
+    node: Uint8Array.of(0x9f, 0x68, 0xde, 0xce, 0xd8, 0x46),
+})
+// Expected output:
+// c232ab00-9414-11ec-b3c8-9f68deced846
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `nanoseconds` - A number that represents tha amount of nanoseconds have elapsed in the specified millisecond (This will always be 0 if not defined, javascript does not measure beyond the millisecond range).
+- `clockSequence` - The current clock sequence used for generation.
+- `node` - A list of random bytes used to complete the UUID V1.
+
+#### `uuidV4(options?)`
+> This is also aliased to `v4` or `uuid`
+
+Returns a randomly generated UUID V4 string.
+
+```ts
+uuidV4();
+// Possible output:
+// 919108f7-52d1-4320-9bac-f847db4148a8
+
+uuidV4({
+    random: Uint8Array.of(0x91, 0x91, 0x08, 0xf7, 0x52, 0xd1, 0x43, 0x20, 0x9b, 0xac, 0xf8, 0x47, 0xdb, 0x41, 0x48, 0xa8),
+})
+// Expected output:
+// 919108f7-52d1-4320-9bac-f847db4148a8
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+
+#### `uuidV7(options?)`
+> This is also aliased to `v7`
+
+Returns a randomly generated UUID V7 string.
+
+```ts
+uuidV7();
+// Possible output:
+// 017f22e2-79b0-7cc3-98c4-dc0c0c07398f
+
+uuidV7({
+    random: Uint8Array.of(0x10, 0x7f, 0x22, 0xe2, 0x79, 0xb0, 0x7c, 0xc3, 0x98, 0xc4, 0xdc, 0x0c, 0x0c, 0x07, 0x39, 0x8f),
+    milliseconds: 0x017f22e279b0,
+    sequence: 0xcc363137,
+})
+// Expected output:
+// 017f22e2-79b0-7cc3-98c4-dc0c0c07398f
+```
+
+options:
+- `random` - The random bytes used to generate the UUID.
+- `rng` - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `sequence` - The current clock sequence used for generation.
+
+#### `chance(percentage)`
+Returns a random boolean based on the specified percentage.  
+The percentage must be a number between 0 and 1. If it is not inside that range it will return a fixed value according to that percentage, so if percentage is more than or equal to 1 it will always return true and if percentage is less than or equal to 0 it will always return false.
+
+```ts
+chance(0.5);
+// Expected output:
+// true | false
+
+chance(1);
+// Expected output:
+// true
+
+chance(0);
+// Expected output:
+// false
+```
+
+#### `draw(list)`
+Returns a random item from a specified list (or `undefined` if the list is empty).
+
+```ts
+draw([0, 1, 2, 3]);
+// Expected output:
+// 0 | 1 | 2 | 3
+
+draw([]);
+// Expected output:
+// undefined
+```
+
+#### `maybe()`
+Returns a random boolean.
+
+```ts
+maybe();
+// Expected output:
+// true | false
+```
+
+#### `random(min?, max?)`
+Returns a random value between a specified minimum and maximum value.
+
+If the minimum and maximum values contradict each other, then this function will return `NaN`.
+
+> NOTE: this utility does **NOT** use [CSPRNG](#randomization-utilities).
+
+```ts
+random();
+// Expected output:
+// n where n > 0 and n < 1
+
+random(10, 20);
+// Expected output:
+// n where n > 10 and n < 20
+
+random(1, 0);
+// Expected output:
+// NaN
+```
+
+#### `scatter(list, split?, options?)`
+Given an array, splits that array into 2 given a hard split and devides the items at random into the 2 given lists.  
+The split must be a number between 0 and 1. If it is not inside that range it will return a fixed sized array according to that split, so if percentage is more than or equal to 1 it will always return `[list, []]` and if percentage is less than or equal to 0 it will always return `[[], list]` (Do note that these are handled as exception cases, meaning if this is the case then the first list will not be in a random order, but preserved order instead).
+
+> NOTE: the first array will be in a random order, while the second array will have the order preserved.
+
+```ts
+scatter([0, 1, 2, 3, 4]);
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.6);
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.4);
+// Possible output:
+// [[2, 4], [0, 1, 3]]
+
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "FLOOR",
+});
+// Possible output:
+// [[2, 4], [0, 1, 3]]
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "ROUND",
+});
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+
+scatter([0, 1, 2, 3, 4], 0.5, {
+    bias: "CEILING",
+});
+// Possible output:
+// [[3, 2, 4], [0, 1]]
+```
+
+options:
+- `bias` - When the split does not work exactly for the given array length, this will decide how to split the final item (e.g. given an array of 5 items and a split of `0.5` (50%), the bias will decide if the split will be `3 - 2` or `2 - 3`) (default = `"ROUND"`)
+
+#### `shuffle(list)`
+Shuffles the array into a new array will all the items in a random order.
+
+```ts
+shuffle([0, 1, 2, 3, 4]);
+// Possible output:
+// [2, 4, 0, 1, 3]
+```
+
+#### `uid(length?, charset?)`
+Returns a random string of characters gotten from a specified charset that can be used for ids.  
+The default length is `8` and the default charset is `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`.
+
+```ts
+uid();
+// Possible output:
+// "Dae3pmZH"
+
+uid(12);
+// Possible output:
+// "9lqD8Mp3CUrK"
+
+uid(8, "Aa");
+// Possible output:
+// "AaAAAaAA"
+```
+
+<!-- !SECTION -->
 <!-- SECTION: String utils -->
 
 ### String utilities
@@ -1050,7 +1449,7 @@ capitalize("some value");
 Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
 
 > NOTE:  
-  This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
+> This library also exports other casing utils that use this function under the hood and can (and most likely should) be used in most cases.
 
 ```ts
 customCase("someValue", {
