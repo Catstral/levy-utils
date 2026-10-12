@@ -1,4 +1,5 @@
 export * from "./utils/compute";
+export * from "./utils/identity";
 export * from "./utils/isEmpty";
 export * from "./utils/isNull";
 export * from "./utils/isNullish";
@@ -6,6 +7,7 @@ export * from "./utils/isPrimitive";
 export * from "./utils/isUndefined";
 export * from "./utils/match";
 export * from "./utils/option";
+export * from "./utils/raise";
 export * from "./utils/range";
 export * from "./utils/readOnly";
 export * from "./utils/sleep";
