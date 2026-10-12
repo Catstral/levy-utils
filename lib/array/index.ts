@@ -2,6 +2,7 @@ export * from "./utils/cluster";
 export * from "./utils/concat";
 export * from "./utils/counting";
 export * from "./utils/filter";
+export * from "./utils/filterMap";
 export * from "./utils/first";
 export * from "./utils/fork";
 export * from "./utils/group";
