@@ -1,389 +1,1820 @@
 import { describe, expect, mock, test } from "bun:test";
-import { RangeUtilError, range } from ".";
+import { Range, type RangeDetails, type RangeString, RangeUtilError, range } from ".";
 
 describe("range", () => {
-	test("Simple range", () => {
-		const fn = mock((i) => i);
+	const testParameters = [
+		{
+			name: "Full range (string)",
+			rangeType: "..",
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with start (string)",
+			rangeType: "1..",
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with exclusive start (string)",
+			rangeType: "1>..",
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with end (string)",
+			rangeType: "..10",
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with inclusive end (string)",
+			rangeType: "..=10",
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with start and end (string)",
+			rangeType: "1..10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with exclusive start and end (string)",
+			rangeType: "1>..10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range with start and inclusive end (string)",
+			rangeType: "1..=10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with exclusive start and inclusive end (string)",
+			rangeType: "1>..=10",
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
 
-		for (const index of range(4)) {
-			fn(index);
-		}
+		{
+			name: "Full range (object)",
+			rangeType: {},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with start and end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(0);
-		expect(calls[1].value).toBe(1);
-		expect(calls[2].value).toBe(2);
-		expect(calls[3].value).toBe(3);
-		expect(calls[4].value).toBe(4);
-	});
-
-	test("Simple range with end", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(0, 4)) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(0);
-		expect(calls[1].value).toBe(1);
-		expect(calls[2].value).toBe(2);
-		expect(calls[3].value).toBe(3);
-		expect(calls[4].value).toBe(4);
-	});
-
-	test("Simple range with start and end", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(2, 4)) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(3);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(2);
-		expect(calls[1].value).toBe(3);
-		expect(calls[2].value).toBe(4);
-	});
-
-	test("Simple range with step", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(0, 4, {
+		{
+			name: "Full range with step (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				step: 2,
+			},
+			start: undefined,
+			end: undefined,
 			step: 2,
-		})) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(3);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(0);
-		expect(calls[1].value).toBe(2);
-		expect(calls[2].value).toBe(4);
-	});
-
-	test("Simple range with mapping literal", () => {
-		const fn = mock((i) => i);
-
-		for (const value of range(0, 4, {
-			valueMapper: "foo",
-		})) {
-			fn(value);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-			expect(call.value).toBe("foo");
-		}
-	});
-
-	test("Simple range with mapping function", () => {
-		const fn = mock((i) => i);
-
-		for (const value of range(0, 4, {
-			valueMapper: (step) => `foo-${step}`,
-		})) {
-			fn(value);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe("foo-0");
-		expect(calls[1].value).toBe("foo-1");
-		expect(calls[2].value).toBe("foo-2");
-		expect(calls[3].value).toBe("foo-3");
-		expect(calls[4].value).toBe("foo-4");
-	});
-
-	test("Simple range with mapping literal and step", () => {
-		const fn = mock((i) => i);
-
-		for (const value of range(0, 8, {
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with step and start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				step: 2,
+			},
+			start: 1,
+			end: undefined,
 			step: 2,
-			valueMapper: "foo",
-		})) {
-			fn(value);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-			expect(call.value).toBe("foo");
-		}
-	});
-
-	test("Simple range with mapping function and step", () => {
-		const fn = mock((i) => i);
-
-		for (const value of range(0, 8, {
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with step and end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				step: 2,
+			},
+			start: undefined,
+			end: 10,
 			step: 2,
-			valueMapper: (step) => `foo-${step}`,
-		})) {
-			fn(value);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe("foo-0");
-		expect(calls[1].value).toBe("foo-2");
-		expect(calls[2].value).toBe("foo-4");
-		expect(calls[3].value).toBe("foo-6");
-		expect(calls[4].value).toBe("foo-8");
-	});
-
-	test("Zero-length range", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(0)) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(1);
-
-		const calls = fn.mock.results;
-
-		expect(calls[0].type).toBe("return");
-		expect(calls[0].value).toBe(0);
-	});
-
-	test("Range where start equals end", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(3, 3)) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(1);
-
-		const calls = fn.mock.results;
-
-		expect(calls[0].type).toBe("return");
-		expect(calls[0].value).toBe(3);
-	});
-
-	test("Range with negative start and end", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(-3, -1)) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(3);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(-3);
-		expect(calls[1].value).toBe(-2);
-		expect(calls[2].value).toBe(-1);
-	});
-
-	test("Range with a non-integer step", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(0, 2, {
-			step: 0.5,
-		})) {
-			fn(index);
-		}
-
-		expect(fn).toBeCalledTimes(5);
-
-		const calls = fn.mock.results;
-
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
-
-		expect(calls[0].value).toBe(0);
-		expect(calls[1].value).toBe(0.5);
-		expect(calls[2].value).toBe(1);
-		expect(calls[3].value).toBe(1.5);
-		expect(calls[4].value).toBe(2);
-	});
-
-	test("Range with a length and options only (no explicit end)", () => {
-		const fn = mock((i) => i);
-
-		for (const index of range(4, undefined, {
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with step and start and end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				step: 2,
+			},
+			start: 1,
+			end: 10,
 			step: 2,
-		})) {
-			fn(index);
-		}
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		expect(fn).toBeCalledTimes(3);
+		{
+			name: "Full range with mapper (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				mapper: (step: number) => step * 2,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				mapper: (step: number) => step * 2,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				mapper: (step: number) => step * 2,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and start and end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				mapper: (step: number) => step * 2,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		const calls = fn.mock.results;
+		{
+			name: "Full range mapper and with step (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				step: 2,
+				mapper: (step: number) => step * 2,
+			},
+			start: undefined,
+			end: undefined,
+			step: 2,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and step and start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				step: 2,
+				mapper: (step: number) => step * 2,
+			},
+			start: 1,
+			end: undefined,
+			step: 2,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and step and end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				step: 2,
+				mapper: (step: number) => step * 2,
+			},
+			start: undefined,
+			end: 10,
+			step: 2,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with mapper and step and start and end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				step: 2,
+				mapper: (step: number) => step * 2,
+			},
+			start: 1,
+			end: 10,
+			step: 2,
+			hasMapper: true,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
+		{
+			name: "Full range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		expect(calls[0].value).toBe(0);
-		expect(calls[1].value).toBe(2);
-		expect(calls[2].value).toBe(4);
-	});
+		{
+			name: "Full range with inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
 
-	test("Descending range (start greater than end)", () => {
-		const fn = mock((i) => i);
+		{
+			name: "Full range with inclusive start and end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range with inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: true,
+				inclusiveEnd: true,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: true,
+			methodInclusiveEnd: true,
+		},
 
-		for (const index of range(4, 0)) {
-			fn(index);
-		}
+		{
+			name: "Full range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: true,
+		},
 
-		expect(fn).toBeCalledTimes(5);
+		{
+			name: "Full range without inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive end (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: true,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
 
-		const calls = fn.mock.results;
+		{
+			name: "Full range without inclusive start and end (object)",
+			rangeType: {
+				start: null,
+				end: null,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: null,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: undefined,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: null,
+				end: 10,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: undefined,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+		{
+			name: "Range without inclusive start (object)",
+			rangeType: {
+				start: 1,
+				end: 10,
+				inclusiveStart: false,
+				inclusiveEnd: false,
+			},
+			start: 1,
+			end: 10,
+			step: undefined,
+			hasMapper: false,
+			inclusiveStart: false,
+			inclusiveEnd: false,
+			methodInclusiveEnd: false,
+		},
+	] satisfies {
+		name: string;
+		rangeType: RangeString | RangeDetails<number>;
+		start: number | undefined;
+		end: number | undefined;
+		step: number | undefined;
+		hasMapper: boolean;
+		inclusiveStart: boolean;
+		inclusiveEnd: boolean;
+		methodInclusiveEnd: boolean;
+	}[];
 
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
+	describe("Util method", () => {
+		test("Simple range with length", () => {
+			const fn = mock((i) => i);
 
-		expect(calls[0].value).toBe(4);
-		expect(calls[1].value).toBe(3);
-		expect(calls[2].value).toBe(2);
-		expect(calls[3].value).toBe(1);
-		expect(calls[4].value).toBe(0);
-	});
+			for (const index of range(4)) {
+				fn(index);
+			}
 
-	test("Descending range with a matching negative step", () => {
-		const fn = mock((i) => i);
+			expect(fn).toBeCalledTimes(5);
 
-		for (const index of range(6, 0, {
-			step: -2,
-		})) {
-			fn(index);
-		}
+			const calls = fn.mock.results;
 
-		expect(fn).toBeCalledTimes(4);
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
 
-		const calls = fn.mock.results;
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(1);
+			expect(calls[2].value).toBe(2);
+			expect(calls[3].value).toBe(3);
+			expect(calls[4].value).toBe(4);
+		});
 
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
+		test("Simple range with end", () => {
+			const fn = mock((i) => i);
 
-		expect(calls[0].value).toBe(6);
-		expect(calls[1].value).toBe(4);
-		expect(calls[2].value).toBe(2);
-		expect(calls[3].value).toBe(0);
-	});
+			for (const index of range(0, 4)) {
+				fn(index);
+			}
 
-	test("Descending range with a mapping function", () => {
-		const fn = mock((i) => i);
+			expect(fn).toBeCalledTimes(5);
 
-		for (const value of range(2, 0, {
-			valueMapper: (step) => `foo-${step}`,
-		})) {
-			fn(value);
-		}
+			const calls = fn.mock.results;
 
-		expect(fn).toBeCalledTimes(3);
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
 
-		const calls = fn.mock.results;
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(1);
+			expect(calls[2].value).toBe(2);
+			expect(calls[3].value).toBe(3);
+			expect(calls[4].value).toBe(4);
+		});
 
-		for (const call of calls) {
-			expect(call.type).toBe("return");
-		}
+		test("Simple range with start and end", () => {
+			const fn = mock((i) => i);
 
-		expect(calls[0].value).toBe("foo-2");
-		expect(calls[1].value).toBe("foo-1");
-		expect(calls[2].value).toBe("foo-0");
-	});
+			for (const index of range(2, 4)) {
+				fn(index);
+			}
 
-	test("Range with a step of zero throws a RangeUtilError", () => {
-		try {
-			const generator = range(0, 2, {
-				step: 0,
-			});
-			generator.next();
-			expect().fail("Expected range to throw");
-		} catch (err) {
-			expect(err).toBeInstanceOf(RangeUtilError);
-			expect((err as RangeUtilError).util).toBe("range");
-			expect((err as RangeUtilError).message).toBe(
-				"Step cannot be 0, that would cause the range to become infinite",
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(2);
+			expect(calls[1].value).toBe(3);
+			expect(calls[2].value).toBe(4);
+		});
+
+		test("Simple range with step", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(0, 4, {
+				step: 2,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(2);
+			expect(calls[2].value).toBe(4);
+		});
+
+		test("Simple range with mapping literal", () => {
+			const fn = mock((i) => i);
+
+			for (const value of range(0, 4, {
+				valueMapper: "foo",
+			})) {
+				fn(value);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+				expect(call.value).toBe("foo");
+			}
+		});
+
+		test("Simple range with mapping function", () => {
+			const fn = mock((i) => i);
+
+			for (const value of range(0, 4, {
+				valueMapper: (step: number) => `foo-${step}`,
+			})) {
+				fn(value);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe("foo-0");
+			expect(calls[1].value).toBe("foo-1");
+			expect(calls[2].value).toBe("foo-2");
+			expect(calls[3].value).toBe("foo-3");
+			expect(calls[4].value).toBe("foo-4");
+		});
+
+		test("Simple range with mapping literal and step", () => {
+			const fn = mock((i) => i);
+
+			for (const value of range(0, 8, {
+				step: 2,
+				valueMapper: "foo",
+			})) {
+				fn(value);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+				expect(call.value).toBe("foo");
+			}
+		});
+
+		test("Simple range with mapping function and step", () => {
+			const fn = mock((i) => i);
+
+			for (const value of range(0, 8, {
+				step: 2,
+				valueMapper: (step: number) => `foo-${step}`,
+			})) {
+				fn(value);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe("foo-0");
+			expect(calls[1].value).toBe("foo-2");
+			expect(calls[2].value).toBe("foo-4");
+			expect(calls[3].value).toBe("foo-6");
+			expect(calls[4].value).toBe("foo-8");
+		});
+
+		test("Zero-length range", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(0)) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(1);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(0);
+		});
+
+		test("Range where start equals end", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(3, 3)) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(1);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(3);
+		});
+
+		test("Range with negative start and end", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(-3, -1)) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(-3);
+			expect(calls[1].value).toBe(-2);
+			expect(calls[2].value).toBe(-1);
+		});
+
+		test("Range with a non-integer step", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(0, 2, {
+				step: 0.5,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(0.5);
+			expect(calls[2].value).toBe(1);
+			expect(calls[3].value).toBe(1.5);
+			expect(calls[4].value).toBe(2);
+		});
+
+		test("Range with a length and options only (no explicit end)", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(4, undefined, {
+				step: 2,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(0);
+			expect(calls[1].value).toBe(2);
+			expect(calls[2].value).toBe(4);
+		});
+
+		test("Descending range (start greater than end)", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(4, 0)) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(5);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(4);
+			expect(calls[1].value).toBe(3);
+			expect(calls[2].value).toBe(2);
+			expect(calls[3].value).toBe(1);
+			expect(calls[4].value).toBe(0);
+		});
+
+		test("Descending range with a matching negative step", () => {
+			const fn = mock((i) => i);
+
+			for (const index of range(6, 0, {
+				step: -2,
+			})) {
+				fn(index);
+			}
+
+			expect(fn).toBeCalledTimes(4);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe(6);
+			expect(calls[1].value).toBe(4);
+			expect(calls[2].value).toBe(2);
+			expect(calls[3].value).toBe(0);
+		});
+
+		test("Descending range with a mapping function", () => {
+			const fn = mock((i) => i);
+
+			for (const value of range(2, 0, {
+				valueMapper: (step: number) => `foo-${step}`,
+			})) {
+				fn(value);
+			}
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("return");
+			}
+
+			expect(calls[0].value).toBe("foo-2");
+			expect(calls[1].value).toBe("foo-1");
+			expect(calls[2].value).toBe("foo-0");
+		});
+
+		test("Range with a step of zero throws a RangeUtilError", () => {
+			try {
+				for (const _ of range(0, 2, {
+					step: 0,
+				})) {
+					expect().fail("Expected range to throw");
+				}
+
+				expect().fail("Expected range to throw");
+			} catch (err) {
+				expect(err).toBeInstanceOf(RangeUtilError);
+				expect((err as RangeUtilError).util).toBe("range");
+				expect((err as RangeUtilError & { message: string }).message).toBe(
+					"Step cannot be 0, that would cause the range to become infinite",
+				);
+			}
+		});
+
+		test("Ascending range with a negative step throws a RangeUtilError", () => {
+			try {
+				for (const _ of range(0, 4, {
+					step: -1,
+				})) {
+					expect().fail("Expected range to throw");
+				}
+
+				expect().fail("Expected range to throw");
+			} catch (err) {
+				expect(err).toBeInstanceOf(RangeUtilError);
+				expect((err as RangeUtilError).util).toBe("range");
+				expect((err as RangeUtilError & { message: string }).message).toBe(
+					"Given start and end should cause the range to traverse positively, but step is specified to traverse negatively",
+				);
+			}
+		});
+
+		test("Descending range with a positive step throws a RangeUtilError", () => {
+			try {
+				for (const _ of range(4, 0, {
+					step: 1,
+				})) {
+					expect().fail("Expected range to throw");
+				}
+
+				expect().fail("Expected range to throw");
+			} catch (err) {
+				expect(err).toBeInstanceOf(RangeUtilError);
+				expect((err as RangeUtilError).util).toBe("range");
+				expect((err as RangeUtilError & { message: string }).message).toBe(
+					"Given start and end should cause the range to traverse negatively, but step is specified to traverse positively",
+				);
+			}
+		});
+
+		describe("Data parsing", () => {
+			test.each(testParameters)(
+				"$name",
+				({ rangeType, start, end, step, hasMapper, inclusiveStart, methodInclusiveEnd }) => {
+					let currentRange: Range;
+
+					if (typeof rangeType === "string") {
+						currentRange = range(rangeType);
+					} else {
+						currentRange = range(rangeType.start, rangeType.end, {
+							step: rangeType.step,
+							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
+						});
+					}
+
+					expect(currentRange.details.start).toBe(start);
+					expect(currentRange.details.inclusiveStart).toBe(inclusiveStart);
+					expect(currentRange.details.end).toBe(end);
+					expect(currentRange.details.inclusiveEnd).toBe(methodInclusiveEnd);
+					expect(currentRange.details.step).toBe(step);
+
+					if (hasMapper) {
+						expect(currentRange.details.mapper).not.toBeUndefined();
+					} else {
+						expect(currentRange.details.mapper).toBeUndefined();
+					}
+				},
 			);
-		}
+		});
+
+		describe("Cloning", () => {
+			describe("Static cloning", () => {
+				test.each(testParameters)("$name", ({ rangeType }) => {
+					let currentRange: Range;
+
+					if (typeof rangeType === "string") {
+						currentRange = range(rangeType);
+					} else {
+						currentRange = range(rangeType.start, rangeType.end, {
+							step: rangeType.step,
+							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
+						});
+					}
+
+					const cloned = Range.from(currentRange);
+
+					expect(currentRange).not.toBe(cloned);
+					expect(currentRange.details.start).toBe(cloned.details.start);
+					expect(currentRange.details.inclusiveStart).toBe(cloned.details.inclusiveStart);
+					expect(currentRange.details.end).toBe(cloned.details.end);
+					expect(currentRange.details.inclusiveEnd).toBe(cloned.details.inclusiveEnd);
+					expect(currentRange.details.step).toBe(cloned.details.step);
+					expect(currentRange.details.mapper).toBe(cloned.details.mapper);
+				});
+			});
+
+			describe("Cloning method", () => {
+				test.each(testParameters)("$name", ({ rangeType }) => {
+					let currentRange: Range;
+
+					if (typeof rangeType === "string") {
+						currentRange = range(rangeType);
+					} else {
+						currentRange = range(rangeType.start, rangeType.end, {
+							step: rangeType.step,
+							valueMapper: rangeType.mapper,
+							inclusiveStart: rangeType.inclusiveStart,
+							inclusiveEnd: rangeType.inclusiveEnd,
+						});
+					}
+
+					const cloned = currentRange.clone();
+
+					expect(currentRange).not.toBe(cloned);
+					expect(currentRange.details.start).toBe(cloned.details.start);
+					expect(currentRange.details.inclusiveStart).toBe(cloned.details.inclusiveStart);
+					expect(currentRange.details.end).toBe(cloned.details.end);
+					expect(currentRange.details.inclusiveEnd).toBe(cloned.details.inclusiveEnd);
+					expect(currentRange.details.step).toBe(cloned.details.step);
+					expect(currentRange.details.mapper).toBe(cloned.details.mapper);
+				});
+			});
+		});
+
+		describe("Template literal", () => {
+			test("Range without interpolation", () => {
+				expect(range`0..=4`.toArray()).toEqual([0, 1, 2, 3, 4]);
+			});
+
+			test("Range with interpolated numbers", () => {
+				const start = 2;
+				const end = 4;
+
+				expect(range`${start}..=${end}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with interpolated strings", () => {
+				expect(range`${"2"}..=${"4"}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with interpolated range string", () => {
+				const rangeString: RangeString = "2..=4";
+
+				expect(range`${rangeString}`.toArray()).toEqual([2, 3, 4]);
+			});
+
+			test("Range with exclusive end", () => {
+				expect(range`0..${4}`.toArray()).toEqual([0, 1, 2, 3]);
+			});
+
+			test("Range with exclusive start", () => {
+				expect(range`${0}>..=${4}`.toArray()).toEqual([1, 2, 3, 4]);
+			});
+
+			test("Range with decimal values", () => {
+				expect(range`${0.5}..=${2.5}`.toArray()).toEqual([0.5, 1.5, 2.5]);
+			});
+
+			test("Descending range", () => {
+				expect(range`${4}..=${0}`.toArray()).toEqual([4, 3, 2, 1, 0]);
+			});
+
+			test("Surrounding whitespace is trimmed", () => {
+				expect(range`  0..=${2}  `.toArray()).toEqual([0, 1, 2]);
+			});
+
+			test("Invalid range string throws a RangeUtilError", () => {
+				try {
+					range`${"foo"}..${"bar"}`;
+
+					expect().fail("Expected range to throw");
+				} catch (err) {
+					expect(err).toBeInstanceOf(RangeUtilError);
+					expect((err as RangeUtilError).util).toBe("range");
+					expect((err as RangeUtilError & { message: string }).message).toBe(
+						"Got a range string, but given range string is not valid",
+					);
+				}
+			});
+
+			describe("Data parsing", () => {
+				test.each(testParameters.filter(({ rangeType }) => typeof rangeType === "string"))(
+					"$name",
+					({ rangeType, start, end, step, inclusiveStart, inclusiveEnd }) => {
+						const currentRange = range`${rangeType as RangeString}`;
+
+						expect(currentRange.details.start).toBe(start);
+						expect(currentRange.details.inclusiveStart).toBe(inclusiveStart);
+						expect(currentRange.details.end).toBe(end);
+						expect(currentRange.details.inclusiveEnd).toBe(inclusiveEnd);
+						expect(currentRange.details.step).toBe(step);
+						expect(currentRange.details.mapper).toBeUndefined();
+					},
+				);
+			});
+		});
 	});
 
-	test("Ascending range with a negative step throws a RangeUtilError", () => {
-		try {
-			const generator = range(0, 4, {
-				step: -1,
-			});
-			generator.next();
-			expect().fail("Expected range to throw");
-		} catch (err) {
-			expect(err).toBeInstanceOf(RangeUtilError);
-			expect((err as RangeUtilError).util).toBe("range");
-			expect((err as RangeUtilError).message).toBe(
-				"Given start and end should cause the range to traverse positively, but step is specified to traverse negatively",
-			);
-		}
-	});
+	describe("Class usage", () => {
+		describe("Iteration tests", () => {});
 
-	test("Descending range with a positive step throws a RangeUtilError", () => {
-		try {
-			const generator = range(4, 0, {
-				step: 1,
+		describe("Non-iteration tests", () => {
+			describe("Full range", () => {
+				test("All numbers are included in range", () => {
+					const range = new Range("..");
+
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeTrue();
+				});
+
+				test("No numbers are excluded from range", () => {
+					const range = new Range("..");
+
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
 			});
-			generator.next();
-			expect().fail("Expected range to throw");
-		} catch (err) {
-			expect(err).toBeInstanceOf(RangeUtilError);
-			expect((err as RangeUtilError).util).toBe("range");
-			expect((err as RangeUtilError).message).toBe(
-				"Given start and end should cause the range to traverse negatively, but step is specified to traverse positively",
-			);
-		}
+
+			describe("Range with start", () => {
+				test("Numbers above or equal to start are included in range and numbers below start are not included in range", () => {
+					const range = new Range("0..");
+
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeFalse();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeFalse();
+					expect(range.includes(NaN)).toBeFalse();
+				});
+
+				test("All numbers below start are excluded from range and all numbers above or equal to start are not exlcuded from range", () => {
+					const range = new Range("0..");
+
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeTrue();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeTrue();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with exclusive start", () => {
+				test("Numbers above start are included in range and numbers below or equal to start are not included in range", () => {
+					const range = new Range("0>..");
+
+					expect(range.includes(0)).toBeFalse();
+					expect(range.includes(1)).toBeTrue();
+					expect(range.includes(-1)).toBeFalse();
+					expect(range.includes(Infinity)).toBeTrue();
+					expect(range.includes(-Infinity)).toBeFalse();
+					expect(range.includes(NaN)).toBeFalse();
+				});
+
+				test("All numbers below or equal to start are excluded from range and all numbers above start are not exlcuded from range", () => {
+					const range = new Range("0>..");
+
+					expect(range.excludes(0)).toBeTrue();
+					expect(range.excludes(1)).toBeFalse();
+					expect(range.excludes(-1)).toBeTrue();
+					expect(range.excludes(Infinity)).toBeFalse();
+					expect(range.excludes(-Infinity)).toBeTrue();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with end", () => {
+				test("Numbers below end are included in range and numbers above or equal to end are not included in range", () => {
+					const range = new Range("..0");
+
+					expect(range.includes(0)).toBeFalse();
+					expect(range.includes(1)).toBeFalse();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeFalse();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeFalse();
+				});
+
+				test("All numbers above or equal to end are excluded from range and all numbers below end are not excluded from range", () => {
+					const range = new Range("..0");
+
+					expect(range.excludes(0)).toBeTrue();
+					expect(range.excludes(1)).toBeTrue();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeTrue();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with inclusive end", () => {
+				test("Numbers below or equal to end are icluded in range and numbers above end are not included in range", () => {
+					const range = new Range("..=0");
+
+					expect(range.includes(0)).toBeTrue();
+					expect(range.includes(1)).toBeFalse();
+					expect(range.includes(-1)).toBeTrue();
+					expect(range.includes(Infinity)).toBeFalse();
+					expect(range.includes(-Infinity)).toBeTrue();
+					expect(range.includes(NaN)).toBeFalse();
+				});
+
+				test("All numbers above end are excluded from range and all numbers below or equal to end are not excluded from range", () => {
+					const range = new Range("..=0");
+
+					expect(range.excludes(0)).toBeFalse();
+					expect(range.excludes(1)).toBeTrue();
+					expect(range.excludes(-1)).toBeFalse();
+					expect(range.excludes(Infinity)).toBeTrue();
+					expect(range.excludes(-Infinity)).toBeFalse();
+					expect(range.excludes(NaN)).toBeFalse();
+				});
+			});
+
+			describe("Range with start and end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above or equal to start and below end are included in range and all numbers below start or above or equal to end are not included in range", () => {
+						const range = new Range("0..10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers below start or above or equal to end are excluded from range and all numbers above or equal to start and below end are not excluded from range", () => {
+						const range = new Range("0..10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below or equal to start and above end are included in range and all numbers above start or below or equal to end are not included in range", () => {
+						const range = new Range("10..0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above start or below or equal to end are excluded from range and all numbers below or equal to start and above end are not excluded from range", () => {
+						const range = new Range("10..0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with exclusive start and end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above start and below end are included in range and all numbers below or equal to start or above or equal to end are not included in range", () => {
+						const range = new Range("0>..10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers below or equal to start or above or equal to end are exclude from range and all numbers above start and below end are not excluded from range", () => {
+						const range = new Range("0>..10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below start and above end are included range and all numbers above or equal to start or below or equal to end are not include in range", () => {
+						const range = new Range("10>..0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above or equal to start or below or equal to end are excluded from range and all numbers below start and above end are not excluded from range", () => {
+						const range = new Range("10>..0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with start and inclusive end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above or equal to start and below or equal to end are included in range and all numbers below start or above end are not included in range", () => {
+						const range = new Range("0..=10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers below start or above end are excluded from range and all numbers above or equal to start and below or equal to end are not excluded from range", () => {
+						const range = new Range("0..=10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below or equal to start and above or equal to end are included in range and all numbers above start or below end are not included in range", () => {
+						const range = new Range("10..=0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above start or below end are excluded from range and all numbers below or equal to start and above or equal to end are not excluded from range", () => {
+						const range = new Range("10..=0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+
+			describe("Range with exclusive start and inclusive end", () => {
+				describe("Range moving towards positive infinity", () => {
+					test("All numbers above start and below or equal to end are included in range and all numbers below or equal to start or above end are not included in range", () => {
+						const range = new Range("0>..=10");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeFalse();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeTrue();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers below or equal to start or above end are excluded from range and all numbers above start and below or equal to end are not excluded from range", () => {
+						const range = new Range("0>..=10");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeTrue();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeFalse();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+
+				describe("Range moving towards negative infinity", () => {
+					test("All numbers below start and above or equal to end are included in range and all numbers above or equal to start or below end are not included in range", () => {
+						const range = new Range("10>..=0");
+
+						expect(range.includes(-1)).toBeFalse();
+						expect(range.includes(0)).toBeTrue();
+						expect(range.includes(1)).toBeTrue();
+						expect(range.includes(9)).toBeTrue();
+						expect(range.includes(10)).toBeFalse();
+						expect(range.includes(11)).toBeFalse();
+						expect(range.includes(Infinity)).toBeFalse();
+						expect(range.includes(-Infinity)).toBeFalse();
+						expect(range.includes(NaN)).toBeFalse();
+					});
+
+					test("All numbers above or equal to start or below end are excluded from range and all numbers below start and above or equal to end are not excluded from range", () => {
+						const range = new Range("10>..=0");
+
+						expect(range.excludes(-1)).toBeTrue();
+						expect(range.excludes(0)).toBeFalse();
+						expect(range.excludes(1)).toBeFalse();
+						expect(range.excludes(9)).toBeFalse();
+						expect(range.excludes(10)).toBeTrue();
+						expect(range.excludes(11)).toBeTrue();
+						expect(range.excludes(Infinity)).toBeTrue();
+						expect(range.excludes(-Infinity)).toBeTrue();
+						expect(range.excludes(NaN)).toBeFalse();
+					});
+				});
+			});
+		});
+
+		describe("Data parsing", () => {
+			test.each(testParameters)("$name", ({ rangeType, start, end, step, hasMapper }) => {
+				const range = new Range(rangeType);
+
+				expect(range.details.start).toBe(start);
+				expect(range.details.end).toBe(end);
+				expect(range.details.step).toBe(step);
+
+				if (hasMapper) {
+					expect(range.details.mapper).not.toBeUndefined();
+				} else {
+					expect(range.details.mapper).toBeUndefined();
+				}
+			});
+
+			describe("Delayed value setting", () => {
+				test("Setting start", () => {
+					const range = new Range();
+					const updateRange = range.start(1);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.start).toBeUndefined();
+					expect(updateRange.details.start).toBe(1);
+				});
+
+				test("Setting inclusive start", () => {
+					const range = new Range();
+					const updateRange = range.inclusiveStart(false);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.inclusiveStart).toBeTrue();
+					expect(updateRange.details.inclusiveStart).toBeFalse();
+				});
+
+				test("Setting end", () => {
+					const range = new Range();
+					const updateRange = range.end(1);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.end).toBeUndefined();
+					expect(updateRange.details.end).toBe(1);
+				});
+
+				test("Setting inclusive end", () => {
+					const range = new Range();
+					const updateRange = range.inclusiveEnd(true);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.inclusiveEnd).toBeFalse();
+					expect(updateRange.details.inclusiveEnd).toBeTrue();
+				});
+
+				test("Setting step", () => {
+					const range = new Range();
+					const updateRange = range.step(1);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.step).toBeUndefined();
+					expect(updateRange.details.step).toBe(1);
+				});
+
+				test("Setting mapper", () => {
+					const range = new Range();
+					const updateRange = range.map(1);
+
+					expect(range).not.toBe(updateRange);
+					expect(range.details.mapper).toBeUndefined();
+					expect(updateRange.details.mapper).toBe(1);
+				});
+			});
+		});
+
+		describe("Cloning", () => {
+			describe("Static cloning", () => {
+				test.each(testParameters)("$name", ({ rangeType }) => {
+					const range = new Range(rangeType);
+					const cloned = Range.from(range);
+
+					expect(range).not.toBe(cloned);
+					expect(range.details.start).toBe(cloned.details.start);
+					expect(range.details.end).toBe(cloned.details.end);
+					expect(range.details.step).toBe(cloned.details.step);
+					expect(range.details.mapper).toBe(cloned.details.mapper);
+				});
+			});
+
+			describe("Cloning method", () => {
+				test.each(testParameters)("$name", ({ rangeType }) => {
+					const range = new Range(rangeType);
+					const cloned = range.clone();
+
+					expect(range).not.toBe(cloned);
+					expect(range.details.start).toBe(cloned.details.start);
+					expect(range.details.end).toBe(cloned.details.end);
+					expect(range.details.step).toBe(cloned.details.step);
+					expect(range.details.mapper).toBe(cloned.details.mapper);
+				});
+			});
+		});
+
+		describe("Range to Array", () => {
+			test("Simple range", () => {
+				const range = new Range("1..=10");
+				const arr = range.toArray();
+
+				expect(arr).toBeArray();
+				expect(arr).toBeArrayOfSize(10);
+				expect(arr).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+			});
+
+			test("Simple range with step", () => {
+				const range = new Range("1..=10").step(2);
+				const arr = range.toArray();
+
+				expect(arr).toBeArray();
+				expect(arr).toBeArrayOfSize(5);
+				expect(arr).toEqual([1, 3, 5, 7, 9]);
+			});
+
+			test("Simple range with static mapper", () => {
+				const range = new Range("1..=10").map<"foo">("foo");
+				const arr = range.toArray();
+
+				expect(arr).toBeArray();
+				expect(arr).toBeArrayOfSize(10);
+				expect(arr).toEqual(["foo", "foo", "foo", "foo", "foo", "foo", "foo", "foo", "foo", "foo"]);
+			});
+
+			test("Simple range with mapper function", () => {
+				const range = new Range("1..=10").map((step: number) => step * 2);
+				const arr = range.toArray();
+
+				expect(arr).toBeArray();
+				expect(arr).toBeArrayOfSize(10);
+				expect(arr).toEqual([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]);
+			});
+
+			test("Fail on incomplete range", () => {
+				try {
+					const range = new Range();
+					range.toArray();
+
+					expect().fail(
+						"Should not be able to create an array when a range is missing either a start or end value",
+					);
+				} catch (err) {
+					expect(err).toBeInstanceOf(RangeUtilError);
+					expect((err as RangeUtilError).util).toBe("range");
+					expect((err as RangeUtilError & { message: string }).message).toBe(
+						"A range must have a start value defined before it becomes iterable, if it isn't defined it can only be used for checking values",
+					);
+				}
+			});
+		});
 	});
 });
