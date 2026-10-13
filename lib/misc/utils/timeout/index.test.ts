@@ -42,33 +42,35 @@ describe("timeout", () => {
 		});
 
 		test("Rejects with a TimeoutError if the promise does not settle in time", async () => {
-			const error = await caught(timeout(delayResolve("foo", 100), 5));
-
-			expect(error).toBeInstanceOf(TimeoutError);
+			expect(timeout(delayResolve("foo", 100), 5)).rejects.toBeInstanceOf(TimeoutError);
 		});
 
 		test("Rejects with the original error if the promise rejects before the delay", () => {
 			const original = new RangeError("boom");
 
-			expect(caught(timeout(delayReject(original, 5), 100))).resolves.toBe(original);
+			expect(timeout(delayReject(original, 5), 100)).rejects.toBe(original);
 		});
 
 		test("Rejects with an already rejected promise's reason", () => {
 			const original = new Error("boom");
 
-			expect(caught(timeout(Promise.reject(original), 100))).resolves.toBe(original);
+			expect(timeout(Promise.reject(original), 100)).rejects.toBe(original);
 		});
 
 		test("Rejects with a non-Error reason as is", () => {
-			expect(caught(timeout(Promise.reject("foo"), 100))).resolves.toBe("foo");
-			expect(caught(timeout(Promise.reject(undefined), 100))).resolves.toBeUndefined();
+			expect(timeout(Promise.reject("foo"), 100)).rejects.toBe("foo");
+			expect(timeout(Promise.reject(undefined), 100)).rejects.toBeUndefined();
 		});
 
 		test("Times out roughly after the given delay", async () => {
 			const delay = 30;
 			const start = Date.now();
 
-			await caught(timeout(delayResolve("foo", 200), delay));
+			try {
+				await timeout(delayResolve("foo", 200), delay);
+			} catch (err) {
+				expect(err).toBeInstanceOf(TimeoutError);
+			}
 
 			const elapsed = Date.now() - start;
 
@@ -91,17 +93,13 @@ describe("timeout", () => {
 		});
 
 		test("A promise settling after the timeout does not change the outcome", async () => {
-			const error = await caught(timeout(delayResolve("foo", 20), 5));
-
-			expect(error).toBeInstanceOf(TimeoutError);
+			expect(timeout(delayResolve("foo", 20), 5)).rejects.toBeInstanceOf(TimeoutError);
 
 			await delayResolve(undefined, 30);
 		});
 
 		test("A rejection after the timeout is swallowed", async () => {
-			const error = await caught(timeout(delayReject(new Error("late"), 20), 5));
-
-			expect(error).toBeInstanceOf(TimeoutError);
+			expect(timeout(delayReject(new Error("late"), 20), 5)).rejects.toBeInstanceOf(TimeoutError);
 
 			await delayResolve(undefined, 30);
 		});
@@ -113,13 +111,13 @@ describe("timeout", () => {
 		});
 
 		test("Rejects with a TimeoutError if the returned promise does not settle in time", async () => {
-			expect(caught(timeout(() => delayResolve("foo", 100), 5))).resolves.toBeInstanceOf(TimeoutError);
+			expect(timeout(() => delayResolve("foo", 100), 5)).rejects.toBeInstanceOf(TimeoutError);
 		});
 
 		test("Rejects with the original error if the returned promise rejects", async () => {
 			const original = new TypeError("boom");
 
-			expect(caught(timeout(() => Promise.reject(original), 100))).resolves.toBe(original);
+			expect(timeout(() => Promise.reject(original), 100)).rejects.toBe(original);
 		});
 
 		test("Calls the function exactly once, without arguments", async () => {
@@ -148,39 +146,45 @@ describe("timeout", () => {
 		test("Rejects if the function throws synchronously", async () => {
 			const original = new Error("boom");
 
-			const error = await caught(
+			expect(
 				timeout((): Promise<string> => {
 					throw original;
 				}, 100),
-			);
-
-			expect(error).toBe(original);
+			).rejects.toBe(original);
 		});
 	});
 
 	describe("Delay", () => {
 		test("Zero delay times out a pending promise", async () => {
-			expect(await caught(timeout(delayResolve("foo", 20), 0))).toBeInstanceOf(TimeoutError);
+			expect(timeout(delayResolve("foo", 20), 0)).rejects.toBeInstanceOf(TimeoutError);
 		});
 
 		test("Negative delay rejects with a TimeoutUtilError", async () => {
-			const error = await caught(timeout(Promise.resolve("foo"), -1 as never));
+			let error: unknown;
+
+			try {
+				await timeout(Promise.resolve("foo"), -1);
+
+				throw null; // NOTE: This is so the try statement always throws an error
+			} catch (err) {
+				error = err;
+			}
 
 			expect(error).toBeInstanceOf(TimeoutUtilError);
-			expect((error as TimeoutUtilError).util).toBe("timeout");
-			expect((error as TimeoutUtilError).message).toBe("Timeout delay cannot be smaller than 0");
+			expect((error as TimeoutUtilError)?.util).toBe("timeout");
+			expect((error as Error)?.message).toBe("Timeout delay cannot be smaller than 0");
 		});
 
 		test("Negative delay does not call the function", async () => {
 			let called = false;
 
-			await caught(
-				timeout(() => {
+			try {
+				await timeout(() => {
 					called = true;
 
 					return Promise.resolve("foo");
-				}, -1 as never),
-			);
+				}, -1);
+			} catch {}
 
 			expect(called).toBeFalse();
 		});
@@ -216,7 +220,6 @@ describe("timeout", () => {
 
 		test("Is called before the promise rejects", async () => {
 			const order: string[] = [];
-
 			const promise = timeout(delayResolve("foo", 100), 5, {
 				onTimeout: () => {
 					order.push("onTimeout");
@@ -238,7 +241,6 @@ describe("timeout", () => {
 					called = true;
 				},
 			});
-
 			await delayResolve(undefined, 70);
 
 			expect(called).toBeFalse();
@@ -254,7 +256,6 @@ describe("timeout", () => {
 					},
 				}),
 			);
-
 			await delayResolve(undefined, 70);
 
 			expect(called).toBeFalse();
@@ -270,7 +271,6 @@ describe("timeout", () => {
 					},
 				}),
 			);
-
 			await delayResolve(undefined, 50);
 
 			expect(calls).toBe(1);
@@ -280,7 +280,7 @@ describe("timeout", () => {
 			let called = false;
 
 			await caught(
-				timeout(Promise.resolve("foo"), -1 as never, {
+				timeout(Promise.resolve("foo"), -1, {
 					onTimeout: () => {
 						called = true;
 					},
@@ -306,7 +306,7 @@ describe("isTimeoutError", () => {
 	});
 
 	test("False for a TimeoutUtilError", () => {
-		expect(isTimeoutError(new TimeoutUtilError("foo"))).toBeFalse();
+		expect(isTimeoutError(new (TimeoutUtilError as unknown as ErrorConstructor)("foo"))).toBeFalse();
 	});
 
 	test("False for an object that only looks like a TimeoutError", () => {
