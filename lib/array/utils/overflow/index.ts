@@ -10,6 +10,8 @@ export class OverflowUtilError extends UtilError {
  * The first item in the tuple is all the items in the list that pass the specified condition,
  * the second item in the tuple contains the rest of the list items.
  *
+ * The time complexity for this is `O(n)` where `n` is the amount of items in the list.
+ *
  * @template T
  * @template {number} L
  * @param {readonly T[]} list The list to seperate into a clamped and rest list
