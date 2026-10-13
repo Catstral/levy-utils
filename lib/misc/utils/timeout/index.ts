@@ -36,7 +36,7 @@ export interface TimeoutOptions<_T, D = number> {
  * @param {Computable<Promise<T>, [abortController: AbortController]>} value The promise or callback that returns a promise to handle
  * @param {PositiveInteger<D>} delayMs The delay in milliseconds to wait before rejecting the promise
  * @param {TimeoutOptions<T, D>} [options] The options given to the timeout
- * @returns {Promise<void>} A promise that handles the given promise and rejects after the specified delay has elapsed
+ * @returns {Promise<T>} A promise that resolves with the given promise's result and rejects after the specified delay has elapsed
  * @throws {TimeoutUtilError} If the given delay is smaller than 0
  * @throws {TimeoutError} If the given delay has elapsed
  */
@@ -60,6 +60,8 @@ export async function timeout<const T, const D extends number = number>(
 				options?.onTimeout?.(delayMs);
 			} catch (err) {
 				reject(err);
+
+				return;
 			}
 
 			reject(new TimeoutError(delayMs));
