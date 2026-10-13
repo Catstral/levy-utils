@@ -1,4 +1,6 @@
-export type First<T extends readonly unknown[], F = undefined> = T extends readonly [infer V, ...T[number][]] ? V : T[number] | F;
+export type First<T extends readonly unknown[], F = undefined> = T extends readonly [infer V, ...T[number][]]
+	? V
+	: T[number] | F;
 
 /**
  * Returns the first item of a list or a fallback if the list is empty.
@@ -13,7 +15,13 @@ export type First<T extends readonly unknown[], F = undefined> = T extends reado
  * @returns {First<L, F>} The first item of the list or a fallback
  */
 export function first<const T, const L extends readonly T[] = T[]>(list: L): First<L>;
-export function first<const T, const L extends readonly T[] = T[], const F = undefined>(list: L, fallback?: F): First<L, F>;
-export function first<const T, const L extends readonly T[] = T[], const F = undefined>(list: L, fallback?: F): First<L, F> {
+export function first<const T, const L extends readonly T[] = T[], const F = undefined>(
+	list: L,
+	fallback?: F,
+): First<L, F>;
+export function first<const T, const L extends readonly T[] = T[], const F = undefined>(
+	list: L,
+	fallback?: F,
+): First<L, F> {
 	return (list.length === 0 ? fallback : list[0]) as First<L>;
 }
