@@ -907,7 +907,7 @@ await sleep(1000);
 #### `timeout(value, delayMs, options?)` / `isTimeoutError(value)`
 Wraps a promise (or a callback that returns one) into a promise that rejects with a `TimeoutError` if it hasn't settled after the given delay (in milliseconds). If the promise settles first, its result (or error) is passed through.
 
-When given a callback, it receives an `AbortController` whose signal is aborted when the delay elapses, so the underlying operation can be cancelled.
+When given a callback, it receives an `AbortSignal` which is aborted when the delay elapses, so the underlying operation can be cancelled.
 
 `isTimeoutError` checks if a value is a `TimeoutError`.
 
