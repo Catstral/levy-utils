@@ -15,45 +15,52 @@ export class TimeoutError extends Error {
 }
 
 export interface TimeoutOptions<_T, D = number> {
+	/**
+	 * A callback that runs when the delay has elapsed.
+	 *
+	 * Throwing a value inside this callback rejects the promise with that value instead of a {@link TimeoutError}.
+	 *
+	 * @param {D} delayMs
+	 * @returns {void}
+	 */
 	onTimeout?: (delayMs: D) => void;
 }
 
 /**
- * ...
+ * Wraps the given promise into one that rejects after a given delay has elapsed.
  *
  * The time complexity for this is `O(1)`.
  *
  * @template T
  * @template {number} [D=number]
- * @param {} value The delay to wait to resolve the returned promise
- * @param {PositiveInteger<D>} delayMs The delay to wait to resolve the returned promise
- * @param {TimeoutOptions<T, D>} [options]
- * @returns {Promise<void>} A Promise that resolved after the specified delay has elapsed
+ * @param {Computable<Promise<T>, [abortController: AbortController]>} value The promise or callback that returns a promise to handle
+ * @param {PositiveInteger<D>} delayMs The delay in milliseconds to wait before rejecting the promise
+ * @param {TimeoutOptions<T, D>} [options] The options given to the timeout
+ * @returns {Promise<void>} A promise that handles the given promise and rejects after the specified delay has elapsed
+ * @throws {TimeoutUtilError} If the given delay is smaller than 0
+ * @throws {TimeoutError} If the given delay has elapsed
  */
 export async function timeout<const T, const D extends number = number>(
-	value: Promise<T>,
+	value: Computable<Promise<T>, [abortController: AbortController]>,
 	delayMs: PositiveInteger<D>,
-	options?: TimeoutOptions<T, D>,
-): Promise<T>;
-export async function timeout<const T, const D extends number = number>(
-	value: () => Promise<T>,
-	delayMs: PositiveInteger<D>,
-	options?: TimeoutOptions<T, D>,
-): Promise<T>;
-export async function timeout<const T>(
-	value: Computable<Promise<T>>,
-	delayMs: number,
 	options?: TimeoutOptions<T>,
 ): Promise<T> {
 	if (delayMs < 0) {
 		throw new TimeoutUtilError("Timeout delay cannot be smaller than 0");
 	}
 
-	const promise = typeof value === "function" ? value() : value;
+	const abortController = new AbortController();
+	const promise = typeof value === "function" ? value(abortController) : value;
 
 	return new Promise((resolve, reject) => {
 		const handler = setTimeout(() => {
-			options?.onTimeout?.(delayMs);
+			abortController.abort();
+
+			try {
+				options?.onTimeout?.(delayMs);
+			} catch (err) {
+				reject(err);
+			}
 
 			reject(new TimeoutError(delayMs));
 		}, delayMs);
@@ -70,6 +77,12 @@ export async function timeout<const T>(
 	});
 }
 
+/**
+ * Checks if the given value is a timeout error.
+ *
+ * @param {?} value The value to check if it is a timeout error.
+ * @returns {boolean} A boolean that signals if the given value is an instance of {@link TimeoutError}
+ */
 export function isTimeoutError(value: unknown): value is TimeoutError {
 	return value instanceof TimeoutError;
 }
