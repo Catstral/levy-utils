@@ -16,8 +16,7 @@ type FilterResult<P, R> = [Extract<P, Promise<unknown>>] extends [never] ? R[] :
  * @template P
  * @param {readonly T[]} list The array to filter values from
  * @param {(item: T, index: number, list: readonly T[]) => P} predicate A callback that returns whether an item is filtered
- * @returns {FilterResult<P, R>} A new list containing the filtered items, or a promise of it if the predicate can
- * return a promise
+ * @returns {FilterResult<P, R>} A new list containing the filtered items, or a promise of it if the predicate can return a promise
  */
 export function filter<const T, const R extends T>(
 	list: readonly T[],

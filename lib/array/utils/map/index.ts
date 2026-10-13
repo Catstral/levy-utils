@@ -15,8 +15,7 @@ type MapResult<R> = [Extract<R, Promise<unknown>>] extends [never] ? R[] : Promi
  * @template R
  * @param {readonly T[]} list The array to map values from
  * @param {(item: T, index: number, list: readonly T[]) => R} callback A mapper to convert the list items
- * @returns {MapResult<R>} A new array with mapped items from the given list, or a promise of it if the callback can
- * return a promise
+ * @returns {MapResult<R>} A new array with mapped items from the given list, or a promise of it if the callback can return a promise
  */
 export function map<const T, const R>(
 	list: readonly T[],
