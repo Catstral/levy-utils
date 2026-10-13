@@ -122,13 +122,13 @@ describe.concurrent("timeout", () => {
 			expect(timeout(() => Promise.reject(original), 100)).rejects.toBe(original);
 		});
 
-		test.concurrent("Calls the function exactly once, without arguments", async () => {
+		test.concurrent("Calls the function exactly once, with an abort signal argument", async () => {
 			const fn = mock((..._args: unknown[]) => Promise.resolve("foo"));
 
 			await timeout(fn, 100);
 
 			expect(fn).toBeCalledTimes(1);
-			expect(fn).toBeCalledWith;
+			expect(fn.mock.calls[0][0]).toBeInstanceOf(AbortSignal);
 		});
 
 		test.concurrent("Calls the function synchronously", () => {
@@ -167,7 +167,7 @@ describe.concurrent("timeout", () => {
 			try {
 				await timeout(Promise.resolve("foo"), -1);
 
-				throw null; // NOTE: This is so the try statement always throws an error
+				expect().fail("Timeout expected to throw with negative delay");
 			} catch (err) {
 				error = err;
 			}
