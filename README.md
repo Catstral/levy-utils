@@ -628,14 +628,14 @@ and returns a fallback if none of the cases match.
 
 ```ts
 const fn = (value: string) => {
-	  return match(
-	  	  value,
-	  	  {
-	  	  	  A: 1,
-	  	  	  B: 2,
-	  	  },
-	  	  -1,
-	  );
+    return match(
+        value,
+        {
+            A: 1,
+            B: 2,
+        },
+        -1,
+    );
 };
 
 fn("A");
