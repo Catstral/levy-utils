@@ -4,6 +4,8 @@ export * from "./utils/isEmpty";
 export * from "./utils/isNull";
 export * from "./utils/isNullish";
 export * from "./utils/isPrimitive";
+export * from "./utils/isPromise";
+export * from "./utils/isPromiseLike";
 export * from "./utils/isUndefined";
 export * from "./utils/match";
 export * from "./utils/option";
