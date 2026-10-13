@@ -1,7 +1,5 @@
 import type { Promisable } from "~/types";
 
-type FilterResult<P, R> = [Extract<P, Promise<unknown>>] extends [never] ? R[] : Promisable<R[]>;
-
 /**
  * Returns a new list containing the items of a given list that pass a predicate.
  *
@@ -22,10 +20,18 @@ export function filter<const T, const R extends T>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => item is R,
 ): R[];
-export function filter<const T, const R extends T, P = unknown>(
+export function filter<const T>(
+	list: readonly T[],
+	predicate: (item: T, index: number, list: readonly T[]) => Promise<unknown>,
+): Promise<T[]>;
+export function filter<const T, const P>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => P,
-): FilterResult<P, R>;
+): [Extract<P, Promise<unknown>>] extends [never] ? T[] : Promisable<T[]>;
+export function filter<const T>(
+	list: readonly T[],
+	predicate: (item: T, index: number, list: readonly T[]) => unknown,
+): T[];
 export function filter(
 	list: readonly unknown[],
 	predicate: (item: unknown, index: number, list: readonly unknown[]) => Promisable<unknown>,
