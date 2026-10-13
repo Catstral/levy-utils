@@ -11,23 +11,65 @@ import type { Promisable } from "~/types";
  *
  * @template T
  * @template {T} R
- * @template P
  * @param {readonly T[]} list The array to filter values from
- * @param {(item: T, index: number, list: readonly T[]) => P} predicate A callback that returns whether an item is filtered
- * @returns {FilterResult<P, R>} A new list containing the filtered items, or a promise of it if the predicate can return a promise
+ * @param {(item: T, index: number, list: readonly T[]) => item is R} predicate A callback that returns whether an item is filtered
+ * @returns {R[]} A new list containing the filtered items, or a promise of it if the predicate can return a promise
  */
 export function filter<const T, const R extends T>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => item is R,
 ): R[];
+/**
+ * Returns a new list containing the items of a given list that pass a predicate.
+ *
+ * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
+ * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
+ * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
+ *
+ * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
+ *
+ * @template T
+ * @param {readonly T[]} list The array to filter values from
+ * @param {(item: T, index: number, list: readonly T[]) => Promise<unknown>} predicate A callback that returns whether an item is filtered
+ * @returns {Promise<T[]>} A new list containing the filtered items, or a promise of it if the predicate can return a promise
+ */
 export function filter<const T>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => Promise<unknown>,
 ): Promise<T[]>;
+/**
+ * Returns a new list containing the items of a given list that pass a predicate.
+ *
+ * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
+ * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
+ * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
+ *
+ * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
+ *
+ * @template T
+ * @template P
+ * @param {readonly T[]} list The array to filter values from
+ * @param {(item: T, index: number, list: readonly T[]) => P} predicate A callback that returns whether an item is filtered
+ * @returns {[Extract<P, Promise<unknown>>] extends [never] ? T[] : Promisable<T[]>} A new list containing the filtered items, or a promise of it if the predicate can return a promise
+ */
 export function filter<const T, const P>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => P,
 ): [Extract<P, Promise<unknown>>] extends [never] ? T[] : Promisable<T[]>;
+/**
+ * Returns a new list containing the items of a given list that pass a predicate.
+ *
+ * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
+ * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
+ * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
+ *
+ * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
+ *
+ * @template T
+ * @param {readonly T[]} list The array to filter values from
+ * @param {(item: T, index: number, list: readonly T[]) => unknown} predicate A callback that returns whether an item is filtered
+ * @returns {T[]} A new list containing the filtered items, or a promise of it if the predicate can return a promise
+ */
 export function filter<const T>(
 	list: readonly T[],
 	predicate: (item: T, index: number, list: readonly T[]) => unknown,
