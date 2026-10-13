@@ -1,5 +1,4 @@
 import { UtilError } from "~/error";
-import type { PositiveInteger } from "~/number";
 import type { Computable } from "../compute";
 
 export class TimeoutUtilError extends UtilError {
@@ -14,16 +13,16 @@ export class TimeoutError extends Error {
 	}
 }
 
-export interface TimeoutOptions<_T, D = number> {
+export interface TimeoutOptions {
 	/**
 	 * A callback that runs when the delay has elapsed.
 	 *
 	 * Throwing a value inside this callback rejects the promise with that value instead of a {@link TimeoutError}.
 	 *
-	 * @param {D} delayMs
+	 * @param {number} delayMs
 	 * @returns {void}
 	 */
-	onTimeout?: (delayMs: D) => void;
+	onTimeout?: (delayMs: number) => void;
 }
 
 /**
@@ -32,18 +31,17 @@ export interface TimeoutOptions<_T, D = number> {
  * The time complexity for this is `O(1)`.
  *
  * @template T
- * @template {number} [D=number]
  * @param {Computable<Promise<T>, [signal: AbortSignal]>} value The promise or callback that returns a promise to handle
- * @param {PositiveInteger<D>} delayMs The delay in milliseconds to wait before rejecting the promise
- * @param {TimeoutOptions<T, D>} [options] The options given to the timeout
+ * @param {number} delayMs The delay in milliseconds to wait before rejecting the promise
+ * @param {TimeoutOptions<T>} [options] The options given to the timeout
  * @returns {Promise<T>} A promise that resolves with the given promise's result and rejects after the specified delay has elapsed
  * @throws {TimeoutUtilError} If the given delay is smaller than 0
  * @throws {TimeoutError} If the given delay has elapsed
  */
-export async function timeout<const T, const D extends number = number>(
+export async function timeout<const T>(
 	value: Computable<Promise<T>, [signal: AbortSignal]>,
-	delayMs: PositiveInteger<D>,
-	options?: TimeoutOptions<T>,
+	delayMs: number,
+	options?: TimeoutOptions,
 ): Promise<T> {
 	if (delayMs < 0) {
 		throw new TimeoutUtilError("Timeout delay cannot be smaller than 0");
