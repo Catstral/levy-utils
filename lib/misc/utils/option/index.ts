@@ -34,7 +34,7 @@ export type Option<T> =
  * @template {?[]} [Args=never[]]
  * @param {(...args: Args) => T} callback The callback to wrap the value
  * @param {...Args} parameters Parameters to pass to the given callback
- * @returns {SafeResult<T>} The result wrapped in an `Option`
+ * @returns {T extends Promise<infer V> ? Promise<Option<V>> : Option<T>} The result wrapped in an `Option`
  *
  * @see {@link Option} for more details about an option value
  * @see {@link unwrap} for a utility that handles option values
