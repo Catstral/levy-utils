@@ -921,8 +921,8 @@ await timeout(sleep(2000), 1000);
 // TimeoutError("The operation was timed out after 1000ms")
 
 await timeout(
-    (abortController) => fetch("https://example.com", { 
-        signal: abortController.signal
+    (signal) => fetch("https://example.com", { 
+        signal,
     }),
     1000,
 );
