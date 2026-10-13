@@ -47,8 +47,14 @@ A list of all the utilities supported:
   - [task](#taskcallback)
 - [Miscellaneous utilities](#miscellaneous-utilities)
   - [compute / isComputation](#computevalue-args--iscomputationvalue)
+  - [identity](#identityvalue)
   - [isEmpty](#isemptyvalue)
+  - [isNull](#isnullvalue)
+  - [isNullish](#isnullishvalue)
   - [isPrimitive](#isprimitivevalue)
+  - [isPromise](#ispromisevalue)
+  - [isPromiseLike](#ispromiselikevalue)
+  - [isUndefined](#isundefinedvalue)
   - [match](#matchvalue-clause-fallback)
   - [Range (class)](#rangerangestring)
     - [static from](#static-fromrange)
@@ -66,8 +72,11 @@ A list of all the utilities supported:
     - [toArray](#toarray)
     - [clone](#clone)
   - [range](#rangestartorlength-end-options)
+  - [raise](#raisevalue)
+  - [readOnly / isReadOnly](#readonlyvalue-deepfreeze--isreadonlyvalue)
   - [safe](#safecallback)
   - [sleep](#sleepdelay)
+  - [timeout / isTimeoutError](#timeoutvalue-delayms-options--istimeouterrorvalue)
   - [unwrap](#unwrapoption-fallback)
   - [values](#valuestarget)
 - [Number utilities](#number-utilities)
@@ -472,6 +481,23 @@ compute((a: number, b: number) => a + b, 2, 3);
 // 5
 ```
 
+#### `identity(value)`
+Returns the given value as is, with its type inferred as narrowly as possible (as a `const` generic).
+
+```ts
+identity(5);
+// Expected output:
+// 5
+
+identity({
+    a: 1,
+});
+// Expected output:
+// {
+//     a: 1,
+// }
+```
+
 #### `isEmpty(value)`
 Checks if a value is considered empty.
 
@@ -506,6 +532,36 @@ isEmpty({
 // false (the key exists)
 ```
 
+#### `isNull(value)`
+Checks if a value is `null`.
+
+```ts
+isNull(null);
+// Expected output:
+// true
+
+isNull(undefined);
+// Expected output:
+// false
+```
+
+#### `isNullish(value)`
+Checks if a value is nullish: `null` or `undefined`.
+
+```ts
+isNullish(null);
+// Expected output:
+// true
+
+isNullish(undefined);
+// Expected output:
+// true
+
+isNullish(0);
+// Expected output:
+// false
+```
+
 #### `isPrimitive(value)`
 Checks if a value is a primitive: `string`, `number`, `boolean`, `symbol`, `null`, or `undefined`.
 
@@ -519,20 +575,67 @@ isPrimitive({});
 // false
 ```
 
+#### `isPromise(value)`
+Checks if a value is a `Promise` (an instance of `Promise`).
+
+```ts
+isPromise(Promise.resolve(1));
+// Expected output:
+// true
+
+isPromise({ 
+    then: () => {},
+});
+// Expected output:
+// false
+```
+
+#### `isPromiseLike(value)`
+Checks if a value is promise-like: an object with a `then` function.
+
+```ts
+isPromiseLike(Promise.resolve(1));
+// Expected output:
+// true
+
+isPromiseLike({
+    then: () => {},
+});
+// Expected output:
+// true
+
+isPromiseLike({});
+// Expected output:
+// false
+```
+
+#### `isUndefined(value)`
+Checks if a value is `undefined`.
+
+```ts
+isUndefined(undefined);
+// Expected output:
+// true
+
+isUndefined(null);
+// Expected output:
+// false
+```
+
 #### `match(value, clause, fallback?)`
 Matches a value to a clause that return a value
 and returns a fallback if none of the cases match.
 
 ```ts
 const fn = (value: string) => {
-	return match(
-		value,
-		{
-			A: 1,
-			B: 2,
-		},
-		-1
-	);
+    return match(
+        value,
+        {
+            A: 1,
+            B: 2,
+        },
+        -1,
+    );
 };
 
 fn("A");
@@ -718,6 +821,57 @@ options:
 
 > NOTE: `inclusiveEnd` default value here differs from the `inclusiveEnd` value set by [`Range`](#rangerangestring), this is for backwards compatibility.
 
+#### `raise(value)`
+Throws the given value, never returns.
+
+- A string is wrapped in an `Error`.
+- A function is called without arguments and its result is thrown.
+- Any other value is thrown as is.
+
+This is useful for throwing in expression positions, such as a fallback.
+
+```ts
+raise("Something went wrong");
+// Expected to throw:
+// Error("Something went wrong")
+
+raise(() => new RangeError("Out of range"));
+// Expected to throw:
+// RangeError("Out of range")
+```
+
+#### `readOnly(value, deepFreeze?)` / `isReadOnly(value)`
+`readOnly` returns a read-only copy of an object, array, map, or set.
+
+`isReadOnly` checks if a value is frozen.
+
+```ts
+const original = {
+    a: 1,
+    nested: {
+        b: 2
+    }
+};
+const shallow = readOnly(original);
+const deep = readOnly(original, true);
+
+isReadOnly(shallow);
+// Expected output:
+// true
+
+shallow.nested === original.nested;
+// Expected output:
+// true (nested values are shared and still mutable)
+
+deep.nested === original.nested;
+// Expected output:
+// false (nested values are cloned and frozen)
+
+isReadOnly(original);
+// Expected output:
+// false
+```
+
 #### `safe(callback)`
 Executes the given callback and returns an option of the result.
 
@@ -749,6 +903,43 @@ await sleep(1000);
 // Expected output:
 // waits 1 second
 ```
+
+#### `timeout(value, delayMs, options?)` / `isTimeoutError(value)`
+Wraps a promise (or a callback that returns one) into a promise that rejects with a `TimeoutError` if it hasn't settled after the given delay (in milliseconds). If the promise settles first, its result (or error) is passed through.
+
+When given a callback, it receives an `AbortSignal` which is aborted when the delay elapses, so the underlying operation can be cancelled.
+
+`isTimeoutError` checks if a value is a `TimeoutError`.
+
+```ts
+await timeout(sleep(100), 1000);
+// Expected output:
+// resolves after 100ms
+
+await timeout(sleep(2000), 1000);
+// Expected to throw:
+// TimeoutError("The operation was timed out after 1000ms")
+
+await timeout(
+    (signal) => fetch("https://example.com", { 
+        signal,
+    }),
+    1000,
+);
+// Expected output:
+// the response, or a rejection (and an aborted request) if it takes longer than 1 second
+
+try {
+    await timeout(sleep(2000), 1000);
+} catch (error) {
+    isTimeoutError(error);
+    // Expected output:
+    // true
+}
+```
+
+Options:
+- `onTimeout` - a callback invoked with the delay when it elapses. Throwing inside it rejects the promise with the thrown value instead of a `TimeoutError`.
 
 #### `unwrap(option, fallback?)`
 Directly returns the option's value, or throws the option's error.

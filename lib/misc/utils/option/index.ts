@@ -26,22 +26,30 @@ export type Option<T> =
  * If a value is returned, the success of the option is `true`.
  * If an error is thrown, the success of the option is `false`.
  *
+ * If the callback returns a promise, a promise of an option is returned instead.
+ *
  * The time complexity for this is `O(1)`.
  *
- * @template {Promisable<?>} T
- * @param {() => T} callback The callback to wrap the value
+ * @template T
+ * @template {?[]} [Args=never[]]
+ * @param {(...args: Args) => T} callback The callback to wrap the value
+ * @param {...Args} parameters Parameters to pass to the given callback
  * @returns {T extends Promise<infer V> ? Promise<Option<V>> : Option<T>} The result wrapped in an `Option`
  *
  * @see {@link Option} for more details about an option value
  * @see {@link unwrap} for a utility that handles option values
  */
-export function safe<const T>(callback: () => T): Option<T>;
-export function safe<const T extends Promise<unknown>>(callback: () => T): Promise<Option<Awaited<T>>>;
-export function safe<const T extends Promisable<unknown>>(
-	callback: () => T,
-): T extends Promise<infer V> ? Promise<Option<V>> : Option<T> {
+export function safe<const T extends never, const Args extends unknown[] = never[]>(
+	callback: (...args: Args) => T,
+	...parameters: Args
+): Option<never>;
+export function safe<const T extends Promisable<unknown>, const Args extends unknown[] = never[]>(
+	callback: (...args: Args) => T,
+	...parameters: Args
+): T extends Promise<infer V> ? Promise<Option<V>> : Option<T>;
+export function safe(callback: (...args: unknown[]) => unknown, ...parameters: unknown[]): Promisable<Option<unknown>> {
 	try {
-		const value = callback();
+		const value = callback(...parameters);
 
 		if (value instanceof Promise) {
 			return value.then(
@@ -53,18 +61,18 @@ export function safe<const T extends Promisable<unknown>>(
 					success: false,
 					error,
 				}),
-			) as T extends Promise<infer V> ? Promise<Option<V>> : Option<T>;
+			);
 		}
 
 		return {
 			success: true,
 			value,
-		} as T extends Promise<infer V> ? Promise<Option<V>> : Option<T>;
+		};
 	} catch (error) {
 		return {
 			success: false,
 			error,
-		} as T extends Promise<infer V> ? Promise<Option<V>> : Option<T>;
+		};
 	}
 }
 
