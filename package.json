@@ -50,7 +50,7 @@
 		"check": "bun tsc && bun lint"
 	},
 	"devDependencies": {
-		"@types/bun": "1.4.0",
+		"@types/bun": "1.4.3",
 		"@biomejs/biome": "2.5.4",
 		"@types/diff-match-patch": "^1.0.36",
 		"typescript": "^7.0.0",
