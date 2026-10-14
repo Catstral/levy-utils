@@ -1,55 +1,34 @@
 import { UtilError } from "~/error";
 
-/**
- * @private
- */
-interface SelectDiscardAction {
+export interface SelectDiscardAction {
 	type: "DISCARD";
 }
 
-/**
- * @private
- */
-interface SelectKeepAction {
+export interface SelectKeepAction {
 	type: "KEEP";
 }
 
-/**
- * @private
- */
-interface SelectFilterAction {
+export interface SelectFilterAction {
 	type: "FILTER";
 	keep: boolean;
 }
 
-/**
- * @private
- */
-interface SelectMapAction<R> {
+export interface SelectMapAction<R> {
 	type: "MAP";
 	value: R;
 }
 
-/**
- * @private
- */
-interface SelectFlatAction<R> {
+export interface SelectFlatAction<R> {
 	type: "FLAT";
-	values: R[];
+	list: R[];
 }
 
-/**
- * @private
- */
-interface SelectSpreadAction<R> {
+export interface SelectSpreadAction<R> {
 	type: "SPREAD";
 	values: R[];
 }
 
-/**
- * @private
- */
-type SelectAction<R> =
+export type SelectAction<R> =
 	| SelectDiscardAction
 	| SelectKeepAction
 	| SelectFilterAction
@@ -57,10 +36,7 @@ type SelectAction<R> =
 	| SelectSpreadAction<R>
 	| SelectFlatAction<R>;
 
-/**
- * @private
- */
-interface SelectContext<T, R = T> {
+export interface SelectContext<T, R = T> {
 	item: T;
 	index: number;
 	list: readonly T[];
@@ -96,7 +72,7 @@ interface SelectContext<T, R = T> {
 	 * @param {R[]} values The values to add in place of the current item
 	 * @returns {SelectFlatAction<R>} An action that flattens the given values into the resulting list
 	 */
-	flat(values: R[]): SelectFlatAction<R>;
+	flat(list: R[]): SelectFlatAction<R>;
 	/**
 	 * Spreads every given item into the resulting list in place of the current item.
 	 *
@@ -168,7 +144,7 @@ export function select<T, R = T>(
 	}
 
 	const result: unknown[] = [];
-	const context = {
+	const context: Omit<SelectContext<T, R>, "item" | "index"> = {
 		list,
 		discard() {
 			return {
@@ -192,10 +168,10 @@ export function select<T, R = T>(
 				value,
 			};
 		},
-		flat(values) {
+		flat(list) {
 			return {
 				type: "FLAT",
-				values,
+				list,
 			};
 		},
 		spread(...values) {
@@ -204,14 +180,14 @@ export function select<T, R = T>(
 				values,
 			};
 		},
-	} satisfies Partial<SelectContext<T, R>>;
+	};
 
 	for (const [index, item] of list.entries()) {
 		const action = callback({
 			...context,
 			index,
 			item,
-		} as SelectContext<T, R>);
+		});
 
 		switch (action.type) {
 			case "DISCARD": {
@@ -234,8 +210,12 @@ export function select<T, R = T>(
 
 				break;
 			}
-			case "SPREAD":
 			case "FLAT": {
+				result.push(...action.list);
+
+				break;
+			}
+			case "SPREAD": {
 				result.push(...action.values);
 
 				break;
