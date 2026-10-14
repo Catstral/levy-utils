@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
 import { filterMap } from ".";
 
-describe("fork", () => {
+describe("filterMap", () => {
 	test("Simple filter and mapper", () => {
 		const selected = filterMap(
 			["foo", "bar"],
