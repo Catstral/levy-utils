@@ -42,7 +42,7 @@ export interface SelectContext<T, R = T> {
 	 */
 	item: T;
 	/**
-	 * The current index of the given list.
+	 * The index of the current item of the given list.
 	 */
 	index: number;
 	/**
