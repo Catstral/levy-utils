@@ -37,8 +37,17 @@ export type SelectAction<R> =
 	| SelectFlatAction<R>;
 
 export interface SelectContext<T, R = T> {
+	/**
+	 * The current item in the given list.
+	 */
 	item: T;
+	/**
+	 * The current index of the given list.
+	 */
 	index: number;
+	/**
+	 * The given list.
+	 */
 	list: readonly T[];
 	/**
 	 * Discards the current item from the resulting list.
@@ -69,7 +78,7 @@ export interface SelectContext<T, R = T> {
 	/**
 	 * Flats every item of the given list into the resulting list in place of the current item.
 	 *
-	 * @param {R[]} values The values to add in place of the current item
+	 * @param {R[]} list The values to add in place of the current item
 	 * @returns {SelectFlatAction<R>} An action that flattens the given values into the resulting list
 	 */
 	flat(list: R[]): SelectFlatAction<R>;
@@ -136,8 +145,8 @@ export class SelectUtilError extends UtilError {
 export function select<T, R = T>(
 	list: readonly T[],
 	callback: (
-		context: [R] extends [T] ? SelectContext<T, R> : Omit<SelectContext<T, R>, "keep" | "filter">,
-	) => Exclude<SelectAction<R>, { type: [R] extends [T] ? never : "KEEP" | "FILTER" }>,
+		context: [T] extends [R] ? SelectContext<T, R> : Omit<SelectContext<T, R>, "keep" | "filter">,
+	) => Exclude<SelectAction<R>, { type: [T] extends [R] ? never : "KEEP" | "FILTER" }>,
 ): R[] {
 	if (list.length === 0) {
 		return [];

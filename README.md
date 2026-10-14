@@ -460,6 +460,8 @@ Available actions:
 
 Throws a `SelectUtilError` if the callback returns an invalid action.
 
+This utility was reworked, it's old behaviour has moved to the `filterMap` utility.
+
 #### `sift(list)`
 Filters all falsy values out of a list.
 
