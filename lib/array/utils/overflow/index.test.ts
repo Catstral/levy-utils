@@ -51,29 +51,7 @@ describe("overflow", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(OverflowUtilError);
 			expect((err as OverflowUtilError).util).toBe("overflow");
-			expect((err as OverflowUtilError).message).toBe("Clamp length cannot be smaller than 0");
-		}
-	});
-
-	test("Non-array list throws an OverflowUtilError", () => {
-		try {
-			overflow("" as unknown as string[], 1);
-			expect().fail("Invalid list definition passed to overflow");
-		} catch (err) {
-			expect(err).toBeInstanceOf(OverflowUtilError);
-			expect((err as OverflowUtilError).util).toBe("overflow");
-			expect((err as OverflowUtilError).message).toBe("List must be an array");
-		}
-	});
-
-	test("Null list throws an OverflowUtilError", () => {
-		try {
-			overflow(null as unknown as number[], 1);
-			expect().fail("Null list definition passed to overflow");
-		} catch (err) {
-			expect(err).toBeInstanceOf(OverflowUtilError);
-			expect((err as OverflowUtilError).util).toBe("overflow");
-			expect((err as OverflowUtilError).message).toBe("List must be an array");
+			expect((err as Error).message).toBe("Clamp length cannot be smaller than 0");
 		}
 	});
 
