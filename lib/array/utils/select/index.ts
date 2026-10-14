@@ -1,39 +1,241 @@
+import { UtilError } from "~/error";
+
+export interface SelectDiscardAction {
+	type: "DISCARD";
+}
+
+export interface SelectKeepAction {
+	type: "KEEP";
+}
+
+export interface SelectFilterAction {
+	type: "FILTER";
+	keep: boolean;
+}
+
+export interface SelectMapAction<R> {
+	type: "MAP";
+	value: R;
+}
+
+export interface SelectFlatAction<R> {
+	type: "FLAT";
+	list: R[];
+}
+
+export interface SelectSpreadAction<R> {
+	type: "SPREAD";
+	values: R[];
+}
+
+export type SelectAction<R> =
+	| SelectDiscardAction
+	| SelectKeepAction
+	| SelectFilterAction
+	| SelectMapAction<R>
+	| SelectSpreadAction<R>
+	| SelectFlatAction<R>;
+
+export interface SelectContext<T, R = T> {
+	/**
+	 * The current item in the given list.
+	 */
+	item: T;
+	/**
+	 * The index of the current item of the given list.
+	 */
+	index: number;
+	/**
+	 * The given list.
+	 */
+	list: readonly T[];
+	/**
+	 * Discards the current item from the resulting list.
+	 *
+	 * @returns {SelectDiscardAction} An action that discards the current item.
+	 */
+	discard(): SelectDiscardAction;
+	/**
+	 * Keeps the current item in the resulting list.
+	 *
+	 * @returns {SelectKeepAction} An action that keeps the current item.
+	 */
+	keep(): SelectKeepAction;
+	/**
+	 * Filters the current item in the resulting list based on the given boolean.
+	 *
+	 * @param {boolean} keep Whether the current item should be kept
+	 * @returns {SelectFilterAction} An action that keeps or discards the current item.
+	 */
+	filter(keep: boolean): SelectFilterAction;
+	/**
+	 * Maps the current item to the given value in the resulting list.
+	 *
+	 * @param {R} value The value to add in place of the current item
+	 * @returns {SelectMapAction<R>} An action that maps the current item to the given value
+	 */
+	map(value: R): SelectMapAction<R>;
+	/**
+	 * Flats every item of the given list into the resulting list in place of the current item.
+	 *
+	 * @param {R[]} list The values to add in place of the current item
+	 * @returns {SelectFlatAction<R>} An action that flattens the given values into the resulting list
+	 */
+	flat(list: R[]): SelectFlatAction<R>;
+	/**
+	 * Spreads every given item into the resulting list in place of the current item.
+	 *
+	 * @param {...R[]} values The values to add in place of the current item
+	 * @returns {SelectSpreadAction<R>} An action that spreads the given values into the resulting list
+	 */
+	spread(...values: R[]): SelectSpreadAction<R>;
+}
+
+export class SelectUtilError extends UtilError {
+	public readonly util = "select";
+}
+
 /**
- * Returns a new list of items based on filtered and mapped values of a given list.
+ * Returns a new list built by deciding what should end up in the result per item.
  *
- * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
+ * The time complexity for this is `O(n)` where `n` is the amount of items in the list.
+ *
+ * @example
+ * select(
+ *     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+ *     ({ item, keep, discard, filter }) => {
+ *         // Keep all numbers less than 3
+ *         if (item < 3) {
+ *             return keep();
+ *         }
+ *
+ * 		   // Removes all numbers greater than 8
+ *         if (item > 8) {
+ *             return discard();
+ *         }
+ *
+ *         // Filters all even numbers
+ *         return filter(item % 2 === 0);
+ *     },
+ * );
+ *
+ * @example
+ * select<number | string[] | null, string>(
+ *     [1, ["2", "3", "4"], null, ["7", "8", "9"], 10],
+ *     ({ item, map, flat, spread }) => {
+ *         if (typeof item === "number") {
+ *             return map(item.toString());
+ *         }
+ *
+ *         if (Array.isArray(item)) {
+ *              return flat(item);
+ *         }
+ *
+ *         return spread("5", "6");
+ *     },
+ * );
  *
  * @template T
- * @template R
- * @param {T[] | readonly T[]} list The list to filter and map values through
- * @param {(item: T, index: number) => boolean} filter A callback to filter out values from the given list
- * @param {(item: T, index: number, originalIndex: number) => R} mapper A mapper to convert the filtered values
- * @returns {R[]} A new list with all filtered and mapped values
+ * @template [R=T]
+ * @param {readonly T[]} list The list to select items from
+ * @param {(context: SelectContext<T, R>) => SelectAction<R>} callback A callback that returns an action describing what to do with the current item
+ * @returns {R[]} A new list with all kept, mapped and flattened values
+ * @throws {SelectUtilError} If the callback returns an invalid action
  */
-export function select<const T, const V extends T, const R>(
-	list: T[] | readonly T[],
-	filter: (item: T, index: number) => item is V,
-	mapper: (item: V, index: number) => R,
-): R[];
-export function select<const T, const R>(
-	list: T[] | readonly T[],
-	filter: (item: T, index: number) => boolean,
-	mapper: (item: T, index: number, originalIndex: number) => R,
-): R[];
-export function select<const T, const R>(
-	list: T[] | readonly T[],
-	filter: (item: T, index: number) => boolean,
-	mapper: (item: T, index: number, originalIndex: number) => R,
+export function select<T, R = T>(
+	list: readonly T[],
+	callback: (
+		context: [T] extends [R] ? SelectContext<T, R> : Omit<SelectContext<T, R>, "keep" | "filter">,
+	) => Exclude<SelectAction<R>, { type: [T] extends [R] ? never : "KEEP" | "FILTER" }>,
 ): R[] {
-	const result: R[] = [];
+	if (list.length === 0) {
+		return [];
+	}
+
+	const result: unknown[] = [];
+	const context: Omit<SelectContext<T, R>, "item" | "index"> = {
+		list,
+		discard() {
+			return {
+				type: "DISCARD",
+			};
+		},
+		keep() {
+			return {
+				type: "KEEP",
+			};
+		},
+		filter(keep) {
+			return {
+				type: "FILTER",
+				keep,
+			};
+		},
+		map(value) {
+			return {
+				type: "MAP",
+				value,
+			};
+		},
+		flat(list) {
+			return {
+				type: "FLAT",
+				list,
+			};
+		},
+		spread(...values) {
+			return {
+				type: "SPREAD",
+				values,
+			};
+		},
+	};
 
 	for (const [index, item] of list.entries()) {
-		if (filter(item, index)) {
-			const value = mapper(item, result.length, index);
+		const action = callback({
+			...context,
+			index,
+			item,
+		});
 
-			result.push(value);
+		switch (action.type) {
+			case "DISCARD": {
+				break;
+			}
+			case "KEEP": {
+				result.push(item);
+
+				break;
+			}
+			case "FILTER": {
+				if (action.keep) {
+					result.push(item);
+				}
+
+				break;
+			}
+			case "MAP": {
+				result.push(action.value);
+
+				break;
+			}
+			case "FLAT": {
+				result.push(...action.list);
+
+				break;
+			}
+			case "SPREAD": {
+				result.push(...action.values);
+
+				break;
+			}
+			default: {
+				const type = (action as { type: unknown }).type;
+
+				throw new SelectUtilError(`Invalid action type: ${type}`);
+			}
 		}
 	}
 
-	return result;
+	return result as R[];
 }

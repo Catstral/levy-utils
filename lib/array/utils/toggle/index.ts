@@ -26,7 +26,7 @@ export interface ToggleOptions<T> {
 /**
  * Toggles a value from an array and returns the new array with the value either removed or added.
  *
- * The time complexity for this is `O(n)` where `n` is the amount of items in the list.
+ * The time complexity for this is `O(2n)` where `n` is the amount of items in the list.
  *
  * @template T
  * @param {T[]} list The list to toggle the item from
@@ -40,7 +40,6 @@ export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOpti
 	};
 
 	const index = list.findIndex((item) => toKey(item) === toKey(itemToToggle));
-
 	const currentList = [...list];
 
 	if (index === -1) {

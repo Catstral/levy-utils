@@ -28,11 +28,20 @@ A list of all the utilities supported:
   - [cluster](#clusteritems-size)
   - [concat](#concatvalues)
   - [counting](#countinglist-identity)
+  - [filter](#filterlist-predicate)
+  - [filterMap](#filtermaplist-filter-mapper)
+  - [first](#firstlist-fallback)
   - [fork](#forklist-condition)
+  - [group](#grouplist-identity)
+  - [hasItems](#hasitemslist)
+  - [last](#lastlist-fallback)
   - [list](#liststartorlength-end-options)
+  - [map](#maplist-callback)
   - [max](#maxlist-mapper-options)
-  - [min](#maxlist-mapper-options)
-  - [select](#selectlist-filter-mapper)
+  - [min](#minlist-mapper-options)
+  - [overflow](#overflowlist-clamplength)
+  - [reduce](#reducelist-initial-callback-options)
+  - [select](#selectlist-callback)
   - [sift](#siftlist)
   - [sum](#sumlist-mapper)
   - [toggle](#togglelist-itemtotoggle-options)
@@ -168,6 +177,49 @@ counting(["a", "b", "a", "c", "a"], (item) => item);
 // }
 ```
 
+#### `filter(list, predicate)`
+Returns a new list containing the items of a given list that pass a predicate.
+
+If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
+
+```ts
+filter([1, 2, 3, 4], (n) => n % 2 === 0);
+// Expected output:
+// [2, 4]
+
+await filter([1, 2, 3], async (n) => n > 1);
+// Expected output:
+// [2, 3]
+```
+
+#### `filterMap(list, filter, mapper)`
+Returns a new list of items based on filtered and mapped values of a given list.
+
+```ts
+filterMap(
+    [1, 2, 3, 4],
+    (n) => n % 2 === 0,
+    (n) => n * 10,
+);
+// Expected output:
+// [20, 40]
+```
+
+This utility was formerly called `select`.
+
+#### `first(list, fallback?)`
+Returns the first item of a list, or a fallback if the list is empty.
+
+```ts
+first([1, 2, 3]);
+// Expected output:
+// 1
+
+first([], "none");
+// Expected output:
+// "none"
+```
+
 #### `fork(list, condition)`
 Splits a list into a tuple of two arrays based on a condition: items that pass, and items that don't.
 
@@ -175,6 +227,44 @@ Splits a list into a tuple of two arrays based on a condition: items that pass, 
 fork([1, 2, 3, 4], (n) => n % 2 === 0);
 // Expected output:
 // [[2, 4], [1, 3]]
+```
+
+#### `group(list, identity)`
+Groups the items of a list into an object of keys (as determined by the `identity` callback) mapped to the items with that key.
+
+```ts
+group(["apple", "avocado", "banana"], (item) => item[0]);
+// Expected output:
+// {
+//     a: ["apple", "avocado"],
+//     b: ["banana"],
+// }
+```
+
+#### `hasItems(list)`
+Checks if a list has at least one item, narrowing its type to a non-empty tuple.
+
+```ts
+hasItems([1, 2, 3]);
+// Expected output:
+// true
+
+hasItems([]);
+// Expected output:
+// false
+```
+
+#### `last(list, fallback?)`
+Returns the last item of a list, or a fallback if the list is empty.
+
+```ts
+last([1, 2, 3]);
+// Expected output:
+// 3
+
+last([], "none");
+// Expected output:
+// "none"
 ```
 
 ### `list(startOrLength, end?, options?)`
@@ -205,6 +295,21 @@ list(0, 3, {
 options:
 - `step` - The steps used to generate the array.
 - `valueMapper` - A mapper function to map a step to a value.
+
+#### `map(list, callback)`
+Returns a new list of items based on mapped values of a given list.
+
+If the callback returns a promise for any item, a promise is returned that resolves once all of them have.
+
+```ts
+map([1, 2, 3], (n) => n * 2);
+// Expected output:
+// [2, 4, 6]
+
+await map([1, 2, 3], async (n) => n + 1);
+// Expected output:
+// [2, 3, 4]
+```
 
 #### `max(list, mapper?, options?)`
 Returns the largest item from a list.
@@ -270,9 +375,92 @@ min(
 // }
 ```
 
-<!-- TODO -->
-#### `select(list, filter, mapper)`
-Returns a new list of items based on filtered and mapped values of a given list.
+#### `overflow(list, clampLength)`
+Splits a list into a tuple of two arrays: the first `clampLength` items, and the rest of the items.
+
+Throws an `OverflowUtilError` if the clamp length is negative or the given list is not an array.
+
+```ts
+overflow([1, 2, 3, 4, 5], 3);
+// Expected output:
+// [[1, 2, 3], [4, 5]]
+```
+
+#### `reduce(list, initial, callback, options?)`
+Reduces all items of a list down to an accumulated result.
+
+```ts
+reduce([1, 2, 3], 0, (acc, n) => acc + n);
+// Expected output:
+// 6
+
+reduce(["a", "b", "c"], "", (acc, letter) => acc + letter, {
+    direction: "DESCENDING",
+});
+// Expected output:
+// "cba"
+
+reduce([1, 2, 3], 0, (acc, n) => acc + n, {
+    result: (total) => `Total: ${total}`,
+});
+// Expected output:
+// "Total: 6"
+```
+
+Options:
+- `direction` - `"ASCENDING"` or `"DESCENDING"`, determines the order the list is reduced in (default `"ASCENDING"`)
+- `result` - transforms the final accumulator into the returned result
+
+#### `select(list, callback)`
+Returns a new list built by deciding, per item, what should end up in the result. The callback receives a context object and must return one of its actions.
+
+```ts
+select(
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    ({ item, keep, discard, filter }) => {
+        if (item < 3) {
+            return keep();
+        }
+    
+        if (item > 8) {
+            return discard();
+        }
+    
+        return filter(item % 2 === 0);
+    },
+);
+// Expected output:
+// [1, 2, 4, 6, 8]
+
+select<number | string[] | null, string>(
+    [1, ["2", "3", "4"], null, ["7", "8", "9"], 10],
+    ({ item, map, flat, spread }) => {
+        if (typeof item === "number") {
+            return map(item.toString());
+        }
+
+        if (Array.isArray(item)) {
+            return flat(item);
+        }
+
+        return spread("5", "6");
+    },
+);
+// Expected output:
+// ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+```
+
+Available actions:
+- `keep()` - keeps the current item
+- `discard()` - removes the current item
+- `filter(keep)` - keeps or removes the current item based on a boolean
+- `map(value)` - replaces the current item with a value
+- `flat(values)` - replaces the current item with every value of a list
+- `spread(...values)` - replaces the current item with every given value
+
+Throws a `SelectUtilError` if the callback returns an invalid action.
+
+This utility was reworked, it's old behaviour has moved to the `filterMap` utility.
 
 #### `sift(list)`
 Filters all falsy values out of a list.

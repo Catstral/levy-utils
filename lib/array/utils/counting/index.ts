@@ -1,7 +1,7 @@
 import type { Key } from "~/types";
 
 /**
- * Reduces a list down to an object of keys (specified using the `identity` param)
+ * Reduces a list down to an object of keys specified by the given `identity` callback
  * with a number of how many times that identity has been seen.
  *
  * The time complexity for this is `O(n)` where `n` is the amount of items in the list.

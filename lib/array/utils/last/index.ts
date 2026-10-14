@@ -1,0 +1,19 @@
+export type Last<T extends readonly unknown[], F = undefined> = T extends readonly [...T[number][], infer V]
+	? V
+	: T[number] | (T extends readonly [T[number], ...T[number][]] ? never : F);
+
+/**
+ * Returns the last item of a list or a fallback if the list is empty.
+ *
+ * The time complexity for this is `O(1)`.
+ *
+ * @template T
+ * @template {readonly T[]} [L=T[]]
+ * @template [F=undefined]
+ * @param list The array to get the last item from
+ * @param [fallback] The value to fall back to if the list is empty
+ * @returns {First<T, F>} The last item of the list or a fallback
+ */
+export function last<const T extends readonly unknown[], const F = undefined>(list: T, fallback?: F): Last<T, F> {
+	return (list.length === 0 ? fallback : list.at(-1)) as Last<T, F>;
+}

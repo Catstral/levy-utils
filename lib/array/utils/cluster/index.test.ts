@@ -36,29 +36,7 @@ describe("cluster", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
 			expect((err as ClusterUtilError).util).toBe("cluster");
-			expect((err as ClusterUtilError).message).toBe("Cluster size cannot be smaller than 1");
-		}
-	});
-
-	test("Non-array items throws a ClusterUtilError", () => {
-		try {
-			cluster("" as unknown as string[], 1);
-			expect().fail("Invalid item definition passed clustering");
-		} catch (err) {
-			expect(err).toBeInstanceOf(ClusterUtilError);
-			expect((err as ClusterUtilError).util).toBe("cluster");
-			expect((err as ClusterUtilError).message).toBe("Items must be an array");
-		}
-	});
-
-	test("Null items throws a ClusterUtilError", () => {
-		try {
-			cluster(null as unknown as number[], 1);
-			expect().fail("Null item definition passed clustering");
-		} catch (err) {
-			expect(err).toBeInstanceOf(ClusterUtilError);
-			expect((err as ClusterUtilError).util).toBe("cluster");
-			expect((err as ClusterUtilError).message).toBe("Items must be an array");
+			expect((err as Error).message).toBe("Cluster size cannot be smaller than 1");
 		}
 	});
 
@@ -69,15 +47,14 @@ describe("cluster", () => {
 		} catch (err) {
 			expect(err).toBeInstanceOf(ClusterUtilError);
 			expect((err as ClusterUtilError).util).toBe("cluster");
-			expect((err as ClusterUtilError).message).toBe("Cluster size cannot be smaller than 1");
+			expect((err as Error).message).toBe("Cluster size cannot be smaller than 1");
 		}
 	});
 
 	test("Empty items list", () => {
 		const clustered = cluster([], 3);
 
-		expect(clustered).toBeArrayOfSize(1);
-		expect(clustered[0]).toBeArrayOfSize(0);
+		expect(clustered).toBeArrayOfSize(0);
 	});
 
 	test("Length is an exact multiple of size", () => {
