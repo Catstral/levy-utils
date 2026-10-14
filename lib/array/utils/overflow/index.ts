@@ -18,7 +18,6 @@ export class OverflowUtilError extends UtilError {
  * @param {PositiveInteger<L>} clampLength The length of the clamped list
  * @returns {[T[], T[]]} A tuple containing a clamped and rest list based off the given list and length
  * @throws {OverflowUtilError} If the clamp length is less than 1
- * @throws {OverflowUtilError} If the given items are not an array
  */
 export function overflow<const T, const L extends number = number>(
 	list: readonly T[],
@@ -26,10 +25,6 @@ export function overflow<const T, const L extends number = number>(
 ): [T[], T[]] {
 	if (clampLength < 0) {
 		throw new OverflowUtilError("Clamp length cannot be smaller than 0");
-	}
-
-	if (!Array.isArray(list)) {
-		throw new OverflowUtilError("List must be an array");
 	}
 
 	return [list.slice(0, clampLength), list.slice(clampLength)];
