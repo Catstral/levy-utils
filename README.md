@@ -205,6 +205,8 @@ filterMap(
 // [20, 40]
 ```
 
+This utility was formerly called `select`.
+
 #### `first(list, fallback?)`
 Returns the first item of a list, or a fallback if the list is empty.
 
