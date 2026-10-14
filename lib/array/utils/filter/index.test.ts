@@ -85,7 +85,7 @@ describe("filter", () => {
 			const mixed: (string | number)[] = ["foo", 1, "bar", 2];
 			const strings = filter(mixed, (value: string | number) => typeof value === "string");
 
-			expectTypeOf(strings).toEqualTypeOf<string[]>()
+			expectTypeOf(strings).toEqualTypeOf<string[]>();
 			expect(strings).toEqual(["foo", "bar"]);
 		});
 
@@ -97,7 +97,7 @@ describe("filter", () => {
 					}
 
 					return true;
-				})
+				});
 			}).toThrow("Oops");
 		});
 

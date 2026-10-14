@@ -14,9 +14,6 @@ export type Last<T extends readonly unknown[], F = undefined> = T extends readon
  * @param [fallback] The value to fall back to if the list is empty
  * @returns {First<T, F>} The last item of the list or a fallback
  */
-export function last<const T extends readonly unknown[], const F = undefined>(
-	list: T,
-	fallback?: F,
-): Last<T, F> {
+export function last<const T extends readonly unknown[], const F = undefined>(list: T, fallback?: F): Last<T, F> {
 	return (list.length === 0 ? fallback : list.at(-1)) as Last<T, F>;
 }
