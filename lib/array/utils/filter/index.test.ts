@@ -83,24 +83,22 @@ describe("filter", () => {
 
 		test("Type guard narrows the resulting list", () => {
 			const mixed: (string | number)[] = ["foo", 1, "bar", 2];
+			const strings = filter(mixed, (value: string | number) => typeof value === "string");
 
-			const isString = (value: string | number): value is string => typeof value === "string";
-
-			const strings: string[] = filter(mixed, isString);
-
+			expectTypeOf(strings).toEqualTypeOf<string[]>()
 			expect(strings).toEqual(["foo", "bar"]);
 		});
 
 		test("Throws if the predicate throws", () => {
-			expect(() =>
+			expect(() => {
 				filter([1, 2, 3], (value) => {
 					if (value === 2) {
 						throw new Error("Oops");
 					}
 
 					return true;
-				}),
-			).toThrow("Oops");
+				})
+			}).toThrow("Oops");
 		});
 
 		test("Stops calling the predicate once it throws", () => {
