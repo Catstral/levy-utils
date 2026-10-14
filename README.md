@@ -180,7 +180,7 @@ counting(["a", "b", "a", "c", "a"], (item) => item);
 #### `filter(list, predicate)`
 Returns a new list containing the items of a given list that pass a predicate.
 
-If the predicate returns a promise for any item, a promise is returned that resolves once all of them have. Since an empty list always returns a plain array, always `await` the result of a predicate that can return a promise instead of chaining on it.
+If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
 
 ```ts
 filter([1, 2, 3, 4], (n) => n % 2 === 0);
@@ -299,7 +299,7 @@ options:
 #### `map(list, callback)`
 Returns a new list of items based on mapped values of a given list.
 
-If the callback returns a promise for any item, a promise is returned that resolves once all of them have. Since an empty list always returns a plain array, always `await` the result of a callback that can return a promise instead of chaining on it.
+If the callback returns a promise for any item, a promise is returned that resolves once all of them have.
 
 ```ts
 map([1, 2, 3], (n) => n * 2);

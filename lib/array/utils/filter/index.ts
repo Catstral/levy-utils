@@ -4,8 +4,6 @@ import type { Promisable } from "~/types";
  * Returns a new list containing the items of a given list that pass a predicate.
  *
  * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
- * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
- * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
  *
  * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
  *
@@ -23,8 +21,6 @@ export function filter<const T, const R extends T>(
  * Returns a new list containing the items of a given list that pass a predicate.
  *
  * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
- * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
- * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
  *
  * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
  *
@@ -41,8 +37,6 @@ export function filter<const T>(
  * Returns a new list containing the items of a given list that pass a predicate.
  *
  * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
- * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
- * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
  *
  * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
  *
@@ -60,8 +54,6 @@ export function filter<const T, const P>(
  * Returns a new list containing the items of a given list that pass a predicate.
  *
  * If the predicate returns a promise for any item, a promise is returned that resolves once all of them have.
- * Whether the predicate is async is only known once it has returned, so an empty list always returns a plain
- * array. Always `await` the result of a predicate that can return a promise instead of chaining on it.
  *
  * The time complexity for this is `O(n)` where `n` is the amount of items in the given list.
  *
