@@ -1,4 +1,5 @@
 export * from "./utils/compute";
+export * from "./utils/get";
 export * from "./utils/identity";
 export * from "./utils/isEmpty";
 export * from "./utils/isNull";
