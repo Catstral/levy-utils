@@ -1,11 +1,11 @@
-import type { Key } from "~/types";
+import type { AnyRecord } from "~/types";
 
 /**
  * @private
  */
-type Mask<T extends Record<Key, unknown>> = (Partial<T> & Record<Key, unknown>) | Record<Key, unknown>;
+type Mask<T extends AnyRecord> = (Partial<T> & AnyRecord) | AnyRecord;
 
-export type Extend<T extends Record<Key, unknown>, U extends Mask<T>> = Omit<T, keyof U> & U;
+export type Extend<T extends AnyRecord, U extends Mask<T>> = Omit<T, keyof U> & U;
 
 /**
  * Extends an object with another object.
@@ -20,10 +20,7 @@ export type Extend<T extends Record<Key, unknown>, U extends Mask<T>> = Omit<T, 
  * @param {U} other The object to override or extend properties of `value` with
  * @returns {Extend<T, U>} An object where `value` is extended by `other`
  */
-export function extend<const T extends Record<Key, unknown>, const U extends Mask<T>>(
-	value: T,
-	other: U,
-): Extend<T, U> {
+export function extend<const T extends AnyRecord, const U extends Mask<T>>(value: T, other: U): Extend<T, U> {
 	const descriptors = Object.getOwnPropertyDescriptors(value);
 
 	for (const key of Reflect.ownKeys(other)) {
