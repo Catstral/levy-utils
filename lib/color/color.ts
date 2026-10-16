@@ -1,21 +1,16 @@
+import type {
+	CMYKParsedColor,
+	ColorInput,
+	LABParsedColor,
+	OKLABParsedColor,
+	ParsedColor,
+	RGBParsedColor,
+} from "./types";
+
 export class ColorError extends Error {}
 
-export interface ParsedColor {
-	r: number;
-	g: number;
-	b: number;
-	a?: number | null;
-}
-
-export type ColorInput = string | Color | ParsedColor;
-
 export class Color {
-	#r: number;
-	#g: number;
-	#b: number;
-	#a: number | null = null;
-
-	#origin: string | null = null;
+	#color: ParsedColor;
 
 	public static from(color: ColorInput): Color {
 		return new Color(color);
@@ -27,65 +22,44 @@ export class Color {
 
 	public constructor(color: ColorInput) {
 		if (typeof color === "string") {
-			this.#origin = color;
-
-			const parsed = this.#parseColorString(color);
-
-			this.#r = parsed.r;
-			this.#g = parsed.g;
-			this.#b = parsed.b;
-			this.#a = parsed.a ?? null;
+			this.#color = this.#parseColorString(color);
 
 			return;
 		}
 
 		if (color instanceof Color) {
-			this.#origin = color.#origin;
-
-			this.#r = color.#r;
-			this.#g = color.#g;
-			this.#b = color.#b;
-			this.#a = color.#a;
+			this.#color = color.#color;
 
 			return;
 		}
 
-		this.#r = color.r;
-		this.#g = color.g;
-		this.#b = color.b;
-		this.#a = color.a ?? null;
-	}
-
-	public get red(): number {
-		return this.#r;
-	}
-
-	public get green(): number {
-		return this.#g;
-	}
-
-	public get blue(): number {
-		return this.#b;
-	}
-
-	public get alpha(): number | null {
-		return this.#a;
+		this.#color = color;
 	}
 
 	public toRGB(): string {
-		return `rgb(${this.#r} ${this.#g} ${this.#b}${this.#a === null ? "" : ` / ${this.#a}`})`;
+		const rgbSpace = this.#getColorInSpace("RGB");
+
+		return `rgb(${rgbSpace.red} ${rgbSpace.green} ${rgbSpace.blue}${rgbSpace.alpha === null ? "" : ` / ${rgbSpace.alpha}`})`;
 	}
 
 	public toHex(): string {
-		const blendedR = this.#blendColorValue(this.#r, 255, this.#a);
-		const blendedG = this.#blendColorValue(this.#g, 255, this.#a);
-		const blendedB = this.#blendColorValue(this.#b, 255, this.#a);
+		const rgbSpace = this.#getColorInSpace("RGB");
+
+		const blendedR = this.#blendColorValue(rgbSpace.red, 255, rgbSpace.alpha);
+		const blendedG = this.#blendColorValue(rgbSpace.green, 255, rgbSpace.alpha);
+		const blendedB = this.#blendColorValue(rgbSpace.blue, 255, rgbSpace.alpha);
 
 		return `#${this.#hexifyColorValue(blendedR)}${this.#hexifyColorValue(blendedG)}${this.#hexifyColorValue(blendedB)}`;
 	}
 
 	public toFullHex(): string {
-		return `#${this.#hexifyColorValue(this.#r)}${this.#hexifyColorValue(this.#g)}${this.#hexifyColorValue(this.#b)}${this.#hexifyColorValue((this.#a ?? 1) * 255)}`;
+		const rgbSpace = this.#getColorInSpace("RGB");
+
+		return `#${this.#hexifyColorValue(rgbSpace.red)}${this.#hexifyColorValue(rgbSpace.green)}${this.#hexifyColorValue(rgbSpace.blue)}${this.#hexifyColorValue((rgbSpace.alpha ?? 1) * 255)}`;
+	}
+
+	#hexifyColorValue(value: number) {
+		return Math.round(value).toString(16).padStart(2, "0");
 	}
 
 	public toString(): string {
@@ -97,24 +71,65 @@ export class Color {
 	}
 
 	public blend(color: ColorInput, baseWeight?: number | null): Color {
-		const blend = new Color(color);
+		const blend = new Color(color).#getColorInSpace("RGB");
+		const rgbSpace = this.#getColorInSpace("RGB");
 
-		const r = this.#blendColorValue(this.#r, blend.#r, baseWeight);
-		const g = this.#blendColorValue(this.#g, blend.#g, baseWeight);
-		const b = this.#blendColorValue(this.#b, blend.#b, baseWeight);
+		const r = this.#blendColorValue(rgbSpace.red, blend.red, baseWeight);
+		const g = this.#blendColorValue(rgbSpace.green, blend.green, baseWeight);
+		const b = this.#blendColorValue(rgbSpace.blue, blend.blue, baseWeight);
 
-		let a: number | null = null;
+		let alpha: number | null = null;
 
-		if (this.#a !== null || blend.#a !== null) {
-			a = this.#blendColorValue(this.#a ?? 1, blend.#a ?? 1, baseWeight);
+		if (rgbSpace.alpha !== null || blend.alpha !== null) {
+			alpha = this.#blendColorValue(rgbSpace.alpha ?? 1, blend.alpha ?? 1, baseWeight);
 		}
 
 		return new Color({
-			r,
-			g,
-			b,
-			a,
+			type: "RGB",
+			red: r,
+			green: g,
+			blue: b,
+			alpha,
 		});
+	}
+
+	#getColorInSpace<T extends ParsedColor["type"]>(space: T): Extract<ParsedColor, { type: T }> {
+		switch (this.#color.type) {
+			case "CMYK": {
+				return this.#convertToCMYK() as Extract<ParsedColor, { type: T }>;
+			}
+			case "RGB": {
+				return this.#convertToRGB() as Extract<ParsedColor, { type: T }>;
+			}
+		}
+
+		throw new ColorError(`Tried to convert into an unsupported color space: ${space}`);
+	}
+
+	#convertToCMYK(): CMYKParsedColor {
+		switch (this.#color.type) {
+			case "RGB": {
+				break;
+			}
+			case "CMYK": {
+				return this.#color;
+			}
+		}
+
+		throw new ColorError(`Tried to convert an unsupported color type to CMYK: ${this.#color.type}`);
+	}
+
+	#convertToRGB(): RGBParsedColor {
+		switch (this.#color.type) {
+			case "RGB": {
+				return this.#color;
+			}
+			case "CMYK": {
+				break;
+			}
+		}
+
+		throw new ColorError(`Tried to convert an unsupported color type to RGB: ${this.#color.type}`);
 	}
 
 	#blendColorValue(base: number, blend: number, baseWeight?: number | null): number {
@@ -131,43 +146,50 @@ export class Color {
 		return base * finalBaseWeight + blend * blendWeight;
 	}
 
-	#hexifyColorValue(value: number) {
-		return Math.round(value).toString(16).padStart(2, "0");
-	}
-
 	// SECTION: Parsing
 
-	#parseCmyk(color: string): ParsedColor | null {
+	#clampIntoRange(floor: number, value: number, ceil: number): number;
+	#clampIntoRange(floor: number, value: number | null, ceil: number): number | null;
+	#clampIntoRange(floor: number, value: number | null, ceil: number): number | null {
+		if (typeof value !== "number") {
+			return value;
+		}
+
+		return Math.min(Math.max(value, floor), ceil);
+	}
+
+	#parseCmyk(_color: string): ParsedColor | null {
 		return null;
 	}
 
-	#parseHsl(color: string): ParsedColor | null {
+	#parseHsl(_color: string): ParsedColor | null {
 		return null;
 	}
 
-	#parseLch(color: string): ParsedColor | null {
+	#parseOklch(_color: string): ParsedColor | null {
 		return null;
 	}
 
-	#parseOklab(color: string): ParsedColor | null {
+	#parseLch(_color: string): ParsedColor | null {
 		return null;
 	}
 
-	static #labRegex =
-		/^lab\((-?\d+(?:\.\d+)?|\.\d+|none)(%)? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? *(?:\/ *(-?\d+(?:\.\d+)?|\.\d+|none)(%)?)? *\)$/;
+	// SECTION - OKLAB
 
-	#parseLab(color: string): ParsedColor | null {
-		const match = color.match(Color.#labRegex);
+	static #oklabRegex =
+		/^oklab\((-?\d+(?:\.\d+)?|\.\d+|none)%? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? *(?:\/ *(-?\d+(?:\.\d+)?|\.\d+|none)(%)?)? *\)$/;
+
+	#parseOklab(color: string): OKLABParsedColor | null {
+		const match = color.match(Color.#oklabRegex);
 
 		if (match) {
 			const l = match[1];
-			let lIsPercentage = !!match[2];
-			const a = match[3];
-			let aIsPercentage = !!match[4];
-			const b = match[5];
-			let bIsPercentage = !!match[6];
-			const alpha = match[7];
-			let alphaIsPercentage = !!match[8];
+			const a = match[2];
+			const aIsPercentage = !!match[3];
+			const b = match[4];
+			const bIsPercentage = !!match[5];
+			const alpha = match[6];
+			const alphaIsPercentage = !!match[7];
 
 			let finalAlpha: number | null = null;
 
@@ -185,31 +207,130 @@ export class Color {
 				}
 			}
 
+			// NOTE: while this can be a percentage, the base value range is the same scale.
 			const lightness = Number.parseFloat(l);
 
-			if (finalAlpha === null || finalAlpha === 1) {
-				if (lightness === 1) {
-					return {
-						r: 255,
-						g: 255,
-						b: 255,
-						a: finalAlpha,
-					};
-				}
-
-				if (lightness === 0) {
-					return {
-						r: 0,
-						g: 0,
-						b: 0,
-						a: finalAlpha,
-					};
-				}
+			if (Number.isNaN(lightness)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB lightness value into a color number",
+				);
 			}
+
+			let axisA = Number.parseFloat(a);
+
+			if (Number.isNaN(axisA)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB A axis value into a color number",
+				);
+			}
+
+			if (aIsPercentage) {
+				axisA = (0.4 / 100) * axisA;
+			}
+
+			let axisB = Number.parseFloat(b);
+
+			if (Number.isNaN(axisB)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB A axis value into a color number",
+				);
+			}
+
+			if (bIsPercentage) {
+				axisB = (0.4 / 100) * axisB;
+			}
+
+			return {
+				type: "OKLAB",
+				lightness: this.#clampIntoRange(0, lightness, 100),
+				axisA: this.#clampIntoRange(-0.4, lightness, 0.4),
+				axisB: this.#clampIntoRange(-0.4, lightness, 0.4),
+			};
 		}
 
 		return null;
 	}
+
+	// !SECTION - OKLAB
+	// SECTION - LAB
+
+	static #labRegex =
+		/^lab\((-?\d+(?:\.\d+)?|\.\d+|none)%? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? +(-?\d+(?:\.\d+)?|\.\d+|none)(%)? *(?:\/ *(-?\d+(?:\.\d+)?|\.\d+|none)(%)?)? *\)$/;
+
+	#parseLab(color: string): LABParsedColor | null {
+		const match = color.match(Color.#labRegex);
+
+		if (match) {
+			const l = match[1];
+			const a = match[2];
+			const aIsPercentage = !!match[3];
+			const b = match[4];
+			const bIsPercentage = !!match[5];
+			const alpha = match[6];
+			const alphaIsPercentage = !!match[7];
+
+			let finalAlpha: number | null = null;
+
+			if (alpha && alpha !== "none") {
+				finalAlpha = Number.parseFloat(alpha);
+
+				if (alphaIsPercentage) {
+					finalAlpha /= 100;
+				}
+
+				if (Number.isNaN(finalAlpha)) {
+					throw new ColorError(
+						"Failed to parse color string: Failed to parse LAB alpha value into a color number",
+					);
+				}
+			}
+
+			// NOTE: while this can be a percentage, the base value range is the same scale.
+			const lightness = Number.parseFloat(l);
+
+			if (Number.isNaN(lightness)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB lightness value into a color number",
+				);
+			}
+
+			let axisA = Number.parseFloat(a);
+
+			if (Number.isNaN(axisA)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB A axis value into a color number",
+				);
+			}
+
+			if (aIsPercentage) {
+				axisA *= 1.25;
+			}
+
+			let axisB = Number.parseFloat(b);
+
+			if (Number.isNaN(axisB)) {
+				throw new ColorError(
+					"Failed to parse color string: Failed to parse LAB A axis value into a color number",
+				);
+			}
+
+			if (bIsPercentage) {
+				axisB *= 1.25;
+			}
+
+			return {
+				type: "LAB",
+				lightness: this.#clampIntoRange(0, lightness, 100),
+				axisA: this.#clampIntoRange(-125, lightness, 125),
+				axisB: this.#clampIntoRange(-125, lightness, 125),
+			};
+		}
+
+		return null;
+	}
+
+	// !SECTION - LAB
+	// SECTION - RGB
 
 	#parseRGBColorValueWithPercentage(value: string, isPercentage: boolean, isAlpha: boolean = false): number {
 		const parsed = Number.parseInt(value, 10);
@@ -219,19 +340,14 @@ export class Color {
 		}
 
 		if (isAlpha && !isPercentage) {
-			const clamped = Math.max(Math.min(parsed, 1), 0);
-
-			return clamped * 255;
+			return parsed * 255;
 		}
-
-		// NOTE: this is to reflect browser standards on how these numbers are parsed
-		const clamped = Math.max(Math.min(parsed, isPercentage ? 100 : 255), 0);
 
 		if (!isPercentage) {
-			return clamped;
+			return parsed;
 		}
 
-		const computedPercentage = (255 / 100) * clamped;
+		const computedPercentage = (255 / 100) * parsed;
 
 		if (isAlpha) {
 			return computedPercentage / 255;
@@ -243,7 +359,7 @@ export class Color {
 	static #rgbRegex =
 		/^rgba?\( *(-?\d+(?:\.\d)?)(%?)(?: +| *, *)(-?\d+(?:\.\d)?)(%?)(?: +| *, *)(-?\d+(?:\.\d)?)(%?)(?: *\/ *(-?\d+(?:\.\d)?)(%?))? *\)$/;
 
-	#parseRGB(color: string): ParsedColor | null {
+	#parseRGB(color: string): RGBParsedColor | null {
 		const rgbMatch = color.match(Color.#rgbRegex);
 
 		if (rgbMatch) {
@@ -256,88 +372,91 @@ export class Color {
 			const a = rgbMatch[7] || null;
 			const aIsPercentage = !!rgbMatch[8];
 
-			let finalAlpha: number | null = null;
+			let alpha: number | null = null;
 
 			if (a !== null) {
-				finalAlpha = this.#parseRGBColorValueWithPercentage(a, aIsPercentage, true);
+				alpha = this.#parseRGBColorValueWithPercentage(a, aIsPercentage, true);
 			}
 
+			const red = this.#parseRGBColorValueWithPercentage(r, rIsPercentage);
+			const green = this.#parseRGBColorValueWithPercentage(g, gIsPercentage);
+			const blue = this.#parseRGBColorValueWithPercentage(b, bIsPercentage);
+
 			return {
-				r: this.#parseRGBColorValueWithPercentage(r, rIsPercentage),
-				g: this.#parseRGBColorValueWithPercentage(g, gIsPercentage),
-				b: this.#parseRGBColorValueWithPercentage(b, bIsPercentage),
-				a: finalAlpha,
+				type: "RGB",
+				red: this.#clampIntoRange(0, red, 255),
+				green: this.#clampIntoRange(0, green, 255),
+				blue: this.#clampIntoRange(0, blue, 255),
+				alpha: this.#clampIntoRange(0, alpha, 1),
 			};
 		}
 
 		return null;
 	}
 
-	#parseHex(color: string): ParsedColor | null {
+	// !SECTION - RGB
+	// SECTION - HEX
+
+	#parseHex(color: string): RGBParsedColor | null {
 		if (/#[0-9a-fA-F]+/.test(color)) {
 			const hex = color.slice(1);
 
+			let r: number;
+			let g: number;
+			let b: number;
+			let alpha: number | null = null;
+
 			switch (hex.length) {
 				case 3: {
-					const r = Number.parseInt(`${hex[0]}${hex[0]}`, 16);
-					const g = Number.parseInt(`${hex[1]}${hex[1]}`, 16);
-					const b = Number.parseInt(`${hex[2]}${hex[2]}`, 16);
+					r = Number.parseInt(`${hex[0]}${hex[0]}`, 16);
+					g = Number.parseInt(`${hex[1]}${hex[1]}`, 16);
+					b = Number.parseInt(`${hex[2]}${hex[2]}`, 16);
 
-					if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
-						throw new ColorError(
-							"Failed to parse color string: Failed to parse hex values into a color number",
-						);
-					}
-
-					return {
-						r,
-						g,
-						b,
-						a: null,
-					};
+					break;
 				}
 				case 6:
 				case 8: {
-					const r = Number.parseInt(hex.slice(0, 2), 16);
-					const g = Number.parseInt(hex.slice(2, 4), 16);
-					const b = Number.parseInt(hex.slice(4, 6), 16);
+					r = Number.parseInt(hex.slice(0, 2), 16);
+					g = Number.parseInt(hex.slice(2, 4), 16);
+					b = Number.parseInt(hex.slice(4, 6), 16);
 
-					let a: number | null = null;
+					const alphaSlice = hex.slice(6, 8) || null;
 
-					const alphaSlice = hex.slice(6, 8);
-
-					if (alphaSlice) {
-						a = Number.parseInt(hex.slice(6, 8) || "FF", 16) / 255;
+					if (alphaSlice !== null) {
+						alpha = Number.parseInt(alphaSlice, 16) / 255;
 					}
 
-					if (
-						Number.isNaN(r) ||
-						Number.isNaN(g) ||
-						Number.isNaN(b) ||
-						(typeof a === "number" && Number.isNaN(a))
-					) {
-						throw new ColorError(
-							"Failed to parse color string: Failed to parse hex values into a color number",
-						);
-					}
-
-					return {
-						r,
-						g,
-						b,
-						a,
-					};
+					break;
 				}
 				default: {
 					throw new ColorError(
-						`Failed to parse color string: Detected hex color string, but hex length is not of a know correct size: ${hex.length}`,
+						`Failed to parse color string: Detected hex color string, but hex length is not of a known correct size: ${hex.length}`,
 					);
 				}
 			}
+
+			if (
+				Number.isNaN(r) ||
+				Number.isNaN(g) ||
+				Number.isNaN(b) ||
+				(typeof alpha === "number" && Number.isNaN(alpha))
+			) {
+				throw new ColorError("Failed to parse color string: Failed to parse hex values into a color number");
+			}
+
+			return {
+				type: "RGB",
+				red: this.#clampIntoRange(0, r, 255),
+				green: this.#clampIntoRange(0, g, 255),
+				blue: this.#clampIntoRange(0, b, 255),
+				alpha: this.#clampIntoRange(0, alpha, 1),
+			};
 		}
 
 		return null;
 	}
+
+	// !SECTION - HEX
 
 	#parseColorString(color: string): ParsedColor {
 		const hex = this.#parseHex(color);
@@ -368,6 +487,12 @@ export class Color {
 
 		if (lch) {
 			return lch;
+		}
+
+		const oklch = this.#parseOklch(color);
+
+		if (oklch) {
+			return oklch;
 		}
 
 		const hsl = this.#parseHsl(color);
