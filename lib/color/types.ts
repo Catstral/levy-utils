@@ -1,5 +1,157 @@
 import type { Color } from "./color";
 
+// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/named-color#value
+export type NamedColor =
+	| "aliceblue"
+	| "antiquewhite"
+	| "aqua"
+	| "aquamarine"
+	| "azure"
+	| "beige"
+	| "bisque"
+	| "black"
+	| "blanchedalmond"
+	| "blue"
+	| "blueviolet"
+	| "brown"
+	| "burlywood"
+	| "cadetblue"
+	| "chartreuse"
+	| "chocolate"
+	| "coral"
+	| "cornflowerblue"
+	| "cornsilk"
+	| "crimson"
+	| "cyan"
+	| "darkblue"
+	| "darkcyan"
+	| "darkgoldenrod"
+	| "darkgray"
+	| "darkgreen"
+	| "darkgrey"
+	| "darkkhaki"
+	| "darkmagenta"
+	| "darkolivegreen"
+	| "darkorange"
+	| "darkorchid"
+	| "darkred"
+	| "darksalmon"
+	| "darkseagreen"
+	| "darkslateblue"
+	| "darkslategray"
+	| "darkslategrey"
+	| "darkturquoise"
+	| "darkviolet"
+	| "deeppink"
+	| "deepskyblue"
+	| "dimgray"
+	| "dimgrey"
+	| "dodgerblue"
+	| "firebrick"
+	| "floralwhite"
+	| "forestgreen"
+	| "fuchsia"
+	| "gainsboro"
+	| "ghostwhite"
+	| "gold"
+	| "goldenrod"
+	| "gray"
+	| "green"
+	| "greenyellow"
+	| "grey"
+	| "honeydew"
+	| "hotpink"
+	| "indianred"
+	| "indigo"
+	| "ivory"
+	| "khaki"
+	| "lavender"
+	| "lavenderblush"
+	| "lawngreen"
+	| "lemonchiffon"
+	| "lightblue"
+	| "lightcoral"
+	| "lightcyan"
+	| "lightgoldenrodyellow"
+	| "lightgray"
+	| "lightgreen"
+	| "lightgrey"
+	| "lightpink"
+	| "lightsalmon"
+	| "lightseagreen"
+	| "lightskyblue"
+	| "lightslategray"
+	| "lightslategrey"
+	| "lightsteelblue"
+	| "lightyellow"
+	| "lime"
+	| "limegreen"
+	| "linen"
+	| "magenta"
+	| "maroon"
+	| "mediumaquamarine"
+	| "mediumblue"
+	| "mediumorchid"
+	| "mediumpurple"
+	| "mediumseagreen"
+	| "mediumslateblue"
+	| "mediumspringgreen"
+	| "mediumturquoise"
+	| "mediumvioletred"
+	| "midnightblue"
+	| "mintcream"
+	| "mistyrose"
+	| "moccasin"
+	| "navajowhite"
+	| "navy"
+	| "oldlace"
+	| "olive"
+	| "olivedrab"
+	| "orange"
+	| "orangered"
+	| "orchid"
+	| "palegoldenrod"
+	| "palegreen"
+	| "paleturquoise"
+	| "palevioletred"
+	| "papayawhip"
+	| "peachpuff"
+	| "peru"
+	| "pink"
+	| "plum"
+	| "powderblue"
+	| "purple"
+	| "rebeccapurple"
+	| "red"
+	| "rosybrown"
+	| "royalblue"
+	| "saddlebrown"
+	| "salmon"
+	| "sandybrown"
+	| "seagreen"
+	| "seashell"
+	| "sienna"
+	| "silver"
+	| "skyblue"
+	| "slateblue"
+	| "slategray"
+	| "slategrey"
+	| "snow"
+	| "springgreen"
+	| "steelblue"
+	| "tan"
+	| "teal"
+	| "thistle"
+	| "tomato"
+	| "transparent"
+	| "turquoise"
+	| "violet"
+	| "wheat"
+	| "white"
+	| "whitesmoke"
+	| "yellow"
+	| "yellowgreen";
+
 // NOTE - This is based on CSS specifications
 // While it is possible to go outside the specified scale, it will be clamped down
 // The scale is designed so that it fits perfectly into the allowed percentages (on a 0 - 100 scale usually)
@@ -66,7 +218,7 @@ export type CMYKParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/lab
@@ -95,7 +247,7 @@ export type LABParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/oklab
@@ -124,7 +276,7 @@ export type OKLABParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/lch
@@ -153,7 +305,7 @@ export type LCHParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/oklch
@@ -182,7 +334,7 @@ export type OKLCHParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/hsl
@@ -195,13 +347,13 @@ export type HSLParsedColor = {
 	 */
 	hue: number;
 	/**
-	 * Scale: 0 - 1
+	 * Scale: 0 - 100
 	 *
 	 * Converted to floats
 	 */
 	saturation: number;
 	/**
-	 * Scale: 0 - 1
+	 * Scale: 0 - 100
 	 *
 	 * Converted to floats
 	 */
@@ -211,7 +363,7 @@ export type HSLParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 // See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/hwb
@@ -224,13 +376,13 @@ export type HWBParsedColor = {
 	 */
 	hue: number;
 	/**
-	 * Scale: 0 - 1
+	 * Scale: 0 - 100
 	 *
 	 * Converted to floats
 	 */
 	whiteness: number;
 	/**
-	 * Scale: 0 - 1
+	 * Scale: 0 - 100
 	 *
 	 * Converted to floats
 	 */
@@ -240,7 +392,7 @@ export type HWBParsedColor = {
 	 *
 	 * Converted to floats
 	 */
-	alpha?: number | number;
+	alpha?: number | null;
 };
 
 export type ParsedColor =
@@ -253,4 +405,4 @@ export type ParsedColor =
 	| HSLParsedColor
 	| HWBParsedColor;
 
-export type ColorInput = string | Color | ParsedColor;
+export type ColorInput = NamedColor | (string & {}) | Color | ParsedColor;
