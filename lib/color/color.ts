@@ -27,7 +27,7 @@ export class Color {
 
 	public constructor(color: ColorInput) {
 		if (typeof color === "string") {
-			this.#color = this.#parseColorString(color);
+			this.#color = this.#clampColor(this.#parseColorString(color));
 
 			return;
 		}
@@ -38,7 +38,7 @@ export class Color {
 			return;
 		}
 
-		this.#color = color;
+		this.#color = this.#clampColor(color);
 	}
 
 	#stringifyMap: Record<ParsedColor["type"], () => string> = {
@@ -546,17 +546,98 @@ export class Color {
 	}
 
 	// !SECTION - Color blending
-	// SECTION - Parsing
+	// SECTION - Color clamping
 
 	#clampIntoRange(floor: number, value: number, ceil: number): number;
-	#clampIntoRange(floor: number, value: number | null, ceil: number): number | null;
-	#clampIntoRange(floor: number, value: number | null, ceil: number): number | null {
+	#clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined;
+	#clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined {
 		if (typeof value !== "number") {
 			return value;
 		}
 
 		return Math.min(Math.max(value, floor), ceil);
 	}
+
+	#clampColor<T extends ParsedColor>(color: T): T {
+		switch (color.type) {
+			case "RGB": {
+				return {
+					...color,
+					red: this.#clampIntoRange(0, color.red, 255),
+					green: this.#clampIntoRange(0, color.green, 255),
+					blue: this.#clampIntoRange(0, color.blue, 255),
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "CMYK": {
+				return {
+					...color,
+					cyan: this.#clampIntoRange(0, color.cyan, 1),
+					magenta: this.#clampIntoRange(0, color.magenta, 1),
+					yellow: this.#clampIntoRange(0, color.yellow, 1),
+					key: this.#clampIntoRange(0, color.key, 1),
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "LAB": {
+				return {
+					...color,
+					lightness: this.#clampIntoRange(0, color.lightness, 100),
+					axisA: this.#clampIntoRange(-125, color.axisA, 125),
+					axisB: this.#clampIntoRange(-125, color.axisB, 125),
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "OKLAB": {
+				return {
+					...color,
+					lightness: this.#clampIntoRange(0, color.lightness, 100),
+					axisA: this.#clampIntoRange(-0.4, color.axisA, 0.4),
+					axisB: this.#clampIntoRange(-0.4, color.axisB, 0.4),
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "LCH": {
+				return {
+					...color,
+					lightness: this.#clampIntoRange(0, color.lightness, 100),
+					chroma: this.#clampIntoRange(0, color.chroma, 150),
+					hue: color.hue % 360,
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "OKLCH": {
+				return {
+					...color,
+					lightness: this.#clampIntoRange(0, color.lightness, 1),
+					chroma: this.#clampIntoRange(0, color.chroma, 0.4),
+					hue: color.hue % 360,
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "HSL": {
+				return {
+					...color,
+					lightness: this.#clampIntoRange(0, color.lightness, 100),
+					saturation: this.#clampIntoRange(0, color.saturation, 100),
+					hue: color.hue % 360,
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "HWB": {
+				return {
+					...color,
+					hue: color.hue % 360,
+					lightness: this.#clampIntoRange(0, color.whiteness, 100),
+					saturation: this.#clampIntoRange(0, color.blackness, 100),
+					alpha: this.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+		}
+	}
+
+	// !SECTION
+	// SECTION - Parsing
 
 	#parsePercentage(value: string, isPercentage: boolean, scale: 1 | 100 | 255): number;
 	#parsePercentage(value: string | null, isPercentage: boolean, scale: 1 | 100 | 255): number | null;
@@ -683,10 +764,10 @@ export class Color {
 
 			return {
 				type: "RGB",
-				red: this.#clampIntoRange(0, r, 255),
-				green: this.#clampIntoRange(0, g, 255),
-				blue: this.#clampIntoRange(0, b, 255),
-				alpha: this.#clampIntoRange(0, alpha, 1),
+				red: r,
+				green: g,
+				blue: b,
+				alpha: alpha,
 			};
 		}
 
@@ -714,10 +795,10 @@ export class Color {
 
 			return {
 				type: "RGB",
-				red: this.#clampIntoRange(0, this.#parsePercentage(r, rIsPercentage, 255), 255),
-				green: this.#clampIntoRange(0, this.#parsePercentage(g, gIsPercentage, 255), 255),
-				blue: this.#clampIntoRange(0, this.#parsePercentage(b, bIsPercentage, 255), 255),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(a, aIsPercentage, 1), 1),
+				red: this.#parsePercentage(r, rIsPercentage, 255),
+				green: this.#parsePercentage(g, gIsPercentage, 255),
+				blue: this.#parsePercentage(b, bIsPercentage, 255),
+				alpha: this.#parsePercentage(a, aIsPercentage, 1),
 			};
 		}
 
@@ -747,11 +828,11 @@ export class Color {
 
 			return {
 				type: "CMYK",
-				cyan: this.#clampIntoRange(0, this.#parsePercentage(c, cIsPercentage, 1), 1),
-				magenta: this.#clampIntoRange(0, this.#parsePercentage(m, mIsPercentage, 1), 1),
-				yellow: this.#clampIntoRange(0, this.#parsePercentage(y, yIsPercentage, 1), 1),
-				key: this.#clampIntoRange(0, this.#parsePercentage(k, kIsPercentage, 1), 1),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				cyan: this.#parsePercentage(c, cIsPercentage, 1),
+				magenta: this.#parsePercentage(m, mIsPercentage, 1),
+				yellow: this.#parsePercentage(y, yIsPercentage, 1),
+				key: this.#parsePercentage(k, kIsPercentage, 1),
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -802,10 +883,10 @@ export class Color {
 
 			return {
 				type: "LAB",
-				lightness: this.#clampIntoRange(0, this.#parsePercentage(l, true, 100), 100),
-				axisA: this.#clampIntoRange(-125, axisA, 125),
-				axisB: this.#clampIntoRange(-125, axisB, 125),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				lightness: this.#parsePercentage(l, true, 100),
+				axisA: axisA,
+				axisB: axisB,
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -852,10 +933,10 @@ export class Color {
 
 			return {
 				type: "OKLAB",
-				lightness: this.#clampIntoRange(0, this.#parsePercentage(l, true, 100), 100),
-				axisA: this.#clampIntoRange(-0.4, axisA, 0.4),
-				axisB: this.#clampIntoRange(-0.4, axisB, 0.4),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				lightness: this.#parsePercentage(l, true, 100),
+				axisA: axisA,
+				axisB: axisB,
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -892,10 +973,10 @@ export class Color {
 
 			return {
 				type: "LCH",
-				lightness: this.#clampIntoRange(0, this.#parsePercentage(l, true, 100), 100),
-				chroma: this.#clampIntoRange(0, chroma, 150),
+				lightness: this.#parsePercentage(l, true, 100),
+				chroma: chroma,
 				hue: this.#parseAngleValue(h, hAngleType),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -933,10 +1014,10 @@ export class Color {
 
 			return {
 				type: "OKLCH",
-				lightness: this.#clampIntoRange(0, this.#parsePercentage(l, lIsPercentage, 1), 1),
-				chroma: this.#clampIntoRange(0, chroma, 0.4),
+				lightness: this.#parsePercentage(l, lIsPercentage, 1),
+				chroma: chroma,
 				hue: this.#parseAngleValue(h, hAngleType),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -963,9 +1044,9 @@ export class Color {
 			return {
 				type: "HSL",
 				hue: this.#parseAngleValue(h, hAngleType),
-				saturation: this.#clampIntoRange(0, this.#parsePercentage(s, true, 100), 100),
-				lightness: this.#clampIntoRange(0, this.#parsePercentage(l, true, 100), 100),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				saturation: this.#parsePercentage(s, true, 100),
+				lightness: this.#parsePercentage(l, true, 100),
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 
@@ -992,9 +1073,9 @@ export class Color {
 			return {
 				type: "HWB",
 				hue: this.#parseAngleValue(h, hAngleType),
-				whiteness: this.#clampIntoRange(0, this.#parsePercentage(w, true, 100), 100),
-				blackness: this.#clampIntoRange(0, this.#parsePercentage(b, true, 100), 100),
-				alpha: this.#clampIntoRange(0, this.#parsePercentage(alpha, alphaIsPercentage, 1), 1),
+				whiteness: this.#parsePercentage(w, true, 100),
+				blackness: this.#parsePercentage(b, true, 100),
+				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
 			};
 		}
 

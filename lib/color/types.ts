@@ -295,7 +295,7 @@ export type LCHParsedColor = {
 	 */
 	chroma: number;
 	/**
-	 * Scale: 0 - 360
+	 * Scale: 0 - 359
 	 *
 	 * Converted to floats
 	 */
@@ -324,7 +324,7 @@ export type OKLCHParsedColor = {
 	 */
 	chroma: number;
 	/**
-	 * Scale: 0 - 360
+	 * Scale: 0 - 359
 	 *
 	 * Converted to floats
 	 */
@@ -341,7 +341,7 @@ export type OKLCHParsedColor = {
 export type HSLParsedColor = {
 	type: "HSL";
 	/**
-	 * Scale: 0 - 360
+	 * Scale: 0 - 359
 	 *
 	 * Converted to floats
 	 */
@@ -370,7 +370,7 @@ export type HSLParsedColor = {
 export type HWBParsedColor = {
 	type: "HWB";
 	/**
-	 * Scale: 0 - 360
+	 * Scale: 0 - 359
 	 *
 	 * Converted to floats
 	 */
