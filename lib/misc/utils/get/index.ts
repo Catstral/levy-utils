@@ -1,5 +1,4 @@
-import type { KeyPath } from "~/object/types";
-import type { AnyRecord } from "~/types";
+import type { AnyRecord, KeyPath } from "~/types";
 import { get as baseGet, type GetOptions } from "./base";
 
 export { type GetOptions, GetUtilError } from "./base";
@@ -21,11 +20,37 @@ type GetPath<T, P> = P extends `${infer K}.${infer Rest}` ? GetPath<GetValue<T, 
 
 export type Get<T extends AnyRecord, P extends KeyPath<T>> = GetPath<T, P>;
 
+/**
+ * Returns the value of an object using a given path.
+ *
+ * The time complexity for this is `O(n)` where `n` is the amount of keys in the given path.
+ *
+ * @template {AnyRecord} T
+ * @template {KeyPath<T>} [P=KeyPath<T>]
+ * @template [F=undefined]
+ * @param {T} object The target object
+ * @param {P | (string & {}) | number} path The key path for the object
+ * @param {Extract<GetOptions<F>, { strict?: true }>} [options] The options given to the getter
+ * @returns {Get<T, P>} The value at given the path of the given object
+ */
 export function get<const T extends AnyRecord, const P extends KeyPath<T> = KeyPath<T>, const F = undefined>(
 	object: T,
 	path: P,
 	options?: Extract<GetOptions<F>, { strict?: true }>,
 ): Get<T, P>;
+/**
+ * Returns the value of an object using a given path.
+ *
+ * The time complexity for this is `O(n)` where `n` is the amount of keys in the given path.
+ *
+ * @template {AnyRecord} T
+ * @template {KeyPath<T>} [P=KeyPath<T>]
+ * @template [F=undefined]
+ * @param {T} object The target object
+ * @param {P | (string & {}) | number} path The key path for the object
+ * @param {Extract<GetOptions<F>, { strict?: true }>} [options] The options given to the getter
+ * @returns {Get<T, P>} The value at given the path of the given object
+ */
 export function get<const T extends AnyRecord, const P extends KeyPath<T> = KeyPath<T>, const F = undefined>(
 	object: T,
 	path: P | (string & {}) | number,
