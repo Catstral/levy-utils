@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface DeferConfig {
+	[key: string]: never;
+}
+
 /**
  * This will defer a callback to the next execution cycle.
  *
@@ -11,3 +17,5 @@ export function defer(callback: () => void): void {
 		callback();
 	}, 0);
 }
+
+defer.config = createUtilConfig<UtilConfigDefinitionShape<DeferConfig>>({});

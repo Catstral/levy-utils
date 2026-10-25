@@ -1,8 +1,13 @@
-import { UtilError } from "~/error";
-import type { PositiveInteger } from "~/number";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { UtilError } from "../../../error";
+import type { PositiveInteger } from "../../../number";
 
 export class OverflowUtilError extends UtilError {
 	public readonly util = "overflow";
+}
+
+export interface OverflowConfig {
+	[key: string]: never;
 }
 
 /**
@@ -29,3 +34,5 @@ export function overflow<const T, const L extends number = number>(
 
 	return [list.slice(0, clampLength), list.slice(clampLength)];
 }
+
+overflow.config = createUtilConfig<UtilConfigDefinitionShape<OverflowConfig>>({});

@@ -1,7 +1,13 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { min } from ".";
 
+// TODO: add tests for config
+
 describe("min", () => {
+	beforeEach(() => {
+		min.config.reset();
+	});
+
 	test("Simple min of number array", () => {
 		const smallest = min([3, 1, 2]);
 

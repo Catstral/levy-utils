@@ -1,6 +1,12 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type Concat<T extends (unknown[] | unknown)[]> = T extends [infer V, ...infer R]
 	? [...(V extends readonly unknown[] ? V : [V]), ...Concat<R>]
 	: [];
+
+export interface ConcatConfig {
+	[key: string]: never;
+}
 
 /**
  * Concatenates values and arrays into a new array.
@@ -19,3 +25,5 @@ export function concat<const T extends (unknown | unknown[])[]>(...values: T): C
 
 	return base.concat(...values) as Concat<T>;
 }
+
+concat.config = createUtilConfig<UtilConfigDefinitionShape<ConcatConfig>>({});

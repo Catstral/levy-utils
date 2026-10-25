@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface PipeConfig {
+	[key: string]: never;
+}
+
 /**
  * Pipes a value into a callback and returns its result.
  *
@@ -12,3 +18,5 @@
 export function pipe<const T, const R>(value: T, callback: (value: T) => R): R {
 	return callback(value);
 }
+
+pipe.config = createUtilConfig<UtilConfigDefinitionShape<PipeConfig>>({});

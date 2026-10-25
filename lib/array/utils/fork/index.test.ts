@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { fork } from ".";
 
 describe("fork", () => {
+	beforeEach(() => {
+		fork.config.reset();
+	});
+
 	test("Simple condition", () => {
 		const forked = fork(["foo", "bar"], (val) => val === "foo");
 

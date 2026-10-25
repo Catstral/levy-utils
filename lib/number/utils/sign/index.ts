@@ -1,4 +1,5 @@
-import type { IsNegative, Zero } from "~/number";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { IsNegative, Zero } from "../../../number";
 
 export type Sign<T extends number> = number extends T
 	? -1 | 0 | 1
@@ -7,6 +8,10 @@ export type Sign<T extends number> = number extends T
 		: IsNegative<T> extends true
 			? -1
 			: 1;
+
+export interface SignConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns the sign of the given number.
@@ -26,3 +31,5 @@ export function sign<const T extends number>(value: T): Sign<T> {
 
 	return Math.sign(value) as Sign<T>;
 }
+
+sign.config = createUtilConfig<UtilConfigDefinitionShape<SignConfig>>({});

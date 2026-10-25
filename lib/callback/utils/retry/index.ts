@@ -1,6 +1,7 @@
-import { UtilError } from "~/error";
-import { sleep } from "~/misc/utils/sleep";
-import type { Promisable } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { UtilError } from "../../../error";
+import { sleep } from "../../../misc/utils/sleep";
+import type { Promisable } from "../../../types";
 
 export class RetryUtilError extends UtilError {
 	public readonly util = "retry";
@@ -33,11 +34,19 @@ export interface RetryOptions {
 	onRetry?: (error: unknown, attempt: number) => void;
 }
 
-export async function retry<const T>(callback: () => Promisable<T>, options?: RetryOptions): Promise<T> {
-	const retries = options?.attempts ?? 3;
-	const backoff = options?.backoff ?? false;
+export interface RetryConfig {
+	attempts: number;
+	delay: number;
+	backoff: boolean;
+	onRetry: ((error: unknown, attempt: number) => void) | undefined;
+}
 
-	let delay = options?.delay ?? 1000;
+export async function retry<const T>(callback: () => Promisable<T>, options?: RetryOptions): Promise<T> {
+	const retries = options?.attempts ?? retry.config.attempts;
+	const backoff = options?.backoff ?? retry.config.backoff;
+	const onRetry = options?.onRetry ?? retry.config.onRetry;
+
+	let delay = options?.delay ?? retry.config.delay;
 	let attempts = 0;
 
 	while (true) {
@@ -53,7 +62,7 @@ export async function retry<const T>(callback: () => Promisable<T>, options?: Re
 					cause: err,
 				});
 			} else {
-				options?.onRetry?.(err, attempts);
+				onRetry?.(err, attempts);
 
 				await sleep(delay);
 			}
@@ -64,3 +73,18 @@ export async function retry<const T>(callback: () => Promisable<T>, options?: Re
 		}
 	}
 }
+
+retry.config = createUtilConfig<UtilConfigDefinitionShape<RetryConfig>>({
+	attempts: {
+		default: () => 3,
+	},
+	delay: {
+		default: () => 1000,
+	},
+	backoff: {
+		default: () => false,
+	},
+	onRetry: {
+		default: () => undefined,
+	},
+});

@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { kebabCase, screamingKebabCase } from ".";
 
+// TODO: add tests for config
+
 describe("kebabCase", () => {
+	beforeEach(() => {
+		kebabCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(kebabCase("hello world")).toBe("hello-world");
 	});

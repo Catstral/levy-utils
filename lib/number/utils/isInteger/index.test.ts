@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isInteger } from ".";
 
-describe("isDecimal", () => {
+describe("isInteger", () => {
+	beforeEach(() => {
+		isInteger.config.reset();
+	});
+
 	// Non-decimal numbers return true
 	test.each([1, 2, 13, 109, 6218, Number.MAX_SAFE_INTEGER, -1, -2, -13, -109, -6218, Number.MIN_SAFE_INTEGER])(
 		"%d returns true",

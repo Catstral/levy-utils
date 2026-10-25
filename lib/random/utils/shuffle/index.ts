@@ -1,4 +1,9 @@
-import { getCryptoSecureRandomNumber } from "~/random/helper";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { getCryptoSecureRandomNumber } from "../../../random/helper";
+
+export interface ShuffleConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns a new Array from a given array, with every item moved to a random position.
@@ -22,3 +27,5 @@ export function shuffle<const T>(list: readonly T[]): T[] {
 
 	return cloned;
 }
+
+shuffle.config = createUtilConfig<UtilConfigDefinitionShape<ShuffleConfig>>({});

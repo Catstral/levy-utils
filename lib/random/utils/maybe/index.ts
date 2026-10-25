@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface MaybeConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a random boolean.
  *
@@ -10,3 +16,5 @@ export function maybe(): boolean {
 
 	return crypto.getRandomValues(new Uint8Array(1))[0] < middlePoint;
 }
+
+maybe.config = createUtilConfig<UtilConfigDefinitionShape<MaybeConfig>>({});

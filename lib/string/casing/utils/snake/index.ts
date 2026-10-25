@@ -1,4 +1,10 @@
-import type { SplitCasingOptions } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+} from "../../internal/splitCasing";
 import { customCase } from "../custom";
 
 /**
@@ -13,6 +19,10 @@ export interface SnakeCaseOptions extends SplitCasingOptions {
 	 * @default false
 	 */
 	screaming?: boolean;
+}
+
+export interface SnakeCaseConfig extends SplitCasingConfig {
+	screaming: boolean;
 }
 
 /**
@@ -35,12 +45,25 @@ export interface SnakeCaseOptions extends SplitCasingOptions {
  * @returns {string} The snake_cased string
  */
 export function snakeCase(str: string, options?: SnakeCaseOptions): string {
+	const splitCasingOptions = readSplitCasingConfig(snakeCase.config);
+	const isScreaming = options?.screaming ?? snakeCase.config.screaming;
+
 	return customCase(str, {
+		...splitCasingOptions,
 		...options,
 		seperator: "_",
-		transform: (word) => (options?.screaming ? word.toUpperCase() : word.toLowerCase()),
+		transform: (word) => (isScreaming ? word.toUpperCase() : word.toLowerCase()),
 	});
 }
+
+snakeCase.config = createUtilConfig<UtilConfigDefinitionShape<SnakeCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+	screaming: {
+		default: () => false,
+	},
+});
+
+export interface ScreamingSnakeCaseConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to SCREAMING_SNAKE_CASE.
@@ -57,8 +80,15 @@ export function snakeCase(str: string, options?: SnakeCaseOptions): string {
  * @returns {string} The SCREAMING_SNAKE_CASEd string
  */
 export function screamingSnakeCase(str: string, options?: Omit<SnakeCaseOptions, "screaming">): string {
+	const splitCasingOptions = readSplitCasingConfig(screamingSnakeCase.config);
+
 	return snakeCase(str, {
+		...splitCasingOptions,
 		...options,
 		screaming: true,
 	});
 }
+
+screamingSnakeCase.config = createUtilConfig<UtilConfigDefinitionShape<ScreamingSnakeCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

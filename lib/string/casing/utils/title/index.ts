@@ -1,4 +1,10 @@
-import type { SplitCasingOptions } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+} from "../../internal/splitCasing";
 import { customCase } from "../custom";
 
 /**
@@ -6,6 +12,8 @@ import { customCase } from "../custom";
  */
 
 export interface TitleCaseOptions extends SplitCasingOptions {}
+
+export interface TitleCaseConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to Title Case.
@@ -28,9 +36,16 @@ export interface TitleCaseOptions extends SplitCasingOptions {}
  * @returns {string} The Title Cased string
  */
 export function titleCase(str: string, options?: TitleCaseOptions): string {
+	const splitCasingOptions = readSplitCasingConfig(titleCase.config);
+
 	return customCase(str, {
+		...splitCasingOptions,
 		...options,
 		seperator: " ",
 		transform: (word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`,
 	});
 }
+
+titleCase.config = createUtilConfig<UtilConfigDefinitionShape<TitleCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

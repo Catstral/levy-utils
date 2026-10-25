@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { ListUtilError, list } from ".";
 
+// TODO: add tests for config
+
 describe("list", () => {
+	beforeEach(() => {
+		list.config.reset();
+	});
+
 	test("Simple list", () => {
 		expect(list(4)).toEqual([0, 1, 2, 3, 4]);
 	});

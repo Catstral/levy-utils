@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsObjectConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given item is an object (This does not include arrays).
  *
@@ -9,3 +15,5 @@
 export function isObject(item: unknown): item is object {
 	return typeof item === "object" && !!item && !Array.isArray(item);
 }
+
+isObject.config = createUtilConfig<UtilConfigDefinitionShape<IsObjectConfig>>({});

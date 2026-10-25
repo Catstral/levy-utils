@@ -1,9 +1,13 @@
-import { describe, expect, expectTypeOf, mock, test } from "bun:test";
-import { sleep } from "~/misc/utils/sleep";
-import type { Promisable } from "~/types";
+import { beforeEach, describe, expect, expectTypeOf, mock, test } from "bun:test";
+import { sleep } from "../../../misc/utils/sleep";
+import type { Promisable } from "../../../types";
 import { filter } from ".";
 
 describe("filter", () => {
+	beforeEach(() => {
+		filter.config.reset();
+	});
+
 	describe("sync", () => {
 		test("Keeps the items that pass the predicate", () => {
 			expect(filter([1, 2, 3, 4], (value) => value > 2)).toEqual([3, 4]);

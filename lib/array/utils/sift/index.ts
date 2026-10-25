@@ -1,4 +1,9 @@
-import type { Falsy } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Falsy } from "../../../types";
+
+export interface SiftConfig {
+	[key: string]: never;
+}
 
 /**
  * Turns a list of items into another list of items with all the falsy values filtered out of the list.
@@ -12,3 +17,5 @@ import type { Falsy } from "~/types";
 export function sift<const T>(list: (T | Falsy)[]): T[] {
 	return list.filter((item): item is T => !!item);
 }
+
+sift.config = createUtilConfig<UtilConfigDefinitionShape<SiftConfig>>({});

@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { trunc } from ".";
 
+// TODO: add tests for config
+
 describe("trunc", () => {
+	beforeEach(() => {
+		trunc.config.reset();
+	});
+
 	test("Integer", () => {
 		expect(trunc(123)).toBe(123);
 	});
@@ -35,7 +41,7 @@ describe("trunc", () => {
 	});
 
 	test("Throws for negative fraction digits", () => {
-		expect(() => trunc(123.456, -1)).toThrow(RangeError);
+		expect(() => trunc(123.456, -1 as number)).toThrow(RangeError);
 	});
 
 	test("Throws for more than 100 fraction digits", () => {

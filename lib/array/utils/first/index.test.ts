@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { first } from ".";
 
 describe("first", () => {
+	beforeEach(() => {
+		first.config.reset();
+	});
+
 	test("Returns the first item of a list", () => {
 		const list = ["A", "B", "C"];
 

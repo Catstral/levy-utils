@@ -1,4 +1,10 @@
-import type { SplitCasingOptions } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+} from "../../internal/splitCasing";
 import { customCase } from "../custom";
 
 /**
@@ -6,6 +12,8 @@ import { customCase } from "../custom";
  */
 
 export interface CamelCaseOptions extends SplitCasingOptions {}
+
+export interface CamelCaseConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to camelCase.
@@ -28,7 +36,10 @@ export interface CamelCaseOptions extends SplitCasingOptions {}
  * @returns {string} The camelCased string
  */
 export function camelCase(str: string, options?: CamelCaseOptions): string {
+	const splitCasingOptions = readSplitCasingConfig(camelCase.config);
+
 	return customCase(str, {
+		...splitCasingOptions,
 		...options,
 		seperator: "",
 		transform: (word, index) => {
@@ -40,3 +51,7 @@ export function camelCase(str: string, options?: CamelCaseOptions): string {
 		},
 	});
 }
+
+camelCase.config = createUtilConfig<UtilConfigDefinitionShape<CamelCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

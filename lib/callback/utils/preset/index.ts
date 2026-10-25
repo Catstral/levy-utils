@@ -1,4 +1,9 @@
-import { type Computable, compute } from "~/misc";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { type Computable, compute } from "../../../misc";
+
+export interface PresetConfig {
+	[key: string]: never;
+}
 
 /**
  * Presets the parameters of a callback with arguments or a callback that computes its arguments.
@@ -33,3 +38,5 @@ export function preset<const T extends (...args: never[]) => unknown, const Args
 		return callback(...params) as ReturnType<T>;
 	};
 }
+
+preset.config = createUtilConfig<UtilConfigDefinitionShape<PresetConfig>>({});

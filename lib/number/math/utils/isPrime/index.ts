@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+
+export interface IsPrimeConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is a prime number.
  *
@@ -21,3 +27,5 @@ export function isPrime(value: number): boolean {
 
 	return true;
 }
+
+isPrime.config = createUtilConfig<UtilConfigDefinitionShape<IsPrimeConfig>>({});

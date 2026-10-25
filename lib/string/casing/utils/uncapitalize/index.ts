@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+
+export interface UncapitalizeConfig {
+	[key: string]: never;
+}
+
 /**
  * Converts the first character of string to lowercase.
  *
@@ -13,3 +19,5 @@
 export function uncapitalize<const T extends string>(str: T): Uncapitalize<T> {
 	return `${str.slice(0, 1).toLowerCase()}${str.slice(1)}` as Uncapitalize<T>;
 }
+
+uncapitalize.config = createUtilConfig<UtilConfigDefinitionShape<UncapitalizeConfig>>({});

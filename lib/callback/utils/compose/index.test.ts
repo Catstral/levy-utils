@@ -1,20 +1,24 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { compose } from ".";
 
-describe.concurrent("compose", () => {
-	test.concurrent("No callbacks", () => {
+describe("compose", () => {
+	beforeEach(() => {
+		compose.config.reset();
+	});
+
+	test("No callbacks", () => {
 		const composed = compose();
 
 		expect(composed()).toBeUndefined();
 	});
 
-	test.concurrent("Single callback", () => {
+	test("Single callback", () => {
 		const composed = compose(() => "foo");
 
 		expect(composed()).toBe("foo");
 	});
 
-	test.concurrent("Single callback receives the composed arguments", () => {
+	test("Single callback receives the composed arguments", () => {
 		const fn = mock((value: number) => value);
 
 		const composed = compose(fn);
@@ -25,7 +29,7 @@ describe.concurrent("compose", () => {
 		expect(fn).toBeCalledWith(42);
 	});
 
-	test.concurrent("Multiple callbacks chain the return value", () => {
+	test("Multiple callbacks chain the return value", () => {
 		const composed = compose(
 			(value: number) => value + 1,
 			(value: number) => value * 2,
@@ -34,7 +38,7 @@ describe.concurrent("compose", () => {
 		expect(composed(1)).toBe(4);
 	});
 
-	test.concurrent("Multiple callbacks pass the previous value in order", () => {
+	test("Multiple callbacks pass the previous value in order", () => {
 		const second = mock((value: boolean) => (value ? "true" : "false"));
 		const third = mock((value: string) => value.toUpperCase());
 
@@ -51,7 +55,7 @@ describe.concurrent("compose", () => {
 		expect(result).toBe("TRUE");
 	});
 
-	test.concurrent("Callbacks are called in order", () => {
+	test("Callbacks are called in order", () => {
 		const order: number[] = [];
 
 		const composed = compose(
@@ -65,7 +69,7 @@ describe.concurrent("compose", () => {
 		expect(order).toEqual([1, 2, 3]);
 	});
 
-	test.concurrent("Returns the result of the final callback", () => {
+	test("Returns the result of the final callback", () => {
 		const composed = compose(
 			() => "foo",
 			() => "bar",
@@ -75,7 +79,7 @@ describe.concurrent("compose", () => {
 		expect(composed()).toBe("baz");
 	});
 
-	test.concurrent("Returns a re-usable callback", () => {
+	test("Returns a re-usable callback", () => {
 		const fn = mock((value: number) => value * 2);
 
 		const composed = compose(fn);

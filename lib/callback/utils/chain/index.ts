@@ -1,3 +1,5 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type ChainCallback<V = never> = ((previousValue: V) => unknown) | (() => unknown);
 
 /**
@@ -23,6 +25,10 @@ type _Chain<N extends number, T extends ChainCallback[], R extends ChainCallback
 		: never;
 
 export type Chain<T extends ChainCallback[]> = number extends T["length"] ? T : _Chain<T["length"], T, [], undefined>;
+
+export interface ChainConfig {
+	[key: string]: never;
+}
 
 /**
  * Allows chaining many callbacks together with the callback
@@ -51,3 +57,5 @@ export function chain<const T extends ChainCallback[]>(...callbacks: Chain<T>): 
 
 	return value as ChainResult<T>;
 }
+
+chain.config = createUtilConfig<UtilConfigDefinitionShape<ChainConfig>>({});

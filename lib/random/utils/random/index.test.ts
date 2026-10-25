@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { random } from ".";
 
 describe("random", () => {
+	beforeEach(() => {
+		random.config.reset();
+	});
+
 	test("Returns a value between 0 and 1 when no arguments are given", () => {
 		const value = random();
 

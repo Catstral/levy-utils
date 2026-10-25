@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { preset } from ".";
 
 describe("preset", () => {
+	beforeEach(() => {
+		preset.config.reset();
+	});
+
 	test("Calls the mapper with the given arguments and uses its result as parameters", () => {
 		const mapper = mock((flag: boolean): [string, boolean] => ["foo", flag]);
 		const fn = mock((value: string, flag: boolean) => (flag ? value : "No"));

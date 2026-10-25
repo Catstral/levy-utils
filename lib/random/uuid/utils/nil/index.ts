@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+
+export interface UuidNilConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a nil UUID string that is all zero's.
  *
@@ -8,3 +14,5 @@
 export function uuidNil(): string {
 	return "00000000-0000-0000-0000-000000000000";
 }
+
+uuidNil.config = createUtilConfig<UtilConfigDefinitionShape<UuidNilConfig>>({});

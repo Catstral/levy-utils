@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { pascalCase } from ".";
 
+// TODO: add tests for config
+
 describe("pascalCase", () => {
+	beforeEach(() => {
+		pascalCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(pascalCase("hello world")).toBe("HelloWorld");
 	});

@@ -1,4 +1,8 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type ReduceCallback<T, Acc> = (accumulator: Acc, value: T, index: number, list: readonly T[]) => Acc;
+
+export type ReduceDirection = "ASCENDING" | "DESCENDING";
 
 export interface ReduceOptions<Acc = unknown, R = Acc> {
 	/**
@@ -6,7 +10,7 @@ export interface ReduceOptions<Acc = unknown, R = Acc> {
 	 *
 	 * @default "ASCENDING"
 	 */
-	direction?: "ASCENDING" | "DESCENDING";
+	direction?: ReduceDirection;
 	/**
 	 * Transforms the accumulator into a final result.
 	 *
@@ -14,6 +18,10 @@ export interface ReduceOptions<Acc = unknown, R = Acc> {
 	 * @returns {R}
 	 */
 	result?: (accumulator: Acc) => R;
+}
+
+export interface ReduceConfig {
+	direction: ReduceDirection;
 }
 
 /**
@@ -55,7 +63,7 @@ export function reduce<const T, Acc, const R = Acc>(
 	callback: ReduceCallback<T, Acc>,
 	options?: ReduceOptions<Acc, R>,
 ): Acc | R {
-	const direction = options?.direction ?? "ASCENDING";
+	const direction = options?.direction ?? reduce.config.direction;
 
 	let acc: Acc = initial;
 
@@ -75,3 +83,9 @@ export function reduce<const T, Acc, const R = Acc>(
 
 	return acc;
 }
+
+reduce.config = createUtilConfig<UtilConfigDefinitionShape<ReduceConfig>>({
+	direction: {
+		default: () => "ASCENDING",
+	},
+});

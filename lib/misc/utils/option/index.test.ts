@@ -1,7 +1,12 @@
-import { describe, expect, expectTypeOf, mock, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, mock, test } from "bun:test";
 import { type Option, safe, unwrap } from ".";
 
 describe("option", () => {
+	beforeEach(() => {
+		safe.config.reset();
+		unwrap.config.reset();
+	});
+
 	describe("safe", () => {
 		test("Returns a successful option", () => {
 			const option = safe<number>(() => {

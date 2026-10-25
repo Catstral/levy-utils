@@ -1,4 +1,9 @@
-import type { PositiveInteger } from "~/number/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { PositiveInteger } from "../../../number/types";
+
+export interface TruncConfig {
+	fractionDigits: number;
+}
 
 /**
  * Truncates a number to the specified number of fraction digits.
@@ -15,7 +20,7 @@ import type { PositiveInteger } from "~/number/types";
  */
 export function trunc(value: number): number;
 export function trunc<const T extends number>(value: number, fractionDigits: PositiveInteger<T>): number;
-export function trunc(value: number, fractionDigits: number = 0): number {
+export function trunc(value: number, fractionDigits: number = trunc.config.fractionDigits): number {
 	if (fractionDigits === 0) {
 		return Math.trunc(value);
 	}
@@ -28,3 +33,9 @@ export function trunc(value: number, fractionDigits: number = 0): number {
 
 	return Number.parseFloat(`${integer}.${fraction.slice(0, fractionDigits)}`);
 }
+
+trunc.config = createUtilConfig<UtilConfigDefinitionShape<TruncConfig>>({
+	fractionDigits: {
+		default: () => 0,
+	},
+});

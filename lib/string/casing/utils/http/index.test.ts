@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { httpHeaderCase } from ".";
 
+// TODO: add tests for config
+
 describe("httpHeaderCase", () => {
+	beforeEach(() => {
+		httpHeaderCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(httpHeaderCase("content type")).toBe("Content-Type");
 	});

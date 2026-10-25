@@ -1,4 +1,9 @@
-import type { Key } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Key } from "../../../types";
+
+export interface CountingConfig {
+	[key: string]: never;
+}
 
 /**
  * Reduces a list down to an object of keys specified by the given `identity` callback
@@ -27,3 +32,5 @@ export function counting<const T, const V extends Key>(
 
 	return counts;
 }
+
+counting.config = createUtilConfig<UtilConfigDefinitionShape<CountingConfig>>({});

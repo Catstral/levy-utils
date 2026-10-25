@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IdentityConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns the given value.
  *
@@ -10,3 +16,5 @@
 export function identity<const T>(value: T): T {
 	return value;
 }
+
+identity.config = createUtilConfig<UtilConfigDefinitionShape<IdentityConfig>>({});

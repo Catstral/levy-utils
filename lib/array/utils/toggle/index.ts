@@ -1,10 +1,13 @@
-import type { Key } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Key } from "../../../types";
+
+export type ToggleStrategy = "APPEND" | "PREPEND";
 
 /**
  * @typedef {Object} ToggleOptions
  * @template T
  * @prop {(item: T) => Key} [tokey] A function to turn an item into a key to determine if the value should be toggled
- * @prop {"APPEND" | "PREPEND"} [strategy="APPEND"] The strategy to use when toggling a value
+ * @prop {ToggleStrategy} [strategy="APPEND"] The strategy to use when toggling a value
  */
 
 export interface ToggleOptions<T> {
@@ -20,7 +23,11 @@ export interface ToggleOptions<T> {
 	 * The strategy to use when toggling a value.
 	 * @default "APPEND"
 	 */
-	strategy?: "APPEND" | "PREPEND";
+	strategy?: ToggleStrategy;
+}
+
+export interface ToggleConfig {
+	strategy: ToggleStrategy;
 }
 
 /**
@@ -43,7 +50,7 @@ export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOpti
 	const currentList = [...list];
 
 	if (index === -1) {
-		const strategy = options?.strategy ?? "APPEND";
+		const strategy = options?.strategy ?? toggle.config.strategy;
 
 		switch (strategy) {
 			case "APPEND": {
@@ -63,3 +70,9 @@ export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOpti
 
 	return currentList;
 }
+
+toggle.config = createUtilConfig<UtilConfigDefinitionShape<ToggleConfig>>({
+	strategy: {
+		default: () => "APPEND",
+	},
+});

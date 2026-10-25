@@ -1,5 +1,6 @@
-import { UtilError } from "~/error";
-import { type Computable, compute } from "~/misc/utils/compute";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { UtilError } from "../../../error";
+import { type Computable, compute } from "../../../misc/utils/compute";
 
 export class ListUtilError extends UtilError {
 	public readonly util = "list";
@@ -25,6 +26,10 @@ export interface ListOptions<T> {
 	 * @default 1
 	 */
 	step?: number;
+}
+
+export interface ListConfig {
+	step: number | undefined;
 }
 
 /**
@@ -89,17 +94,23 @@ export function list<const T = number>(startOrLength: number, end?: number, opti
 		}
 	}
 
-	const list: T[] = [];
+	const finalList: T[] = [];
 
 	while (shouldStepDown ? value >= endValue : value <= endValue) {
 		if (options?.valueMapper !== undefined) {
-			list.push(compute(options.valueMapper, value));
+			finalList.push(compute(options.valueMapper, value));
 		} else {
-			list.push(value as T);
+			finalList.push(value as T);
 		}
 
-		value += options?.step ?? (shouldStepDown ? -1 : 1);
+		value += options?.step ?? list.config.step ?? (shouldStepDown ? -1 : 1);
 	}
 
-	return list;
+	return finalList;
 }
+
+list.config = createUtilConfig<UtilConfigDefinitionShape<ListConfig>>({
+	step: {
+		default: () => undefined,
+	},
+});

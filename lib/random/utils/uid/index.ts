@@ -1,3 +1,10 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface UidConfig {
+	length: number;
+	charset: string;
+}
+
 /**
  * Returns a cryptographically secure random string of characters, based on a given charset, grown to a specified length.
  *
@@ -9,10 +16,7 @@
  * @param {string} [charset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"] The characters used for generation (default = `"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"`)
  * @returns {string} A random string of characters from the charset, with the specified length
  */
-export function uid(
-	length: number = 8,
-	charset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-): string {
+export function uid(length: number = uid.config.length, charset: string = uid.config.charset): string {
 	if (charset.length <= 0) {
 		return "";
 	}
@@ -40,3 +44,12 @@ export function uid(
 
 	return output;
 }
+
+uid.config = createUtilConfig<UtilConfigDefinitionShape<UidConfig>>({
+	length: {
+		default: () => 8,
+	},
+	charset: {
+		default: () => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+	},
+});

@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsOddConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is an odd number.
  *
@@ -9,3 +15,5 @@
 export function isOdd(value: number): boolean {
 	return ((value % 2) + 2) % 2 === 1;
 }
+
+isOdd.config = createUtilConfig<UtilConfigDefinitionShape<IsOddConfig>>({});

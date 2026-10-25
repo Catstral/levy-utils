@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isEmpty } from ".";
 
 describe("isEmpty", () => {
+	beforeEach(() => {
+		isEmpty.config.reset();
+	});
+
 	describe("Empty values", () => {
 		test("String", () => {
 			expect(isEmpty("")).toBeTrue();

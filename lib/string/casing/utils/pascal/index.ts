@@ -1,4 +1,10 @@
-import type { SplitCasingOptions } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+} from "../../internal/splitCasing";
 import { customCase } from "../custom";
 
 /**
@@ -6,6 +12,8 @@ import { customCase } from "../custom";
  */
 
 export interface PascalCaseOptions extends SplitCasingOptions {}
+
+export interface PascalCaseConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to PascalCase.
@@ -32,9 +40,16 @@ export interface PascalCaseOptions extends SplitCasingOptions {}
  * @returns {string} The PascalCased string
  */
 export function pascalCase(str: string, options?: PascalCaseOptions): string {
+	const splitCasingOptions = readSplitCasingConfig(pascalCase.config);
+
 	return customCase(str, {
+		...splitCasingOptions,
 		...options,
 		seperator: "",
 		transform: (word) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`,
 	});
 }
+
+pascalCase.config = createUtilConfig<UtilConfigDefinitionShape<PascalCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

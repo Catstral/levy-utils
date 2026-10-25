@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsPromiseLikeConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is promise-like.
  *
@@ -9,3 +15,5 @@
 export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 	return !!value && typeof value === "object" && "then" in value && typeof value.then === "function";
 }
+
+isPromiseLike.config = createUtilConfig<UtilConfigDefinitionShape<IsPromiseLikeConfig>>({});

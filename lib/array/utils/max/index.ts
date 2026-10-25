@@ -1,10 +1,18 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export type MaxDirection = "ASCENDING" | "DESCENDING";
+
 export interface MaxOptions {
 	/**
 	 * The direction the list should be checked in.
 	 *
 	 * @default "ASCENDING"
 	 */
-	direction?: "ASCENDING" | "DESCENDING";
+	direction?: MaxDirection;
+}
+
+export interface MaxConfig {
+	direction: MaxDirection;
 }
 
 interface MaxEntry {
@@ -33,7 +41,7 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 		return undefined;
 	}
 
-	const direction = options?.direction ?? "ASCENDING";
+	const direction = options?.direction ?? max.config.direction;
 	const reduceMethod: "reduce" | "reduceRight" = direction === "DESCENDING" ? "reduceRight" : "reduce";
 
 	if (mapper) {
@@ -78,3 +86,9 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 		},
 	).value as T | undefined;
 }
+
+max.config = createUtilConfig<UtilConfigDefinitionShape<MaxConfig>>({
+	direction: {
+		default: () => "ASCENDING",
+	},
+});

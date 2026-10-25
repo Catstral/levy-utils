@@ -1,5 +1,11 @@
 // TODO: Write docs
 
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface ParseUrlParamsConfig {
+	[key: string]: never;
+}
+
 export function parseUrlParams(url: string): Record<string, string | undefined>;
 export function parseUrlParams<const T extends Record<string, (value: string | undefined) => unknown>>(
 	url: string,
@@ -24,3 +30,5 @@ export function parseUrlParams<const T extends Record<string, (value: string | u
 
 	return obj;
 }
+
+parseUrlParams.config = createUtilConfig<UtilConfigDefinitionShape<ParseUrlParamsConfig>>({});

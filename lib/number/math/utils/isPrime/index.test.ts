@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isPrime } from ".";
 
 describe("isPrime", () => {
+	beforeEach(() => {
+		isPrime.config.reset();
+	});
+
 	test("Prime numbers", () => {
 		expect(isPrime(2)).toBe(true);
 		expect(isPrime(3)).toBe(true);

@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface ClampConfig {
+	[key: string]: never;
+}
+
 /**
  * Clamps a number between a minimum and maximum value.
  *
@@ -29,3 +35,5 @@ export function clamp(min: number, value: number, max: number): number {
 
 	return NaN;
 }
+
+clamp.config = createUtilConfig<UtilConfigDefinitionShape<ClampConfig>>({});

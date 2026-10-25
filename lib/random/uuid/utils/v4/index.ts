@@ -1,6 +1,7 @@
-import { UtilError } from "~/error";
-import { getRNG, stringifyBytes } from "../../helpers";
-import type { UuidRNGOptions } from "../../types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { UtilError } from "../../../../error";
+import { getRNG, readUuidRNGConfig, stringifyBytes, UUID_RNG_CONFIG_SHAPE } from "../../helpers";
+import type { UuidRNGConfig, UuidRNGOptions } from "../../types";
 
 export class UuidV4UtilError extends UtilError {
 	public readonly util = "uuidV4";
@@ -13,6 +14,8 @@ export class UuidV4UtilError extends UtilError {
 
 export interface UuidV4Options extends UuidRNGOptions {}
 
+export interface UuidV4Config extends UuidRNGConfig {}
+
 /**
  * Returns a Cryptographically secure random V4 UUID string.
  *
@@ -23,12 +26,25 @@ export interface UuidV4Options extends UuidRNGOptions {}
  * @throws {UuidV4UtilError} If the length of the specified random bytes is less then 16
  */
 export function uuidV4(options?: UuidV4Options): string {
+	const rngOptions = readUuidRNGConfig(uuidV4.config);
+
+	const finalOptions = {
+		...rngOptions,
+		...options,
+	};
+
 	// If possible and no options are given, use the build in secure UUID generation
-	if (!options && crypto && "randomUUID" in crypto && typeof crypto.randomUUID === "function") {
+	if (
+		!finalOptions.rng &&
+		!finalOptions.random &&
+		crypto &&
+		"randomUUID" in crypto &&
+		typeof crypto.randomUUID === "function"
+	) {
 		return crypto.randomUUID();
 	}
 
-	const random = getRNG(options);
+	const random = getRNG(finalOptions);
 
 	if (!random) {
 		throw new UuidV4UtilError("Random byte length must at least be 16");
@@ -40,5 +56,9 @@ export function uuidV4(options?: UuidV4Options): string {
 
 	return stringifyBytes(random);
 }
+
+uuidV4.config = createUtilConfig<UtilConfigDefinitionShape<UuidV4Config>>({
+	...UUID_RNG_CONFIG_SHAPE,
+});
 
 export { uuidV4 as v4, uuidV4 as uuid };

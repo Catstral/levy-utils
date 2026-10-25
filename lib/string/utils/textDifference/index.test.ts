@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { textDifference } from ".";
 
+// TODO: add tests for config
+
 describe("textDifference", () => {
+	beforeEach(() => {
+		textDifference.config.reset();
+	});
+
 	describe("Plain text (default options)", () => {
 		test("Identical strings produce no visible markup", () => {
 			expect(textDifference("Hello World", "Hello World")).toBe("Hello World");

@@ -1,6 +1,7 @@
-import { UtilError } from "~/error";
-import { getRNG, stringifyBytes } from "../../helpers";
-import type { UuidRNGOptions } from "../../types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { UtilError } from "../../../../error";
+import { getRNG, readUuidRNGConfig, stringifyBytes, UUID_RNG_CONFIG_SHAPE } from "../../helpers";
+import type { UuidRNGConfig, UuidRNGOptions } from "../../types";
 
 export class UuidV7UtilError extends UtilError {
 	public readonly util = "uuidV7";
@@ -26,6 +27,11 @@ export interface UuidV7Options extends UuidRNGOptions {
 	sequence?: number;
 }
 
+export interface UuidV7Config extends UuidRNGConfig {
+	milliseconds: number | undefined;
+	sequence: number | undefined;
+}
+
 /**
  * Returns a Cryptographically secure random V7 UUID string.
  *
@@ -36,14 +42,20 @@ export interface UuidV7Options extends UuidRNGOptions {
  * @throws {UuidV7UtilError} If the length of the specified random bytes is less then 16
  */
 export function uuidV7(options?: UuidV7Options): string {
-	const random = getRNG(options);
+	const random = getRNG({
+		...readUuidRNGConfig(uuidV7.config),
+		...options,
+	});
 
 	if (!random) {
 		throw new UuidV7UtilError("Random byte length must at least be 16");
 	}
 
-	const milis = options?.milliseconds ?? Date.now();
-	const sequence = options?.sequence ?? ((random[6] & 0x7f) << 24) | (random[7] << 16) | (random[8] << 8) | random[9];
+	const milis = options?.milliseconds ?? uuidV7.config.milliseconds ?? Date.now();
+	const sequence =
+		options?.sequence ??
+		uuidV7.config.sequence ??
+		((random[6] & 0x7f) << 24) | (random[7] << 16) | (random[8] << 8) | random[9];
 	const buffer = new Uint8Array(16);
 
 	buffer[0] = (milis / 0x10000000000) & 0xff;
@@ -71,5 +83,15 @@ export function uuidV7(options?: UuidV7Options): string {
 
 	return stringifyBytes(buffer);
 }
+
+uuidV7.config = createUtilConfig<UtilConfigDefinitionShape<UuidV7Config>>({
+	...UUID_RNG_CONFIG_SHAPE,
+	milliseconds: {
+		default: () => undefined,
+	},
+	sequence: {
+		default: () => undefined,
+	},
+});
 
 export { uuidV7 as v7 };

@@ -1,4 +1,11 @@
-import { type SplitCasingOptions, splitCasing } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+	splitCasing,
+} from "../../internal/splitCasing";
 
 /**
  * @typedef {Object} CustomCaseOptions
@@ -20,6 +27,8 @@ export interface CustomCaseOptions extends SplitCasingOptions {
 	 */
 	transform: (word: string, index: number) => string;
 }
+
+export interface CustomCaseConfig extends SplitCasingConfig {}
 
 /**
  * Splits a string into words (see {@link SplitCasingOptions}) and joins them back together using a custom separator,
@@ -43,7 +52,11 @@ export interface CustomCaseOptions extends SplitCasingOptions {
  * @returns {string} The transformed string
  */
 export function customCase(str: string, options: CustomCaseOptions): string {
-	const words = splitCasing(str, options);
+	const splitCasingOptions = readSplitCasingConfig(customCase.config);
+	const words = splitCasing(str, {
+		...splitCasingOptions,
+		...options,
+	});
 	const lastIndex = words.length - 1;
 
 	return words.reduce<string>((acc, word, index) => {
@@ -56,3 +69,7 @@ export function customCase(str: string, options: CustomCaseOptions): string {
 		return acc;
 	}, "");
 }
+
+customCase.config = createUtilConfig<UtilConfigDefinitionShape<CustomCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

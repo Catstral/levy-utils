@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface HasItemsConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given array has at least one item.
  *
@@ -14,3 +20,5 @@ export function hasItems<const T>(list: readonly T[]): list is readonly [T, ...T
 export function hasItems<const T>(list: readonly T[]): list is readonly [T, ...T[]] {
 	return list.length > 0;
 }
+
+hasItems.config = createUtilConfig<UtilConfigDefinitionShape<HasItemsConfig>>({});

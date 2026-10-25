@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { uid } from ".";
 
+// TODO: add tests for config
+
 describe("uid", () => {
+	beforeEach(() => {
+		uid.config.reset();
+	});
+
 	test("Returns a string", () => {
 		expect(uid()).toBeString();
 	});

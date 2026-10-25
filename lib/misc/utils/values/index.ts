@@ -1,4 +1,5 @@
-import type { Key } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Key } from "../../../types";
 
 export type ValuesTarget =
 	| ArrayLike<unknown>
@@ -20,6 +21,10 @@ export type Values<T extends ValuesTarget> =
 						? V[]
 						: never;
 
+export interface ValuesConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns an array of values based on the given target.
  *
@@ -40,3 +45,5 @@ export function values<const T extends ValuesTarget>(target: T): Values<T> {
 
 	return Object.values(target) as Values<T>;
 }
+
+values.config = createUtilConfig<UtilConfigDefinitionShape<ValuesConfig>>({});

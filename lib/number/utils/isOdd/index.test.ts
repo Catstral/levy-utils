@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isOdd } from ".";
 
 describe("isOdd", () => {
+	beforeEach(() => {
+		isOdd.config.reset();
+	});
+
 	// Odd numbers return true
 	test.each([[1, 3, 59, 173, 8991223103, -1, -3, -59, -173, -8991223103]])("%d returns true", (value) => {
 		expect(isOdd(value)).toBeTrue();

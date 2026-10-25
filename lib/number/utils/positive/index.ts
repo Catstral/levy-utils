@@ -1,4 +1,9 @@
-import type { IsPositive, Positive } from "~/number";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { IsPositive, Positive } from "../../../number";
+
+export interface PositiveConfig {
+	[key: string]: never;
+}
 
 /**
  * Converts a number into a positive number.
@@ -13,6 +18,12 @@ export function positive<const T extends number>(value: T): Positive<T> {
 	return Math.abs(value) as Positive<T>;
 }
 
+positive.config = createUtilConfig<UtilConfigDefinitionShape<PositiveConfig>>({});
+
+export interface IsPositiveConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is a positive number.
  *
@@ -25,3 +36,5 @@ export function positive<const T extends number>(value: T): Positive<T> {
 export function isPositive<const T extends number>(value: T): IsPositive<T> {
 	return (value > 0 || Object.is(value, 0)) as IsPositive<T>;
 }
+
+isPositive.config = createUtilConfig<UtilConfigDefinitionShape<IsPositiveConfig>>({});

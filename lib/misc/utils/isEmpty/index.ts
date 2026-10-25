@@ -1,4 +1,9 @@
-import { isObject } from "~/object/utils/isObject";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { isObject } from "../../../object/utils/isObject";
+
+export interface IsEmptyConfig {
+	[key: string]: never;
+}
 
 /**
  * Checks if the given value is considered empty.
@@ -41,3 +46,5 @@ export function isEmpty(value: unknown): value is "" | [] | Record<string, never
 
 	return false;
 }
+
+isEmpty.config = createUtilConfig<UtilConfigDefinitionShape<IsEmptyConfig>>({});

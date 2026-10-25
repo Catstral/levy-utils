@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { toFloat } from ".";
 
+// TODO: add tests for config
+
 describe("toFloat", () => {
+	beforeEach(() => {
+		toFloat.config.reset();
+	});
+
 	describe("Numbers", () => {
 		test("Integer", () => {
 			expect(toFloat(5)).toBe(5);

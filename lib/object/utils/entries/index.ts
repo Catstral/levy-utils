@@ -1,6 +1,12 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type Entries<T extends object> = {
 	[K in keyof T]: [K, T[K]];
 }[keyof T][];
+
+export interface EntriesConfig {
+	[key: string]: never;
+}
 
 /**
  * Converts an object into a types version of `Object.entries`.
@@ -8,3 +14,5 @@ export type Entries<T extends object> = {
 export function entries<const T extends Record<string, unknown>>(value: T): Entries<T> {
 	return Object.entries(value) as Entries<T>;
 }
+
+entries.config = createUtilConfig<UtilConfigDefinitionShape<EntriesConfig>>({});

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isNullish } from ".";
 
 describe("isNullish", () => {
+	beforeEach(() => {
+		isNullish.config.reset();
+	});
+
 	describe("Nullish values", () => {
 		test("Null", () => {
 			expect(isNullish(null)).toBeTrue();

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { slug } from ".";
 
 describe("slug", () => {
+	beforeEach(() => {
+		slug.config.reset();
+	});
+
 	test("Empty string", () => {
 		expect(slug("")).toBe("");
 	});

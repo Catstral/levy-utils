@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { concat } from ".";
 
 describe("concat", () => {
+	beforeEach(() => {
+		concat.config.reset();
+	});
+
 	test("No arguments returns an empty array", () => {
 		expect(concat()).toEqual([]);
 	});

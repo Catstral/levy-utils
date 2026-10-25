@@ -1,4 +1,5 @@
-import type { Key } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Key } from "../../../types";
 
 /**
  * @private
@@ -6,6 +7,10 @@ import type { Key } from "~/types";
 type Mask<T extends Record<Key, unknown>> = (Partial<T> & Record<Key, unknown>) | Record<Key, unknown>;
 
 export type Extend<T extends Record<Key, unknown>, U extends Mask<T>> = Omit<T, keyof U> & U;
+
+export interface ExtendConfig {
+	[key: string]: never;
+}
 
 /**
  * Extends an object with another object.
@@ -36,3 +41,5 @@ export function extend<const T extends Record<Key, unknown>, const U extends Mas
 
 	return result;
 }
+
+extend.config = createUtilConfig<UtilConfigDefinitionShape<ExtendConfig>>({});

@@ -1,6 +1,12 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type Last<T extends readonly unknown[], F = undefined> = T extends readonly [...T[number][], infer V]
 	? V
 	: T[number] | (T extends readonly [T[number], ...T[number][]] ? never : F);
+
+export interface LastConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns the last item of a list or a fallback if the list is empty.
@@ -17,3 +23,5 @@ export type Last<T extends readonly unknown[], F = undefined> = T extends readon
 export function last<const T extends readonly unknown[], const F = undefined>(list: T, fallback?: F): Last<T, F> {
 	return (list.length === 0 ? fallback : list.at(-1)) as Last<T, F>;
 }
+
+last.config = createUtilConfig<UtilConfigDefinitionShape<LastConfig>>({});

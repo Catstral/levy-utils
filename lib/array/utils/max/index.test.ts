@@ -1,7 +1,13 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { max } from ".";
 
+// TODO: add tests for config
+
 describe("max", () => {
+	beforeEach(() => {
+		max.config.reset();
+	});
+
 	test("Simple max of number array", () => {
 		const largest = max([3, 1, 2]);
 

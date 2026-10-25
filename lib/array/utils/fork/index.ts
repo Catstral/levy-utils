@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface ForkConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a tuple of 2 arrays that are constructed from a single list based on a condition given.
  * The first item in the tuple is all the items in the list that pass the specified condition,
@@ -23,3 +29,5 @@ export function fork<const T>(list: T[], condition: (item: T) => boolean): [T[],
 
 	return lists;
 }
+
+fork.config = createUtilConfig<UtilConfigDefinitionShape<ForkConfig>>({});

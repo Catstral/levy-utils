@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { values } from ".";
 
 describe("values", () => {
+	beforeEach(() => {
+		values.config.reset();
+	});
+
 	test("Returns values for a simple object", () => {
 		const val = values({
 			foo: "bar",

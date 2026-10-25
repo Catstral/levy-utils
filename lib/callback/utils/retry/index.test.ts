@@ -1,7 +1,13 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { RetryUtilError, retry } from ".";
 
+// TODO: add tests for config
+
 describe.concurrent("retry", () => {
+	beforeEach(() => {
+		retry.config.reset();
+	});
+
 	test.concurrent("No retry", async () => {
 		const fn = mock();
 

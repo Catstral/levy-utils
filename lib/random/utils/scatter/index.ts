@@ -1,8 +1,11 @@
-import { getCryptoSecureRandomNumber } from "~/random/helper";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { getCryptoSecureRandomNumber } from "../../../random/helper";
+
+export type ScatterBias = "FLOOR" | "ROUND" | "CEILING";
 
 /**
  * @typedef {Object} ScatterOptions
- * @prop {"FLOOR" | "ROUND" | "CEIL"} [bias="ROUND"] The bias of the split
+ * @prop {ScatterBias} [bias="ROUND"] The bias of the split
  */
 
 export interface ScatterOptions {
@@ -11,7 +14,11 @@ export interface ScatterOptions {
 	 *
 	 * @default `"ROUND"`
 	 */
-	bias?: "FLOOR" | "ROUND" | "CEILING";
+	bias?: ScatterBias;
+}
+
+export interface ScatterConfig {
+	bias: ScatterBias;
 }
 
 /**
@@ -45,7 +52,7 @@ export function scatter<const T>(list: readonly T[], split: number = 0.5, option
 
 	let largeSize: number;
 
-	const bias = options?.bias ?? "ROUND";
+	const bias = options?.bias ?? scatter.config.bias;
 
 	switch (bias) {
 		case "FLOOR": {
@@ -75,3 +82,9 @@ export function scatter<const T>(list: readonly T[], split: number = 0.5, option
 
 	return output;
 }
+
+scatter.config = createUtilConfig<UtilConfigDefinitionShape<ScatterConfig>>({
+	bias: {
+		default: () => "ROUND",
+	},
+});

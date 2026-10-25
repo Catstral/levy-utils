@@ -1,4 +1,21 @@
-import type { UuidRNGOptions } from "./types";
+import type { UtilConfig, UtilConfigDefinitionShape } from "../../config";
+import type { UuidRNGConfig, UuidRNGOptions } from "./types";
+
+export const UUID_RNG_CONFIG_SHAPE = {
+	rng: {
+		default: () => undefined,
+	},
+	random: {
+		default: () => undefined,
+	},
+} satisfies UtilConfigDefinitionShape<UuidRNGConfig>;
+
+export function readUuidRNGConfig(config: UtilConfig<UuidRNGConfig>): UuidRNGOptions {
+	return {
+		rng: config.rng,
+		random: config.random,
+	};
+}
 
 export function rng(): Uint8Array {
 	const random = new Uint8Array(16);

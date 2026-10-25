@@ -1,7 +1,13 @@
-import { describe, expect, expectTypeOf, mock, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, mock, test } from "bun:test";
 import { reduce } from ".";
 
+// TODO: add tests for config
+
 describe("reduce", () => {
+	beforeEach(() => {
+		reduce.config.reset();
+	});
+
 	test("Accumulates a result from every item of a list", () => {
 		expect(reduce([1, 2, 3, 4], 0, (acc, value) => acc + value)).toBe(10);
 	});

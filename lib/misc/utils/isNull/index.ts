@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsNullConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is null.
  *
@@ -9,3 +15,5 @@
 export function isNull(value: unknown): value is null {
 	return value === null;
 }
+
+isNull.config = createUtilConfig<UtilConfigDefinitionShape<IsNullConfig>>({});

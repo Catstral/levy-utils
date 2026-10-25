@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isDecimal } from ".";
 
 describe("isDecimal", () => {
+	beforeEach(() => {
+		isDecimal.config.reset();
+	});
+
 	// Decimal numbers return true
 	test.each([0.1, 0.5, 0.002, 1.1, 17.3, 208.7, 7261.59, -0.1, -0.5, -0.002, -1.1, -17.3, -208.7, -7261.59])(
 		"%d returns true",

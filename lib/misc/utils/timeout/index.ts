@@ -1,4 +1,5 @@
-import { UtilError } from "~/error";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { UtilError } from "../../../error";
 import type { Computable } from "../compute";
 
 export class TimeoutUtilError extends UtilError {
@@ -23,6 +24,10 @@ export interface TimeoutOptions {
 	 * @returns {void}
 	 */
 	onTimeout?: (delayMs: number) => void;
+}
+
+export interface TimeoutConfig {
+	[key: string]: never;
 }
 
 /**
@@ -77,6 +82,12 @@ export async function timeout<const T>(
 	});
 }
 
+timeout.config = createUtilConfig<UtilConfigDefinitionShape<TimeoutConfig>>({});
+
+export interface IsTimeoutErrorConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is a timeout error.
  *
@@ -86,3 +97,5 @@ export async function timeout<const T>(
 export function isTimeoutError(value: unknown): value is TimeoutError {
 	return value instanceof TimeoutError;
 }
+
+isTimeoutError.config = createUtilConfig<UtilConfigDefinitionShape<IsTimeoutErrorConfig>>({});

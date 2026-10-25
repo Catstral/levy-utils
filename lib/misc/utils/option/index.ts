@@ -1,4 +1,5 @@
-import type { Promisable } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Promisable } from "../../../types";
 
 /**
  * A value that represents a wrapped result with varying success.
@@ -19,6 +20,10 @@ export type Option<T> =
 			value?: never;
 			error: unknown;
 	  };
+
+export interface SafeConfig {
+	[key: string]: never;
+}
 
 /**
  * Executes the given callback and returns an option of the result.
@@ -76,6 +81,12 @@ export function safe(callback: (...args: unknown[]) => unknown, ...parameters: u
 	}
 }
 
+safe.config = createUtilConfig<UtilConfigDefinitionShape<SafeConfig>>({});
+
+export interface UnwrapConfig {
+	[key: string]: never;
+}
+
 /**
  * Directly returns the option's value, or throws the option's error.
  * An option's error won't be thrown when a fallback is provided.
@@ -104,3 +115,5 @@ export function unwrap<const T, const F = undefined>(...args: [option: Option<T>
 
 	throw option.error;
 }
+
+unwrap.config = createUtilConfig<UtilConfigDefinitionShape<UnwrapConfig>>({});

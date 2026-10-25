@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { draw } from ".";
 
 describe("draw", () => {
+	beforeEach(() => {
+		draw.config.reset();
+	});
+
 	test("Returns a value from inside the given list", () => {
 		const list = [0, 1, 2, 3, 4, 5] as const;
 		const drawn = draw(list);

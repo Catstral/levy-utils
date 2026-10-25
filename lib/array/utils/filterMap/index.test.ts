@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { filterMap } from ".";
 
 describe("filterMap", () => {
+	beforeEach(() => {
+		filterMap.config.reset();
+	});
+
 	test("Simple filter and mapper", () => {
 		const selected = filterMap(
 			["foo", "bar"],

@@ -1,7 +1,11 @@
-import { describe, expect, expectTypeOf, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, test } from "bun:test";
 import { hasItems } from ".";
 
 describe("hasItems", () => {
+	beforeEach(() => {
+		hasItems.config.reset();
+	});
+
 	test("Returns true for a list with one item", () => {
 		expect(hasItems([1])).toBeTrue();
 	});

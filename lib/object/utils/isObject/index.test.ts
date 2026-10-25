@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isObject } from ".";
 
 describe("isObject", () => {
+	beforeEach(() => {
+		isObject.config.reset();
+	});
+
 	describe("Objects", () => {
 		test("Empty", () => {
 			expect(isObject({})).toBeTrue();

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isEven } from ".";
 
 describe("isEven", () => {
+	beforeEach(() => {
+		isEven.config.reset();
+	});
+
 	// Even numbers return true
 	test.each([2, 4, 60, 174, 8991223104, -2, -4, -60, -174, -8991223104])("%d returns true", (value) => {
 		expect(isEven(value)).toBeTrue();

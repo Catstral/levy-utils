@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { clamp } from ".";
 
 describe("clamp", () => {
+	beforeEach(() => {
+		clamp.config.reset();
+	});
+
 	test("Value isn't clamped when between minimum and maximum", () => {
 		expect(clamp(-5, 0, 5)).toBe(0);
 	});

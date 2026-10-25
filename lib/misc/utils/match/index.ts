@@ -1,8 +1,13 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
 import { type Computable, compute, isComputation } from "../compute";
 
 export type MatchTarget = string | number | boolean | bigint | null | undefined;
 
 export type MatchClause<T extends MatchTarget> = Partial<Record<`${T}`, Computable<unknown>>>;
+
+export interface MatchConfig {
+	[key: string]: never;
+}
 
 type ComputedValue<C> = C extends Computable<infer V> ? V : never;
 
@@ -50,3 +55,5 @@ export function match<const T extends MatchTarget, const C extends MatchClause<T
 
 	return fallback;
 }
+
+match.config = createUtilConfig<UtilConfigDefinitionShape<MatchConfig>>({});

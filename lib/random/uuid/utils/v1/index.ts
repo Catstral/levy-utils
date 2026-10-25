@@ -1,6 +1,7 @@
-import { UtilError } from "~/error";
-import { getRNG, stringifyBytes } from "../../helpers";
-import type { UuidRNGOptions } from "../../types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { UtilError } from "../../../../error";
+import { getRNG, readUuidRNGConfig, stringifyBytes, UUID_RNG_CONFIG_SHAPE } from "../../helpers";
+import type { UuidRNGConfig, UuidRNGOptions } from "../../types";
 
 export class UuidV1UtilError extends UtilError {
 	public readonly util = "uuidV1";
@@ -38,6 +39,13 @@ export interface UuidV1Options extends UuidRNGOptions {
 	node?: Uint8Array;
 }
 
+export interface UuidV1Config extends UuidRNGConfig {
+	milliseconds: number | undefined;
+	nanoseconds: number | undefined;
+	clockSequence: number | undefined;
+	node: Uint8Array | undefined;
+}
+
 /**
  * Returns a Cryptographically secure random V1 UUID string.
  *
@@ -48,7 +56,11 @@ export interface UuidV1Options extends UuidRNGOptions {
  * @throws {UuidV1UtilError} If the length of the specified random bytes is less then 16
  */
 export function uuidV1(options?: UuidV1Options): string {
-	const random = getRNG(options);
+	const rngOptions = readUuidRNGConfig(uuidV1.config);
+	const random = getRNG({
+		...rngOptions,
+		...options,
+	});
 
 	if (!random) {
 		throw new UuidV1UtilError("Random byte length must at least be 16");
@@ -57,13 +69,14 @@ export function uuidV1(options?: UuidV1Options): string {
 	// NOTE: the milis and nanos split is because it requires 57+ bit numbers, but JS doesn't offer that precision.
 	// Offset to Gregorian epoch
 	// https://www.rfc-editor.org/rfc/rfc9562.html#section-5.1-1
-	const milis = (options?.milliseconds ?? Date.now()) + 12219292800000;
-	const nanos = options?.nanoseconds ?? 0;
-	const clockSequence = options?.clockSequence ?? ((random[8] << 8) | random[9]) & 0x3fff;
+	const milis = (options?.milliseconds ?? uuidV1.config.milliseconds ?? Date.now()) + 12219292800000;
+	const nanos = options?.nanoseconds ?? uuidV1.config.nanoseconds ?? 0;
+	const clockSequence =
+		options?.clockSequence ?? uuidV1.config.clockSequence ?? ((random[8] << 8) | random[9]) & 0x3fff;
 	const buffer = new Uint8Array(16);
-	const node = options?.node ?? random.slice(10, 16);
+	const node = options?.node ?? uuidV1.config.node ?? random.slice(10, 16);
 
-	if (!options?.node) {
+	if (!options?.node && !uuidV1.config.node) {
 		// Set multicast bit
 		// https://www.rfc-editor.org/rfc/rfc9562.html#section-6.10-3
 		node[0] |= 0x01;
@@ -98,5 +111,21 @@ export function uuidV1(options?: UuidV1Options): string {
 
 	return stringifyBytes(buffer);
 }
+
+uuidV1.config = createUtilConfig<UtilConfigDefinitionShape<UuidV1Config>>({
+	...UUID_RNG_CONFIG_SHAPE,
+	milliseconds: {
+		default: () => undefined,
+	},
+	nanoseconds: {
+		default: () => undefined,
+	},
+	clockSequence: {
+		default: () => undefined,
+	},
+	node: {
+		default: () => undefined,
+	},
+});
 
 export { uuidV1 as v1 };

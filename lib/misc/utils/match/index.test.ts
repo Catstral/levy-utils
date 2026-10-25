@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { match } from ".";
 
 describe("match", () => {
+	beforeEach(() => {
+		match.config.reset();
+	});
+
 	describe("String target", () => {
 		test("Matches a case with a literal value", () => {
 			const value = "B" as "A" | "B" | "C";

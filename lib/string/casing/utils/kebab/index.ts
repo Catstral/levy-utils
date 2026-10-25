@@ -1,4 +1,10 @@
-import type { SplitCasingOptions } from "../../internal/splitCasing";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import {
+	readSplitCasingConfig,
+	SPLIT_CASE_CONFIG_SHAPE,
+	type SplitCasingConfig,
+	type SplitCasingOptions,
+} from "../../internal/splitCasing";
 import { customCase } from "../custom";
 
 /**
@@ -13,6 +19,10 @@ export interface KebabCaseOptions extends SplitCasingOptions {
 	 * @default false
 	 */
 	screaming?: boolean;
+}
+
+export interface KebabCaseConfig extends SplitCasingConfig {
+	screaming: boolean;
 }
 
 /**
@@ -35,12 +45,25 @@ export interface KebabCaseOptions extends SplitCasingOptions {
  * @returns {string} The kebab-cased string
  */
 export function kebabCase(str: string, options?: KebabCaseOptions): string {
+	const splitCasingOptions = readSplitCasingConfig(kebabCase.config);
+	const isScreaming = options?.screaming ?? kebabCase.config.screaming;
+
 	return customCase(str, {
+		...splitCasingOptions,
 		...options,
 		seperator: "-",
-		transform: (word) => (options?.screaming ? word.toUpperCase() : word.toLowerCase()),
+		transform: (word) => (isScreaming ? word.toUpperCase() : word.toLowerCase()),
 	});
 }
+
+kebabCase.config = createUtilConfig<UtilConfigDefinitionShape<KebabCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+	screaming: {
+		default: () => false,
+	},
+});
+
+export interface ScreamingKebabCaseConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to SCREAMING-KEBAB-CASE.
@@ -62,3 +85,7 @@ export function screamingKebabCase(str: string, options?: Omit<KebabCaseOptions,
 		screaming: true,
 	});
 }
+
+screamingKebabCase.config = createUtilConfig<UtilConfigDefinitionShape<ScreamingKebabCaseConfig>>({
+	...SPLIT_CASE_CONFIG_SHAPE,
+});

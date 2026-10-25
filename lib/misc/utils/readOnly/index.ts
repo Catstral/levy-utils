@@ -1,4 +1,5 @@
-import type { Key } from "~/types";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Key } from "../../../types";
 
 export type ReadOnlyTarget =
 	| Record<Key, unknown>
@@ -29,6 +30,10 @@ export type DeepReadOnly<T> =
 					? ReadonlySet<DeepReadOnly<U>>
 					: T;
 
+export interface IsReadOnlyConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is read-only.
  *
@@ -44,6 +49,12 @@ export function isReadOnly<const T extends Record<Key, unknown> | unknown[] | re
 	value: T,
 ): value is Readonly<T> {
 	return Object.isFrozen(value);
+}
+
+isReadOnly.config = createUtilConfig<UtilConfigDefinitionShape<IsReadOnlyConfig>>({});
+
+export interface ReadOnlyConfig {
+	[key: string]: never;
 }
 
 /**
@@ -128,3 +139,5 @@ export function readOnly<const T extends ReadOnlyTarget>(value: T, deepFreeze = 
 
 	return freeze(cloned) as DeepReadOnly<T>;
 }
+
+readOnly.config = createUtilConfig<UtilConfigDefinitionShape<ReadOnlyConfig>>({});

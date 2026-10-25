@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface FilterMapConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a new list of items based on filtered and mapped values of a given list.
  *
@@ -37,3 +43,5 @@ export function filterMap<const T, const R>(
 
 	return result;
 }
+
+filterMap.config = createUtilConfig<UtilConfigDefinitionShape<FilterMapConfig>>({});

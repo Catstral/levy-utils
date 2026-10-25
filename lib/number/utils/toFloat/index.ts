@@ -1,13 +1,19 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface ToFloatConfig {
+	fallback: number;
+}
+
 /**
  * Turns a value into an float where invalid values, `NaN` or `Infinity` will return a fallback.
  *
  * The time complexity for this is `O(1)`.
  *
  * @param {?} value The value to convert
- * @param {number} [fallback = 0] A float number to fallback on when the value is invalid
+ * @param {number} [fallback=0] A float number to fallback on when the value is invalid
  * @returns {number} A float number parsed from the value or a fallback
  */
-export function toFloat(value: unknown, fallback: number = 0): number {
+export function toFloat(value: unknown, fallback: number = toFloat.config.fallback): number {
 	let result: number;
 
 	switch (typeof value) {
@@ -38,3 +44,9 @@ export function toFloat(value: unknown, fallback: number = 0): number {
 
 	return result;
 }
+
+toFloat.config = createUtilConfig<UtilConfigDefinitionShape<ToFloatConfig>>({
+	fallback: {
+		default: () => 0,
+	},
+});

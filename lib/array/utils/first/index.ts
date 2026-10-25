@@ -1,6 +1,12 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
 export type First<T extends readonly unknown[], F = undefined> = T extends readonly [infer V, ...T[number][]]
 	? V
 	: T[number] | (T extends readonly [...T[number][], T[number]] ? never : F);
+
+export interface FirstConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns the first item of a list or a fallback if the list is empty.
@@ -16,3 +22,5 @@ export type First<T extends readonly unknown[], F = undefined> = T extends reado
 export function first<const T extends readonly unknown[], const F = undefined>(list: T, fallback?: F): First<T, F> {
 	return (list.length === 0 ? fallback : list[0]) as First<T, F>;
 }
+
+first.config = createUtilConfig<UtilConfigDefinitionShape<FirstConfig>>({});

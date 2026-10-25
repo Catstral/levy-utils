@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { camelCase } from ".";
 
+// TODO: add tests for config
+
 describe("camelCase", () => {
+	beforeEach(() => {
+		camelCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(camelCase("hello world")).toBe("helloWorld");
 	});

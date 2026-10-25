@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { customCase } from ".";
 
+// TODO: add tests for config
+
 describe("customCase", () => {
+	beforeEach(() => {
+		customCase.config.reset();
+	});
+
 	test("Joins words using the given separator, without a leading separator", () => {
 		expect(
 			customCase("hello world", {

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { compute, isComputation } from ".";
 
 describe("compute", () => {
+	beforeEach(() => {
+		compute.config.reset();
+	});
+
 	describe("Non-computable", () => {
 		test("String", () => {
 			expect(compute("foo")).toBe("foo");
@@ -87,6 +91,10 @@ describe("compute", () => {
 });
 
 describe("isComputation", () => {
+	beforeEach(() => {
+		isComputation.config.reset();
+	});
+
 	describe("Non-computable", () => {
 		test("String", () => {
 			expect(isComputation("")).toBeFalse();

@@ -1,4 +1,5 @@
 import DiffMatchPatch from "diff-match-patch";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
 
 /**
  * @typedef TextDifferenceOptionsNodes
@@ -679,6 +680,12 @@ function mergeAdjacentNodes(nodesToMerge: TextDifferenceNode[]): TextDifferenceN
 	return merged;
 }
 
+export interface TextDifferenceConfig {
+	raw: boolean;
+	htmlAware: boolean;
+	tags: TextDifferenceOptionsStringContextTags | TextDifferenceOptionsStringTags;
+}
+
 /**
  * Turns 2 strings into a constructed string, showing the difference using tags wrapped around changes.
  *
@@ -706,8 +713,8 @@ export function textDifference(
 	newValue: string,
 	options?: TextDifferenceOptionsString | TextDifferenceOptionsNodes,
 ): string | TextDifferenceNode[] {
-	const htmlAware = options?.htmlAware ?? false;
-	const keepRaw = options?.raw ?? false;
+	const htmlAware = options?.htmlAware ?? textDifference.config.htmlAware;
+	const keepRaw = options?.raw ?? textDifference.config.raw;
 	const nodes: TextDifferenceNode[] = [];
 
 	if (htmlAware) {
@@ -770,64 +777,64 @@ export function textDifference(
 			};
 		};
 
-		if (options && "tags" in options && options.tags) {
-			if ("inlineContext" in options.tags || "blockContext" in options.tags) {
-				if (options.tags.inlineContext) {
-					const tags = parseTags(options.tags.inlineContext, {
-						equal: ["", ""],
-						insert: ['<span data-diff="insert">', "</span>"],
-						delete: ['<span data-diff="delete">', "</span>"],
-					});
+		const specifiedTags = options && "tags" in options && options.tags ? options.tags : textDifference.config.tags;
 
-					equalInlineTags = tags.equalTags;
-					insertInlineTags = tags.insertTags;
-					deleteInlineTags = tags.deleteTags;
-				}
+		if ("inlineContext" in specifiedTags || "blockContext" in specifiedTags) {
+			if (specifiedTags.inlineContext) {
+				const tags = parseTags(specifiedTags.inlineContext, {
+					equal: ["", ""],
+					insert: ['<span data-diff="insert">', "</span>"],
+					delete: ['<span data-diff="delete">', "</span>"],
+				});
 
-				if (options.tags.blockContext) {
-					const tags = parseTags(options.tags.blockContext, {
-						equal: ["", ""],
-						insert: ['<div data-diff="insert">', "</div>"],
-						delete: ['<div data-diff="delete">', "</div>"],
-					});
+				equalInlineTags = tags.equalTags;
+				insertInlineTags = tags.insertTags;
+				deleteInlineTags = tags.deleteTags;
+			}
 
-					equalBlockTags = tags.equalTags;
-					insertBlockTags = tags.insertTags;
-					deleteBlockTags = tags.deleteTags;
-				}
-			} else if ("equal" in options.tags || "insert" in options.tags || "delete" in options.tags) {
-				if (htmlAware) {
-					const inlineTags = parseTags(options.tags, {
-						equal: ["", ""],
-						insert: ['<span data-diff="insert">', "</span>"],
-						delete: ['<span data-diff="delete">', "</span>"],
-					});
-					const blockTags = parseTags(options.tags, {
-						equal: ["", ""],
-						insert: ['<div data-diff="insert">', "</div>"],
-						delete: ['<div data-diff="delete">', "</div>"],
-					});
+			if (specifiedTags.blockContext) {
+				const tags = parseTags(specifiedTags.blockContext, {
+					equal: ["", ""],
+					insert: ['<div data-diff="insert">', "</div>"],
+					delete: ['<div data-diff="delete">', "</div>"],
+				});
 
-					equalInlineTags = inlineTags.equalTags;
-					equalBlockTags = blockTags.equalTags;
-					insertInlineTags = inlineTags.insertTags;
-					insertBlockTags = blockTags.insertTags;
-					deleteInlineTags = inlineTags.deleteTags;
-					deleteBlockTags = blockTags.deleteTags;
-				} else {
-					const tags = parseTags(options.tags, {
-						equal: ["", ""],
-						insert: ['<span data-diff="insert">', "</span>"],
-						delete: ['<span data-diff="delete">', "</span>"],
-					});
+				equalBlockTags = tags.equalTags;
+				insertBlockTags = tags.insertTags;
+				deleteBlockTags = tags.deleteTags;
+			}
+		} else if ("equal" in specifiedTags || "insert" in specifiedTags || "delete" in specifiedTags) {
+			if (htmlAware) {
+				const inlineTags = parseTags(specifiedTags, {
+					equal: ["", ""],
+					insert: ['<span data-diff="insert">', "</span>"],
+					delete: ['<span data-diff="delete">', "</span>"],
+				});
+				const blockTags = parseTags(specifiedTags, {
+					equal: ["", ""],
+					insert: ['<div data-diff="insert">', "</div>"],
+					delete: ['<div data-diff="delete">', "</div>"],
+				});
 
-					equalInlineTags = tags.equalTags;
-					equalBlockTags = tags.equalTags;
-					insertInlineTags = tags.insertTags;
-					insertBlockTags = tags.insertTags;
-					deleteInlineTags = tags.deleteTags;
-					deleteBlockTags = tags.deleteTags;
-				}
+				equalInlineTags = inlineTags.equalTags;
+				equalBlockTags = blockTags.equalTags;
+				insertInlineTags = inlineTags.insertTags;
+				insertBlockTags = blockTags.insertTags;
+				deleteInlineTags = inlineTags.deleteTags;
+				deleteBlockTags = blockTags.deleteTags;
+			} else {
+				const tags = parseTags(specifiedTags, {
+					equal: ["", ""],
+					insert: ['<span data-diff="insert">', "</span>"],
+					delete: ['<span data-diff="delete">', "</span>"],
+				});
+
+				equalInlineTags = tags.equalTags;
+				equalBlockTags = tags.equalTags;
+				insertInlineTags = tags.insertTags;
+				insertBlockTags = tags.insertTags;
+				deleteInlineTags = tags.deleteTags;
+				deleteBlockTags = tags.deleteTags;
 			}
 		}
 
@@ -903,3 +910,17 @@ export function textDifference(
 
 	return nodes;
 }
+
+textDifference.config = createUtilConfig<UtilConfigDefinitionShape<TextDifferenceConfig>>({
+	raw: {
+		default: () => false,
+	},
+	htmlAware: {
+		default: () => false,
+	},
+	tags: {
+		default: () => {
+			return {};
+		},
+	},
+});

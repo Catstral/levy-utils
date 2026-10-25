@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { keys } from ".";
 
 describe("keys", () => {
+	beforeEach(() => {
+		keys.config.reset();
+	});
+
 	test("Returns keys for a simple object", () => {
 		const entr = keys({
 			foo: "bar",

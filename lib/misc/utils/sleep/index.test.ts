@@ -1,14 +1,18 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { sleep } from ".";
 
-describe("sleep", () => {
-	test("Resolves with undefined", async () => {
+describe.concurrent("sleep", () => {
+	beforeEach(() => {
+		sleep.config.reset();
+	});
+
+	test.concurrent("Resolves with undefined", async () => {
 		const result = await sleep(5);
 
 		expect(result).toBeUndefined();
 	});
 
-	test("Resolves after roughly the given delay", async () => {
+	test.concurrent("Resolves after roughly the given delay", async () => {
 		const delay = 20;
 		const start = Date.now();
 
@@ -19,7 +23,7 @@ describe("sleep", () => {
 		expect(elapsed).toBeGreaterThanOrEqual(delay - 5);
 	});
 
-	test("Does not resolve synchronously", async () => {
+	test.concurrent("Does not resolve synchronously", async () => {
 		let resolved = false;
 
 		const promise = sleep(10).then(() => {
@@ -33,7 +37,7 @@ describe("sleep", () => {
 		expect(resolved).toBeTrue();
 	});
 
-	test("Zero delay still resolves asynchronously", async () => {
+	test.concurrent("Zero delay still resolves asynchronously", async () => {
 		let resolved = false;
 
 		const promise = sleep(0).then(() => {
@@ -47,7 +51,7 @@ describe("sleep", () => {
 		expect(resolved).toBeTrue();
 	});
 
-	test("Negative delay resolves without throwing", async () => {
+	test.concurrent("Negative delay resolves without throwing", async () => {
 		await expect(sleep(-100)).resolves.toBeUndefined();
 	});
 });

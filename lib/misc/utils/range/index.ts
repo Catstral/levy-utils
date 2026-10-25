@@ -1,5 +1,6 @@
-import { UtilError } from "~/error";
-import { type Computable, compute } from "~/misc/utils/compute";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { UtilError } from "../../../error";
+import { type Computable, compute } from "../../../misc/utils/compute";
 
 export class RangeUtilError extends UtilError {
 	public readonly util = "range";
@@ -10,6 +11,11 @@ export type RangeString =
 	| `${number}${">" | ""}..`
 	| `${number}${">" | ""}..${"=" | ""}${number}`
 	| `..${"=" | ""}${number}`;
+
+// NOTE: Because of the complexity of this util, the config for now must be defined on init
+export interface RangeConfig {
+	[key: string]: never;
+}
 
 /**
  * @typedef {Object} RangeDetails
@@ -655,3 +661,5 @@ export function range<const T = number>(
 		mapper: options?.valueMapper,
 	});
 }
+
+range.config = createUtilConfig<UtilConfigDefinitionShape<RangeConfig>>({});

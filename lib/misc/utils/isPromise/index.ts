@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsPromiseConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is a promise.
  *
@@ -9,3 +15,5 @@
 export function isPromise(value: unknown): value is Promise<unknown> {
 	return value instanceof Promise;
 }
+
+isPromise.config = createUtilConfig<UtilConfigDefinitionShape<IsPromiseConfig>>({});

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { shuffle } from ".";
 
 describe("shuffle", () => {
+	beforeEach(() => {
+		shuffle.config.reset();
+	});
+
 	test("Returns an array", () => {
 		const list = [0, 1, 2, 3, 4, 5];
 		const shuffled = shuffle(list);

@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { titleCase } from ".";
 
+// TODO: add tests for config
+
 describe("titleCase", () => {
+	beforeEach(() => {
+		titleCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(titleCase("hello world")).toBe("Hello World");
 	});

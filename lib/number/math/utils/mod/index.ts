@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+
+export interface ModConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns the modulo of a dividend and a divisor.
  *
@@ -10,3 +16,5 @@
 export function mod(dividend: number, divisor: number): number {
 	return ((dividend % divisor) + divisor) % divisor || 0;
 }
+
+mod.config = createUtilConfig<UtilConfigDefinitionShape<ModConfig>>({});

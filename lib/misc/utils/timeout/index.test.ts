@@ -1,4 +1,4 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { isTimeoutError, TimeoutError, TimeoutUtilError, timeout } from ".";
 
 function delayResolve<const T>(value: T, delayMs: number): Promise<T> {
@@ -20,6 +20,10 @@ async function caught(promise: Promise<unknown>): Promise<unknown> {
 }
 
 describe.concurrent("timeout", () => {
+	beforeEach(() => {
+		timeout.config.reset();
+	});
+
 	describe.concurrent("Promise", () => {
 		test.concurrent("Resolves with the value if it settles before the delay", () => {
 			expect(timeout(delayResolve("foo", 5), 100)).resolves.toBe("foo");
@@ -293,6 +297,12 @@ describe.concurrent("timeout", () => {
 });
 
 describe.concurrent("isTimeoutError", () => {
+	beforeEach(() => {
+		// NOTE: timeout is also being reset as it is also being used here
+		timeout.config.reset();
+		isTimeoutError.config.reset();
+	});
+
 	test.concurrent("True for a TimeoutError", () => {
 		expect(isTimeoutError(new TimeoutError(5))).toBeTrue();
 	});

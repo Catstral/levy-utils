@@ -1,10 +1,18 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export type MinDirection = "ASCENDING" | "DESCENDING";
+
 export interface MinOptions {
 	/**
 	 * The direction the list should be checked in.
 	 *
 	 * @default "ASCENDING"
 	 */
-	direction?: "ASCENDING" | "DESCENDING";
+	direction?: MinDirection;
+}
+
+export interface MinConfig {
+	direction: MinDirection;
 }
 
 interface MinEntry {
@@ -33,7 +41,7 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 		return undefined;
 	}
 
-	const direction = options?.direction ?? "ASCENDING";
+	const direction = options?.direction ?? min.config.direction;
 	const reduceMethod: "reduce" | "reduceRight" = direction === "DESCENDING" ? "reduceRight" : "reduce";
 
 	if (mapper) {
@@ -78,3 +86,9 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 		},
 	).value as T | undefined;
 }
+
+min.config = createUtilConfig<UtilConfigDefinitionShape<MinConfig>>({
+	direction: {
+		default: () => "ASCENDING",
+	},
+});

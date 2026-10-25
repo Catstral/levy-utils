@@ -1,4 +1,9 @@
-import type { Integer } from "~/number";
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import type { Integer } from "../../../number";
+
+export interface ToIntConfig {
+	fallback: number;
+}
 
 /**
  * Turns a value into an integer where invalid values, `NaN` or `Infinity` will return a fallback.
@@ -7,10 +12,13 @@ import type { Integer } from "~/number";
  *
  * @template {number} T
  * @param {?} value The value to convert
- * @param {Integer<T>} [fallback = 0] An integer to fallback on when the value is invalid
+ * @param {Integer<T>} [fallback=0] An integer to fallback on when the value is invalid
  * @returns {number} An integer number parsed from the value or a fallback
  */
-export function toInt<const T extends number>(value: unknown, fallback: Integer<T> = 0 as Integer<T>): number {
+export function toInt<const T extends number>(
+	value: unknown,
+	fallback: Integer<T> = toInt.config.fallback as Integer<T>,
+): number {
 	const integerFallback = Math.trunc(fallback);
 
 	let result: number;
@@ -43,3 +51,9 @@ export function toInt<const T extends number>(value: unknown, fallback: Integer<
 
 	return result;
 }
+
+toInt.config = createUtilConfig<UtilConfigDefinitionShape<ToIntConfig>>({
+	fallback: {
+		default: () => 0,
+	},
+});

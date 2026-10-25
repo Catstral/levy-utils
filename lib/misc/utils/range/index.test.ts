@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { Range, type RangeDetails, type RangeString, RangeUtilError, range } from ".";
 
 describe("range", () => {
+	beforeEach(() => {
+		range.config.reset();
+	});
+
 	const testParameters = [
 		{
 			name: "Full range (string)",

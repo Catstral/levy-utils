@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface RandomConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a random number between a given minimum and maximum value.
  *
@@ -24,3 +30,5 @@ export function random(min: number = 0, max: number = 1): number {
 
 	return Math.random() * diff + min;
 }
+
+random.config = createUtilConfig<UtilConfigDefinitionShape<RandomConfig>>({});

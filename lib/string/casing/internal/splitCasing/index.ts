@@ -1,3 +1,5 @@
+import type { UtilConfig, UtilConfigDefinitionShape } from "../../../../config";
+
 export type splitCasingParser = (str: string) => string[];
 
 /**
@@ -26,6 +28,32 @@ export interface SplitCasingOptions {
 	 * If this is defined, all other options are ignored.
 	 */
 	parser?: splitCasingParser;
+}
+
+export interface SplitCasingConfig {
+	groupNumbers: boolean;
+	groupUppercaseLetters: boolean;
+	parser: splitCasingParser | undefined;
+}
+
+export const SPLIT_CASE_CONFIG_SHAPE = {
+	groupNumbers: {
+		default: () => false,
+	},
+	groupUppercaseLetters: {
+		default: () => true,
+	},
+	parser: {
+		default: () => undefined,
+	},
+} satisfies UtilConfigDefinitionShape<SplitCasingConfig>;
+
+export function readSplitCasingConfig(config: UtilConfig<SplitCasingConfig>): SplitCasingOptions {
+	return {
+		groupNumbers: config.groupNumbers,
+		groupUppercaseLetters: config.groupUppercaseLetters,
+		parser: config.parser,
+	};
 }
 
 /**

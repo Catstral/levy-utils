@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { scatter } from ".";
 
+// TODO: add tests for config
+
 describe("scatter", () => {
+	beforeEach(() => {
+		scatter.config.reset();
+	});
+
 	test("Splits the given list with the original items", () => {
 		const list = [0, 1, 2, 3, 4, 5] as const;
 		const scattered = scatter(list);

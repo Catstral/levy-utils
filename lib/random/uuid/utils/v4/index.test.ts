@@ -1,7 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { UuidV4UtilError, uuidV4 } from ".";
 
+// TODO: add tests for config
+
 describe("uuidV4", () => {
+	beforeEach(() => {
+		uuidV4.config.reset();
+	});
+
 	// See: https://www.rfc-editor.org/rfc/rfc9562.html#name-example-of-a-uuidv4-value
 	test("UUID V4 test vector as defined in spec", () => {
 		const expected = "919108f7-52d1-4320-9bac-f847db4148a8";

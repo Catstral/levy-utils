@@ -1,3 +1,9 @@
+import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+
+export interface IsEvenConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is an even number.
  *
@@ -9,3 +15,5 @@
 export function isEven(value: number): boolean {
 	return ((value % 2) + 2) % 2 === 0;
 }
+
+isEven.config = createUtilConfig<UtilConfigDefinitionShape<IsEvenConfig>>({});

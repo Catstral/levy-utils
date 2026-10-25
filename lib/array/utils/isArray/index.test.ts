@@ -1,7 +1,11 @@
-import { describe, expect, expectTypeOf, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, test } from "bun:test";
 import { isArray } from ".";
 
 describe("isArray", () => {
+	beforeEach(() => {
+		isArray.config.reset();
+	});
+
 	test("Returns true for an empty array", () => {
 		expect(isArray([])).toBeTrue();
 	});
