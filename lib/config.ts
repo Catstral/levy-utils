@@ -1,11 +1,12 @@
 import type { Entries } from "./object";
+import type { AnyRecord, RecordOf } from "./types";
 
-export type UtilConfigDefinition<T> = {
+export type UtilConfigDefinition<T = unknown> = {
 	default: () => T;
 };
 
-export type UtilConfig<S extends Record<string, unknown>> = {
-	[K in keyof S]-?: S[K];
+export type UtilConfig<S extends AnyRecord> = {
+	-readonly [K in keyof S]-?: S[K];
 } & {
 	/**
 	 * Resets all config properties to their default value.
@@ -15,39 +16,41 @@ export type UtilConfig<S extends Record<string, unknown>> = {
 	 * A read-only object containing the default values for each config property.
 	 */
 	default: {
-		readonly [K in Exclude<keyof S, "default" | "reset">]: S[K];
+		readonly [K in keyof S]: S[K];
 	};
 };
 
-export function createUtilConfig<const S extends Record<string, UtilConfigDefinition<unknown>>>(
-	shape: S,
-): UtilConfig<{
+export type UtilConfigShape<S extends RecordOf<UtilConfigDefinition>> = {
 	[K in keyof S]: ReturnType<S[K]["default"]>;
-}> {
+};
+
+export function createUtilConfig<const S extends RecordOf<UtilConfigDefinition>>(
+	shape: S,
+): UtilConfig<UtilConfigShape<S>> {
 	const entries = Object.entries(shape) as Entries<S>;
-	const config: Record<string, unknown> = {
+	const config: AnyRecord = {
 		...Object.fromEntries(entries.map(([key, definition]) => [key, definition.default()])),
 		default: {},
 		reset() {
-			for (const [key, value] of Object.entries(this.default as Record<string, unknown>)) {
-				this[key as string] = value;
+			for (const [key, value] of Object.entries(this.default)) {
+				this[key] = value;
 			}
 		},
 	};
 
 	for (const [key, value] of entries) {
+		const defaultValue = value.default();
+
 		Object.defineProperty(config.default, key, {
 			enumerable: true,
 			configurable: false,
 			get() {
-				return value;
+				return defaultValue;
 			},
 		});
 	}
 
 	Object.freeze(config.default);
 
-	return config as UtilConfig<{
-		[K in keyof S]: ReturnType<S[K]["default"]>;
-	}>;
+	return config as UtilConfig<UtilConfigShape<S>>;
 }
