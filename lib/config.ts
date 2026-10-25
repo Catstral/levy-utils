@@ -16,12 +16,16 @@ export type UtilConfig<S extends AnyRecord> = {
 	 * A read-only object containing the default values for each config property.
 	 */
 	default: {
-		readonly [K in keyof S]: S[K];
+		readonly [K in keyof S]-?: S[K];
 	};
 };
 
 export type UtilConfigShape<S extends RecordOf<UtilConfigDefinition>> = {
 	[K in keyof S]: ReturnType<S[K]["default"]>;
+};
+
+export type UtilConfigDefinitionShape<S extends AnyRecord> = {
+	[K in keyof S]: UtilConfigDefinition<S[K]>;
 };
 
 export function createUtilConfig<const S extends RecordOf<UtilConfigDefinition>>(
