@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface FilterMapConfig {
+export interface FilterMapUtilConfig {
 	[key: string]: never;
 }
 
@@ -44,4 +44,4 @@ export function filterMap<const T, const R>(
 	return result;
 }
 
-filterMap.config = createUtilConfig<UtilConfigDefinitionShape<FilterMapConfig>>({});
+filterMap.config = createUtilConfig<FilterMapUtilConfig>({});

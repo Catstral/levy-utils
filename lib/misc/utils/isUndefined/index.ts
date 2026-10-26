@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsUndefinedConfig {
+export interface IsUndefinedUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isUndefined(value: unknown): value is undefined {
 	return value === undefined;
 }
 
-isUndefined.config = createUtilConfig<UtilConfigDefinitionShape<IsUndefinedConfig>>({});
+isUndefined.config = createUtilConfig<IsUndefinedUtilConfig>({});

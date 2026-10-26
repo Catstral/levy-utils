@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import {
 	readSplitCasingConfig,
 	SPLIT_CASE_CONFIG_SHAPE,
@@ -28,7 +28,7 @@ export interface CustomCaseOptions extends SplitCasingOptions {
 	transform: (word: string, index: number) => string;
 }
 
-export interface CustomCaseConfig extends SplitCasingConfig {}
+export interface CustomCaseUtilConfig extends SplitCasingConfig {}
 
 /**
  * Splits a string into words (see {@link SplitCasingOptions}) and joins them back together using a custom separator,
@@ -70,6 +70,6 @@ export function customCase(str: string, options: CustomCaseOptions): string {
 	}, "");
 }
 
-customCase.config = createUtilConfig<UtilConfigDefinitionShape<CustomCaseConfig>>({
+customCase.config = createUtilConfig<CustomCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 });

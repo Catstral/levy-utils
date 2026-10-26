@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Key } from "../../../types";
 
-export interface CountingConfig {
+export interface CountingUtilConfig {
 	[key: string]: never;
 }
 
@@ -33,4 +33,4 @@ export function counting<const T, const V extends Key>(
 	return counts;
 }
 
-counting.config = createUtilConfig<UtilConfigDefinitionShape<CountingConfig>>({});
+counting.config = createUtilConfig<CountingUtilConfig>({});

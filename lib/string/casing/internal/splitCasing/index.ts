@@ -1,4 +1,4 @@
-import type { UtilConfig, UtilConfigDefinitionShape } from "../../../../config";
+import type { UtilConfig, UtilConfigShape } from "../../../../config";
 
 export type splitCasingParser = (str: string) => string[];
 
@@ -46,7 +46,7 @@ export const SPLIT_CASE_CONFIG_SHAPE = {
 	parser: {
 		default: () => undefined,
 	},
-} satisfies UtilConfigDefinitionShape<SplitCasingConfig>;
+} satisfies UtilConfigShape<SplitCasingConfig>;
 
 export function readSplitCasingConfig(config: UtilConfig<SplitCasingConfig>): SplitCasingOptions {
 	return {

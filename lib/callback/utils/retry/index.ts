@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { UtilError } from "../../../error";
 import { sleep } from "../../../misc/utils/sleep";
 import type { Promisable } from "../../../types";
@@ -34,7 +34,7 @@ export interface RetryOptions {
 	onRetry?: (error: unknown, attempt: number) => void;
 }
 
-export interface RetryConfig {
+export interface RetryUtilConfig {
 	attempts: number;
 	delay: number;
 	backoff: boolean;
@@ -74,7 +74,7 @@ export async function retry<const T>(callback: () => Promisable<T>, options?: Re
 	}
 }
 
-retry.config = createUtilConfig<UtilConfigDefinitionShape<RetryConfig>>({
+retry.config = createUtilConfig<RetryUtilConfig>({
 	attempts: {
 		default: () => 3,
 	},

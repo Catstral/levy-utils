@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type MinDirection = "ASCENDING" | "DESCENDING";
 
@@ -11,7 +11,7 @@ export interface MinOptions {
 	direction?: MinDirection;
 }
 
-export interface MinConfig {
+export interface MinUtilConfig {
 	direction: MinDirection;
 }
 
@@ -87,7 +87,7 @@ export function min<const T>(list: T[], mapper?: (item: T) => number, options?: 
 	).value as T | undefined;
 }
 
-min.config = createUtilConfig<UtilConfigDefinitionShape<MinConfig>>({
+min.config = createUtilConfig<MinUtilConfig>({
 	direction: {
 		default: () => "ASCENDING",
 	},

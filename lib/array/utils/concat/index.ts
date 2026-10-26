@@ -1,10 +1,10 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type Concat<T extends (unknown[] | unknown)[]> = T extends [infer V, ...infer R]
 	? [...(V extends readonly unknown[] ? V : [V]), ...Concat<R>]
 	: [];
 
-export interface ConcatConfig {
+export interface ConcatUtilConfig {
 	[key: string]: never;
 }
 
@@ -26,4 +26,4 @@ export function concat<const T extends (unknown | unknown[])[]>(...values: T): C
 	return base.concat(...values) as Concat<T>;
 }
 
-concat.config = createUtilConfig<UtilConfigDefinitionShape<ConcatConfig>>({});
+concat.config = createUtilConfig<ConcatUtilConfig>({});

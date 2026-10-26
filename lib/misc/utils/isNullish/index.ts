@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsNullishConfig {
+export interface IsNullishUtilConfig {
 	[key: string]: never;
 }
 
@@ -20,4 +20,4 @@ export function isNullish(value: unknown): value is undefined | null {
 	return value == null;
 }
 
-isNullish.config = createUtilConfig<UtilConfigDefinitionShape<IsNullishConfig>>({});
+isNullish.config = createUtilConfig<IsNullishUtilConfig>({});

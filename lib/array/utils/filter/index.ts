@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Promisable } from "../../../types";
 
-export interface FilterConfig {
+export interface FilterUtilConfig {
 	[key: string]: never;
 }
 
@@ -116,4 +116,4 @@ export function filter(
 	return values;
 }
 
-filter.config = createUtilConfig<UtilConfigDefinitionShape<FilterConfig>>({});
+filter.config = createUtilConfig<FilterUtilConfig>({});

@@ -1,5 +1,5 @@
 import DiffMatchPatch from "diff-match-patch";
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 /**
  * @typedef TextDifferenceOptionsNodes
@@ -680,7 +680,7 @@ function mergeAdjacentNodes(nodesToMerge: TextDifferenceNode[]): TextDifferenceN
 	return merged;
 }
 
-export interface TextDifferenceConfig {
+export interface TextDifferenceUtilConfig {
 	raw: boolean;
 	htmlAware: boolean;
 	tags: TextDifferenceOptionsStringContextTags | TextDifferenceOptionsStringTags;
@@ -911,7 +911,7 @@ export function textDifference(
 	return nodes;
 }
 
-textDifference.config = createUtilConfig<UtilConfigDefinitionShape<TextDifferenceConfig>>({
+textDifference.config = createUtilConfig<TextDifferenceUtilConfig>({
 	raw: {
 		default: () => false,
 	},

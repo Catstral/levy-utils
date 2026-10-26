@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsEvenConfig {
+export interface IsEvenUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isEven(value: number): boolean {
 	return ((value % 2) + 2) % 2 === 0;
 }
 
-isEven.config = createUtilConfig<UtilConfigDefinitionShape<IsEvenConfig>>({});
+isEven.config = createUtilConfig<IsEvenUtilConfig>({});

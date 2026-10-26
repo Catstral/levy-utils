@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import {
 	readSplitCasingConfig,
 	SPLIT_CASE_CONFIG_SHAPE,
@@ -13,7 +13,7 @@ import { customCase } from "../custom";
 
 export interface TitleCaseOptions extends SplitCasingOptions {}
 
-export interface TitleCaseConfig extends SplitCasingConfig {}
+export interface TitleCaseUtilConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to Title Case.
@@ -46,6 +46,6 @@ export function titleCase(str: string, options?: TitleCaseOptions): string {
 	});
 }
 
-titleCase.config = createUtilConfig<UtilConfigDefinitionShape<TitleCaseConfig>>({
+titleCase.config = createUtilConfig<TitleCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 });

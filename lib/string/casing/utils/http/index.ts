@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import {
 	readSplitCasingConfig,
 	SPLIT_CASE_CONFIG_SHAPE,
@@ -13,7 +13,7 @@ import { customCase } from "../custom";
 
 export interface HttpHeaderCaseOptions extends SplitCasingOptions {}
 
-export interface HttpHeaderCaseConfig extends SplitCasingConfig {}
+export interface HttpHeaderCaseUtilConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to HTTP-Header-Case (also known as Train-Case).
@@ -45,12 +45,12 @@ export function httpHeaderCase(str: string, options?: HttpHeaderCaseOptions): st
 	});
 }
 
-httpHeaderCase.config = createUtilConfig<UtilConfigDefinitionShape<HttpHeaderCaseConfig>>({
+httpHeaderCase.config = createUtilConfig<HttpHeaderCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 });
 
 export {
-	type HttpHeaderCaseConfig as TrainCaseConfig,
 	type HttpHeaderCaseOptions as TrainCaseOptions,
+	type HttpHeaderCaseUtilConfig as TrainCaseUtilConfig,
 	httpHeaderCase as trainCase,
 };

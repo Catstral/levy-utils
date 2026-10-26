@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface NoopConfig {
+export interface NoopUtilConfig {
 	[key: string]: never;
 }
 
@@ -13,4 +13,4 @@ export interface NoopConfig {
  */
 export function noop(): void {}
 
-noop.config = createUtilConfig<UtilConfigDefinitionShape<NoopConfig>>({});
+noop.config = createUtilConfig<NoopUtilConfig>({});

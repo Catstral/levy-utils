@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface KeysConfig {
+export interface KeysUtilConfig {
 	[key: string]: never;
 }
 
@@ -11,4 +11,4 @@ export function keys<const T extends Record<string, unknown>>(value: T): (keyof 
 	return Object.keys(value);
 }
 
-keys.config = createUtilConfig<UtilConfigDefinitionShape<KeysConfig>>({});
+keys.config = createUtilConfig<KeysUtilConfig>({});

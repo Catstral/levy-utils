@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { getCryptoSecureRandomNumber } from "../../../random/helper";
 
-export interface DrawConfig {
+export interface DrawUtilConfig {
 	[key: string]: never;
 }
 
@@ -26,4 +26,4 @@ export function draw(list: readonly unknown[]): unknown {
 	return list[getCryptoSecureRandomNumber(list.length)];
 }
 
-draw.config = createUtilConfig<UtilConfigDefinitionShape<DrawConfig>>({});
+draw.config = createUtilConfig<DrawUtilConfig>({});

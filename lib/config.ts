@@ -1,5 +1,5 @@
 import type { Entries } from "./object";
-import type { AnyRecord, RecordOf } from "./types";
+import type { AnyRecord } from "./types";
 
 export type UtilConfigDefinition<T = unknown> = {
 	default: () => T;
@@ -20,17 +20,13 @@ export type UtilConfig<S extends AnyRecord> = {
 	};
 };
 
-export type UtilConfigShape<S extends RecordOf<UtilConfigDefinition>> = {
-	[K in keyof S]: ReturnType<S[K]["default"]>;
-};
-
-export type UtilConfigDefinitionShape<S extends AnyRecord> = {
+export type UtilConfigShape<S extends AnyRecord> = {
 	[K in keyof S]: UtilConfigDefinition<S[K]>;
 };
 
-export function createUtilConfig<const S extends RecordOf<UtilConfigDefinition>>(
+export function createUtilConfig<const T extends AnyRecord, const S extends UtilConfigShape<T> = UtilConfigShape<T>>(
 	shape: S,
-): UtilConfig<UtilConfigShape<S>> {
+): UtilConfig<T> {
 	const entries = Object.entries(shape) as Entries<S>;
 	const config: AnyRecord = {
 		...Object.fromEntries(entries.map(([key, definition]) => [key, definition.default()])),
@@ -56,5 +52,5 @@ export function createUtilConfig<const S extends RecordOf<UtilConfigDefinition>>
 
 	Object.freeze(config.default);
 
-	return config as UtilConfig<UtilConfigShape<S>>;
+	return config as UtilConfig<T>;
 }

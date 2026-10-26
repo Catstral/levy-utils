@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface UncapitalizeConfig {
+export interface UncapitalizeUtilConfig {
 	[key: string]: never;
 }
 
@@ -20,4 +20,4 @@ export function uncapitalize<const T extends string>(str: T): Uncapitalize<T> {
 	return `${str.slice(0, 1).toLowerCase()}${str.slice(1)}` as Uncapitalize<T>;
 }
 
-uncapitalize.config = createUtilConfig<UtilConfigDefinitionShape<UncapitalizeConfig>>({});
+uncapitalize.config = createUtilConfig<UncapitalizeUtilConfig>({});

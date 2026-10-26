@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface ForkConfig {
+export interface ForkUtilConfig {
 	[key: string]: never;
 }
 
@@ -30,4 +30,4 @@ export function fork<const T>(list: T[], condition: (item: T) => boolean): [T[],
 	return lists;
 }
 
-fork.config = createUtilConfig<UtilConfigDefinitionShape<ForkConfig>>({});
+fork.config = createUtilConfig<ForkUtilConfig>({});

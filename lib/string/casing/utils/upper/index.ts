@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface UpperCaseConfig {
+export interface UpperCaseUtilConfig {
 	[key: string]: never;
 }
 
@@ -20,4 +20,4 @@ export function upperCase<const T extends string>(str: T): Uppercase<T> {
 	return str.toUpperCase() as Uppercase<T>;
 }
 
-upperCase.config = createUtilConfig<UtilConfigDefinitionShape<UpperCaseConfig>>({});
+upperCase.config = createUtilConfig<UpperCaseUtilConfig>({});

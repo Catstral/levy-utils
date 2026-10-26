@@ -1,8 +1,8 @@
 // TODO: Write docs
 
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface ParseUrlParamsConfig {
+export interface ParseUrlParamsUtilConfig {
 	[key: string]: never;
 }
 
@@ -31,4 +31,4 @@ export function parseUrlParams<const T extends Record<string, (value: string | u
 	return obj;
 }
 
-parseUrlParams.config = createUtilConfig<UtilConfigDefinitionShape<ParseUrlParamsConfig>>({});
+parseUrlParams.config = createUtilConfig<ParseUrlParamsUtilConfig>({});

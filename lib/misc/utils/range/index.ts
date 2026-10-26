@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { UtilError } from "../../../error";
 import { type Computable, compute } from "../../../misc/utils/compute";
 
@@ -13,7 +13,7 @@ export type RangeString =
 	| `..${"=" | ""}${number}`;
 
 // NOTE: Because of the complexity of this util, the config for now must be defined on init
-export interface RangeConfig {
+export interface RangeUtilConfig {
 	[key: string]: never;
 }
 
@@ -662,4 +662,4 @@ export function range<const T = number>(
 	});
 }
 
-range.config = createUtilConfig<UtilConfigDefinitionShape<RangeConfig>>({});
+range.config = createUtilConfig<RangeUtilConfig>({});

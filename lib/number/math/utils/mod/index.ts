@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface ModConfig {
+export interface ModUtilConfig {
 	[key: string]: never;
 }
 
@@ -17,4 +17,4 @@ export function mod(dividend: number, divisor: number): number {
 	return ((dividend % divisor) + divisor) % divisor || 0;
 }
 
-mod.config = createUtilConfig<UtilConfigDefinitionShape<ModConfig>>({});
+mod.config = createUtilConfig<ModUtilConfig>({});

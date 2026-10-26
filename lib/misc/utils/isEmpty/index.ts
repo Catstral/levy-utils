@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { isObject } from "../../../object/utils/isObject";
 
-export interface IsEmptyConfig {
+export interface IsEmptyUtilConfig {
 	[key: string]: never;
 }
 
@@ -47,4 +47,4 @@ export function isEmpty(value: unknown): value is "" | [] | Record<string, never
 	return false;
 }
 
-isEmpty.config = createUtilConfig<UtilConfigDefinitionShape<IsEmptyConfig>>({});
+isEmpty.config = createUtilConfig<IsEmptyUtilConfig>({});

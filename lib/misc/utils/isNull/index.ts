@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsNullConfig {
+export interface IsNullUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isNull(value: unknown): value is null {
 	return value === null;
 }
 
-isNull.config = createUtilConfig<UtilConfigDefinitionShape<IsNullConfig>>({});
+isNull.config = createUtilConfig<IsNullUtilConfig>({});

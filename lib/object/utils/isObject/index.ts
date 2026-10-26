@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsObjectConfig {
+export interface IsObjectUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isObject(item: unknown): item is object {
 	return typeof item === "object" && !!item && !Array.isArray(item);
 }
 
-isObject.config = createUtilConfig<UtilConfigDefinitionShape<IsObjectConfig>>({});
+isObject.config = createUtilConfig<IsObjectUtilConfig>({});

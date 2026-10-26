@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface RaiseConfig {
+export interface RaiseUtilConfig {
 	[key: string]: never;
 }
 
@@ -36,4 +36,4 @@ export function raise(value: unknown): never {
 	}
 }
 
-raise.config = createUtilConfig<UtilConfigDefinitionShape<RaiseConfig>>({});
+raise.config = createUtilConfig<RaiseUtilConfig>({});

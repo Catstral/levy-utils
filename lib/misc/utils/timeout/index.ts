@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { UtilError } from "../../../error";
 import type { Computable } from "../compute";
 
@@ -26,7 +26,7 @@ export interface TimeoutOptions {
 	onTimeout?: (delayMs: number) => void;
 }
 
-export interface TimeoutConfig {
+export interface TimeoutUtilConfig {
 	[key: string]: never;
 }
 
@@ -82,9 +82,9 @@ export async function timeout<const T>(
 	});
 }
 
-timeout.config = createUtilConfig<UtilConfigDefinitionShape<TimeoutConfig>>({});
+timeout.config = createUtilConfig<TimeoutUtilConfig>({});
 
-export interface IsTimeoutErrorConfig {
+export interface IsTimeoutErrorUtilConfig {
 	[key: string]: never;
 }
 
@@ -98,4 +98,4 @@ export function isTimeoutError(value: unknown): value is TimeoutError {
 	return value instanceof TimeoutError;
 }
 
-isTimeoutError.config = createUtilConfig<UtilConfigDefinitionShape<IsTimeoutErrorConfig>>({});
+isTimeoutError.config = createUtilConfig<IsTimeoutErrorUtilConfig>({});

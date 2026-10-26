@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { PositiveInteger } from "../../../number/types";
 
-export interface TruncConfig {
+export interface TruncUtilConfig {
 	fractionDigits: number;
 }
 
@@ -34,7 +34,7 @@ export function trunc(value: number, fractionDigits: number = trunc.config.fract
 	return Number.parseFloat(`${integer}.${fraction.slice(0, fractionDigits)}`);
 }
 
-trunc.config = createUtilConfig<UtilConfigDefinitionShape<TruncConfig>>({
+trunc.config = createUtilConfig<TruncUtilConfig>({
 	fractionDigits: {
 		default: () => 0,
 	},

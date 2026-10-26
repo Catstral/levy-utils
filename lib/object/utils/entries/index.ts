@@ -1,10 +1,10 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type Entries<T extends object> = {
 	[K in keyof T]: [K, T[K]];
 }[keyof T][];
 
-export interface EntriesConfig {
+export interface EntriesUtilConfig {
 	[key: string]: never;
 }
 
@@ -15,4 +15,4 @@ export function entries<const T extends Record<string, unknown>>(value: T): Entr
 	return Object.entries(value) as Entries<T>;
 }
 
-entries.config = createUtilConfig<UtilConfigDefinitionShape<EntriesConfig>>({});
+entries.config = createUtilConfig<EntriesUtilConfig>({});

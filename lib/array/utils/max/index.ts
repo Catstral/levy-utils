@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type MaxDirection = "ASCENDING" | "DESCENDING";
 
@@ -11,7 +11,7 @@ export interface MaxOptions {
 	direction?: MaxDirection;
 }
 
-export interface MaxConfig {
+export interface MaxUtilConfig {
 	direction: MaxDirection;
 }
 
@@ -87,7 +87,7 @@ export function max<const T>(list: T[], mapper?: (item: T) => number, options?: 
 	).value as T | undefined;
 }
 
-max.config = createUtilConfig<UtilConfigDefinitionShape<MaxConfig>>({
+max.config = createUtilConfig<MaxUtilConfig>({
 	direction: {
 		default: () => "ASCENDING",
 	},

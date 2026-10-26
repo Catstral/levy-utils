@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import {
 	readSplitCasingConfig,
 	SPLIT_CASE_CONFIG_SHAPE,
@@ -21,7 +21,7 @@ export interface SnakeCaseOptions extends SplitCasingOptions {
 	screaming?: boolean;
 }
 
-export interface SnakeCaseConfig extends SplitCasingConfig {
+export interface SnakeCaseUtilConfig extends SplitCasingConfig {
 	screaming: boolean;
 }
 
@@ -56,14 +56,14 @@ export function snakeCase(str: string, options?: SnakeCaseOptions): string {
 	});
 }
 
-snakeCase.config = createUtilConfig<UtilConfigDefinitionShape<SnakeCaseConfig>>({
+snakeCase.config = createUtilConfig<SnakeCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 	screaming: {
 		default: () => false,
 	},
 });
 
-export interface ScreamingSnakeCaseConfig extends SplitCasingConfig {}
+export interface ScreamingSnakeCaseUtilConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to SCREAMING_SNAKE_CASE.
@@ -89,6 +89,6 @@ export function screamingSnakeCase(str: string, options?: Omit<SnakeCaseOptions,
 	});
 }
 
-screamingSnakeCase.config = createUtilConfig<UtilConfigDefinitionShape<ScreamingSnakeCaseConfig>>({
+screamingSnakeCase.config = createUtilConfig<ScreamingSnakeCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 });

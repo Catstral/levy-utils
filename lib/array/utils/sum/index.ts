@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface SumConfig {
+export interface SumUtilConfig {
 	[key: string]: never;
 }
 
@@ -44,4 +44,4 @@ export function sum<const T>(list: T[], mapper?: (item: T) => number): number {
 	return result;
 }
 
-sum.config = createUtilConfig<UtilConfigDefinitionShape<SumConfig>>({});
+sum.config = createUtilConfig<SumUtilConfig>({});

@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface ClampConfig {
+export interface ClampUtilConfig {
 	[key: string]: never;
 }
 
@@ -36,4 +36,4 @@ export function clamp(min: number, value: number, max: number): number {
 	return NaN;
 }
 
-clamp.config = createUtilConfig<UtilConfigDefinitionShape<ClampConfig>>({});
+clamp.config = createUtilConfig<ClampUtilConfig>({});

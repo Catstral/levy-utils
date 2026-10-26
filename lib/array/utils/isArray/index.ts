@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsArrayConfig {
+export interface IsArrayUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isArray(value: unknown): value is unknown[] {
 	return Array.isArray(value);
 }
 
-isArray.config = createUtilConfig<UtilConfigDefinitionShape<IsArrayConfig>>({});
+isArray.config = createUtilConfig<IsArrayUtilConfig>({});

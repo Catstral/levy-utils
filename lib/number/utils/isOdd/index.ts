@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsOddConfig {
+export interface IsOddUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isOdd(value: number): boolean {
 	return ((value % 2) + 2) % 2 === 1;
 }
 
-isOdd.config = createUtilConfig<UtilConfigDefinitionShape<IsOddConfig>>({});
+isOdd.config = createUtilConfig<IsOddUtilConfig>({});

@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface IsPrimeConfig {
+export interface IsPrimeUtilConfig {
 	[key: string]: never;
 }
 
@@ -28,4 +28,4 @@ export function isPrime(value: number): boolean {
 	return true;
 }
 
-isPrime.config = createUtilConfig<UtilConfigDefinitionShape<IsPrimeConfig>>({});
+isPrime.config = createUtilConfig<IsPrimeUtilConfig>({});

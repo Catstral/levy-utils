@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface ToFloatConfig {
+export interface ToFloatUtilConfig {
 	fallback: number;
 }
 
@@ -45,7 +45,7 @@ export function toFloat(value: unknown, fallback: number = toFloat.config.fallba
 	return result;
 }
 
-toFloat.config = createUtilConfig<UtilConfigDefinitionShape<ToFloatConfig>>({
+toFloat.config = createUtilConfig<ToFloatUtilConfig>({
 	fallback: {
 		default: () => 0,
 	},

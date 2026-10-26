@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface ChanceConfig {
+export interface ChanceUtilConfig {
 	[key: string]: never;
 }
 
@@ -30,4 +30,4 @@ export function chance(percentage: number): boolean {
 	return crypto.getRandomValues(new Uint8Array(1))[0] < fullPercentage * percentage;
 }
 
-chance.config = createUtilConfig<UtilConfigDefinitionShape<ChanceConfig>>({});
+chance.config = createUtilConfig<ChanceUtilConfig>({});

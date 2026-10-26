@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface DeferConfig {
+export interface DeferUtilConfig {
 	[key: string]: never;
 }
 
@@ -18,4 +18,4 @@ export function defer(callback: () => void): void {
 	}, 0);
 }
 
-defer.config = createUtilConfig<UtilConfigDefinitionShape<DeferConfig>>({});
+defer.config = createUtilConfig<DeferUtilConfig>({});

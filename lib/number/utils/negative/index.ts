@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { IsNegative, Negative } from "../../../number";
 
-export interface NegativeConfig {
+export interface NegativeUtilConfig {
 	[key: string]: never;
 }
 
@@ -18,9 +18,9 @@ export function negative<const T extends number>(value: T): Negative<T> {
 	return -Math.abs(value) as Negative<T>;
 }
 
-negative.config = createUtilConfig<UtilConfigDefinitionShape<NegativeConfig>>({});
+negative.config = createUtilConfig<NegativeUtilConfig>({});
 
-export interface IsNegativeConfig {
+export interface IsNegativeUtilConfig {
 	[key: string]: never;
 }
 
@@ -37,4 +37,4 @@ export function isNegative<const T extends number>(value: T): IsNegative<T> {
 	return (value < 0 || Object.is(value, -0)) as IsNegative<T>;
 }
 
-isNegative.config = createUtilConfig<UtilConfigDefinitionShape<IsNegativeConfig>>({});
+isNegative.config = createUtilConfig<IsNegativeUtilConfig>({});

@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface MaybeConfig {
+export interface MaybeUtilConfig {
 	[key: string]: never;
 }
 
@@ -17,4 +17,4 @@ export function maybe(): boolean {
 	return crypto.getRandomValues(new Uint8Array(1))[0] < middlePoint;
 }
 
-maybe.config = createUtilConfig<UtilConfigDefinitionShape<MaybeConfig>>({});
+maybe.config = createUtilConfig<MaybeUtilConfig>({});

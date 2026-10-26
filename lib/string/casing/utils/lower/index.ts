@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface LowercaseConfig {
+export interface LowerCaseUtilConfig {
 	[key: string]: never;
 }
 
@@ -20,4 +20,4 @@ export function lowerCase<const T extends string>(str: T): Lowercase<T> {
 	return str.toLowerCase() as Lowercase<T>;
 }
 
-lowerCase.config = createUtilConfig<UtilConfigDefinitionShape<LowercaseConfig>>({});
+lowerCase.config = createUtilConfig<LowerCaseUtilConfig>({});

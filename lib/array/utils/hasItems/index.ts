@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface HasItemsConfig {
+export interface HasItemsUtilConfig {
 	[key: string]: never;
 }
 
@@ -21,4 +21,4 @@ export function hasItems<const T>(list: readonly T[]): list is readonly [T, ...T
 	return list.length > 0;
 }
 
-hasItems.config = createUtilConfig<UtilConfigDefinitionShape<HasItemsConfig>>({});
+hasItems.config = createUtilConfig<HasItemsUtilConfig>({});

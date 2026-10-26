@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Promisable } from "../../../types";
 
-export interface MapConfig {
+export interface MapUtilConfig {
 	[key: string]: never;
 }
 
@@ -60,4 +60,4 @@ export function map(
 	return isPromise ? Promise.all(result) : result;
 }
 
-map.config = createUtilConfig<UtilConfigDefinitionShape<MapConfig>>({});
+map.config = createUtilConfig<MapUtilConfig>({});

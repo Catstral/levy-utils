@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Key } from "../../../types";
 
 export type ValuesTarget =
@@ -21,7 +21,7 @@ export type Values<T extends ValuesTarget> =
 						? V[]
 						: never;
 
-export interface ValuesConfig {
+export interface ValuesUtilConfig {
 	[key: string]: never;
 }
 
@@ -46,4 +46,4 @@ export function values<const T extends ValuesTarget>(target: T): Values<T> {
 	return Object.values(target) as Values<T>;
 }
 
-values.config = createUtilConfig<UtilConfigDefinitionShape<ValuesConfig>>({});
+values.config = createUtilConfig<ValuesUtilConfig>({});

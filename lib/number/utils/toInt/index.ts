@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Integer } from "../../../number";
 
-export interface ToIntConfig {
+export interface ToIntUtilConfig {
 	fallback: number;
 }
 
@@ -52,7 +52,7 @@ export function toInt<const T extends number>(
 	return result;
 }
 
-toInt.config = createUtilConfig<UtilConfigDefinitionShape<ToIntConfig>>({
+toInt.config = createUtilConfig<ToIntUtilConfig>({
 	fallback: {
 		default: () => 0,
 	},

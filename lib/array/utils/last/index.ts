@@ -1,10 +1,10 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type Last<T extends readonly unknown[], F = undefined> = T extends readonly [...T[number][], infer V]
 	? V
 	: T[number] | (T extends readonly [T[number], ...T[number][]] ? never : F);
 
-export interface LastConfig {
+export interface LastUtilConfig {
 	[key: string]: never;
 }
 
@@ -24,4 +24,4 @@ export function last<const T extends readonly unknown[], const F = undefined>(li
 	return (list.length === 0 ? fallback : list.at(-1)) as Last<T, F>;
 }
 
-last.config = createUtilConfig<UtilConfigDefinitionShape<LastConfig>>({});
+last.config = createUtilConfig<LastUtilConfig>({});

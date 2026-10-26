@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface RandomConfig {
+export interface RandomUtilConfig {
 	[key: string]: never;
 }
 
@@ -31,4 +31,4 @@ export function random(min: number = 0, max: number = 1): number {
 	return Math.random() * diff + min;
 }
 
-random.config = createUtilConfig<UtilConfigDefinitionShape<RandomConfig>>({});
+random.config = createUtilConfig<RandomUtilConfig>({});

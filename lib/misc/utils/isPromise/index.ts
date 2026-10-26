@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface IsPromiseConfig {
+export interface IsPromiseUtilConfig {
 	[key: string]: never;
 }
 
@@ -16,4 +16,4 @@ export function isPromise(value: unknown): value is Promise<unknown> {
 	return value instanceof Promise;
 }
 
-isPromise.config = createUtilConfig<UtilConfigDefinitionShape<IsPromiseConfig>>({});
+isPromise.config = createUtilConfig<IsPromiseUtilConfig>({});

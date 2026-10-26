@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { IsInteger } from "../../../number";
 
-export interface IsIntegerConfig {
+export interface IsIntegerUtilConfig {
 	[key: string]: never;
 }
 
@@ -18,4 +18,4 @@ export function isInteger<const T extends number>(value: T): IsInteger<T> {
 	return Number.isInteger(value) as IsInteger<T>;
 }
 
-isInteger.config = createUtilConfig<UtilConfigDefinitionShape<IsIntegerConfig>>({});
+isInteger.config = createUtilConfig<IsIntegerUtilConfig>({});

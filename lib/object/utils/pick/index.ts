@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface PickConfig {
+export interface PickUtilConfig {
 	[key: string]: never;
 }
 
@@ -29,4 +29,4 @@ export function pick<const T extends Record<string, unknown>, const K extends ke
 	return picked;
 }
 
-pick.config = createUtilConfig<UtilConfigDefinitionShape<PickConfig>>({});
+pick.config = createUtilConfig<PickUtilConfig>({});

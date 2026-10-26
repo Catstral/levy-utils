@@ -1,4 +1,4 @@
-import type { UtilConfig, UtilConfigDefinitionShape } from "../../config";
+import type { UtilConfig, UtilConfigShape } from "../../config";
 import type { UuidRNGConfig, UuidRNGOptions } from "./types";
 
 export const UUID_RNG_CONFIG_SHAPE = {
@@ -8,7 +8,7 @@ export const UUID_RNG_CONFIG_SHAPE = {
 	random: {
 		default: () => undefined,
 	},
-} satisfies UtilConfigDefinitionShape<UuidRNGConfig>;
+} satisfies UtilConfigShape<UuidRNGConfig>;
 
 export function readUuidRNGConfig(config: UtilConfig<UuidRNGConfig>): UuidRNGOptions {
 	return {

@@ -1,8 +1,8 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type Computable<T, Args extends unknown[] = never[]> = T | ((...args: Args) => T);
 
-export interface IsComputationConfig {
+export interface IsComputationUtilConfig {
 	[key: string]: never;
 }
 
@@ -22,9 +22,9 @@ export function isComputation<const T, const Args extends unknown[]>(
 	return typeof value === "function";
 }
 
-isComputation.config = createUtilConfig<UtilConfigDefinitionShape<IsComputationConfig>>({});
+isComputation.config = createUtilConfig<IsComputationUtilConfig>({});
 
-export interface ComputeConfig {
+export interface ComputeUtilConfig {
 	[key: string]: never;
 }
 
@@ -43,4 +43,4 @@ export function compute<const T, const Args extends unknown[] = never[]>(value: 
 	return isComputation(value) ? value(...args) : value;
 }
 
-compute.config = createUtilConfig<UtilConfigDefinitionShape<ComputeConfig>>({});
+compute.config = createUtilConfig<ComputeUtilConfig>({});

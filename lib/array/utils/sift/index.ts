@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Falsy } from "../../../types";
 
-export interface SiftConfig {
+export interface SiftUtilConfig {
 	[key: string]: never;
 }
 
@@ -18,4 +18,4 @@ export function sift<const T>(list: (T | Falsy)[]): T[] {
 	return list.filter((item): item is T => !!item);
 }
 
-sift.config = createUtilConfig<UtilConfigDefinitionShape<SiftConfig>>({});
+sift.config = createUtilConfig<SiftUtilConfig>({});

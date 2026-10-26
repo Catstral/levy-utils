@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface UuidMaxConfig {
+export interface UuidMaxUtilConfig {
 	[key: string]: never;
 }
 
@@ -15,4 +15,4 @@ export function uuidMax(): string {
 	return "ffffffff-ffff-ffff-ffff-ffffffffffff";
 }
 
-uuidMax.config = createUtilConfig<UtilConfigDefinitionShape<UuidMaxConfig>>({});
+uuidMax.config = createUtilConfig<UuidMaxUtilConfig>({});

@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import { UtilError } from "../../../../error";
 import { getRNG, readUuidRNGConfig, stringifyBytes, UUID_RNG_CONFIG_SHAPE } from "../../helpers";
 import type { UuidRNGConfig, UuidRNGOptions } from "../../types";
@@ -14,7 +14,7 @@ export class UuidV4UtilError extends UtilError {
 
 export interface UuidV4Options extends UuidRNGOptions {}
 
-export interface UuidV4Config extends UuidRNGConfig {}
+export interface UuidV4UtilConfig extends UuidRNGConfig {}
 
 /**
  * Returns a Cryptographically secure random V4 UUID string.
@@ -57,7 +57,7 @@ export function uuidV4(options?: UuidV4Options): string {
 	return stringifyBytes(random);
 }
 
-uuidV4.config = createUtilConfig<UtilConfigDefinitionShape<UuidV4Config>>({
+uuidV4.config = createUtilConfig<UuidV4UtilConfig>({
 	...UUID_RNG_CONFIG_SHAPE,
 });
 

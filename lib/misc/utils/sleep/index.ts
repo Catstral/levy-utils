@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface SleepConfig {
+export interface SleepUtilConfig {
 	[key: string]: never;
 }
 
@@ -20,4 +20,4 @@ export async function sleep(delayMs: number): Promise<void> {
 	});
 }
 
-sleep.config = createUtilConfig<UtilConfigDefinitionShape<SleepConfig>>({});
+sleep.config = createUtilConfig<SleepUtilConfig>({});

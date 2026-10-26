@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface OmitConfig {
+export interface OmitUtilConfig {
 	[key: string]: never;
 }
 
@@ -31,4 +31,4 @@ export function omit<const T extends Record<string, unknown>, const K extends ke
 	return omitted;
 }
 
-omit.config = createUtilConfig<UtilConfigDefinitionShape<OmitConfig>>({});
+omit.config = createUtilConfig<OmitUtilConfig>({});

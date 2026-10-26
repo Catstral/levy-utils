@@ -1,8 +1,8 @@
 // TODO: Write docs
 
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface SlugConfig {
+export interface SlugUtilConfig {
 	[key: string]: never;
 }
 
@@ -14,4 +14,4 @@ export function slug(text: string) {
 		.replace(/ +/g, "-");
 }
 
-slug.config = createUtilConfig<UtilConfigDefinitionShape<SlugConfig>>({});
+slug.config = createUtilConfig<SlugUtilConfig>({});

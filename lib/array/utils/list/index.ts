@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { UtilError } from "../../../error";
 import { type Computable, compute } from "../../../misc/utils/compute";
 
@@ -28,7 +28,7 @@ export interface ListOptions<T> {
 	step?: number;
 }
 
-export interface ListConfig {
+export interface ListUtilConfig {
 	step: number | undefined;
 }
 
@@ -109,7 +109,7 @@ export function list<const T = number>(startOrLength: number, end?: number, opti
 	return finalList;
 }
 
-list.config = createUtilConfig<UtilConfigDefinitionShape<ListConfig>>({
+list.config = createUtilConfig<ListUtilConfig>({
 	step: {
 		default: () => undefined,
 	},

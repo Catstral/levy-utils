@@ -1,11 +1,11 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { type Computable, compute, isComputation } from "../compute";
 
 export type MatchTarget = string | number | boolean | bigint | null | undefined;
 
 export type MatchClause<T extends MatchTarget> = Partial<Record<`${T}`, Computable<unknown>>>;
 
-export interface MatchConfig {
+export interface MatchUtilConfig {
 	[key: string]: never;
 }
 
@@ -56,4 +56,4 @@ export function match<const T extends MatchTarget, const C extends MatchClause<T
 	return fallback;
 }
 
-match.config = createUtilConfig<UtilConfigDefinitionShape<MatchConfig>>({});
+match.config = createUtilConfig<MatchUtilConfig>({});

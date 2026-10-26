@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import { UtilError } from "../../../../error";
 import { getRNG, readUuidRNGConfig, stringifyBytes, UUID_RNG_CONFIG_SHAPE } from "../../helpers";
 import type { UuidRNGConfig, UuidRNGOptions } from "../../types";
@@ -27,7 +27,7 @@ export interface UuidV7Options extends UuidRNGOptions {
 	sequence?: number;
 }
 
-export interface UuidV7Config extends UuidRNGConfig {
+export interface UuidV7UtilConfig extends UuidRNGConfig {
 	milliseconds: number | undefined;
 	sequence: number | undefined;
 }
@@ -84,7 +84,7 @@ export function uuidV7(options?: UuidV7Options): string {
 	return stringifyBytes(buffer);
 }
 
-uuidV7.config = createUtilConfig<UtilConfigDefinitionShape<UuidV7Config>>({
+uuidV7.config = createUtilConfig<UuidV7UtilConfig>({
 	...UUID_RNG_CONFIG_SHAPE,
 	milliseconds: {
 		default: () => undefined,

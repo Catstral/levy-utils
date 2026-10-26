@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Promisable } from "../../../types";
 
 /**
@@ -21,7 +21,7 @@ export type Option<T> =
 			error: unknown;
 	  };
 
-export interface SafeConfig {
+export interface SafeUtilConfig {
 	[key: string]: never;
 }
 
@@ -81,9 +81,9 @@ export function safe(callback: (...args: unknown[]) => unknown, ...parameters: u
 	}
 }
 
-safe.config = createUtilConfig<UtilConfigDefinitionShape<SafeConfig>>({});
+safe.config = createUtilConfig<SafeUtilConfig>({});
 
-export interface UnwrapConfig {
+export interface UnwrapUtilConfig {
 	[key: string]: never;
 }
 
@@ -116,4 +116,4 @@ export function unwrap<const T, const F = undefined>(...args: [option: Option<T>
 	throw option.error;
 }
 
-unwrap.config = createUtilConfig<UtilConfigDefinitionShape<UnwrapConfig>>({});
+unwrap.config = createUtilConfig<UnwrapUtilConfig>({});

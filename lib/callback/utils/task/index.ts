@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Promisable } from "../../../types";
 
-export interface TaskConfig {
+export interface TaskUtilConfig {
 	[key: string]: never;
 }
 
@@ -19,4 +19,4 @@ export async function task(callback?: () => Promisable<void>): Promise<void> {
 	await callback?.();
 }
 
-task.config = createUtilConfig<UtilConfigDefinitionShape<TaskConfig>>({});
+task.config = createUtilConfig<TaskUtilConfig>({});

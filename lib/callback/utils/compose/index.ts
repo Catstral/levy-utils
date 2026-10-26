@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type ComposeCallback<V = never> = ((previousValue: V) => unknown) | (() => unknown);
 
@@ -43,7 +43,7 @@ export type ComposeParameters<T extends unknown[]> = T extends [infer Entry exte
 	? Parameters<Entry>
 	: [];
 
-export interface ComposeConfig {
+export interface ComposeUtilConfig {
 	[key: string]: never;
 }
 
@@ -78,4 +78,4 @@ export function compose<const T extends ComposeEntry[]>(
 	};
 }
 
-compose.config = createUtilConfig<UtilConfigDefinitionShape<ComposeConfig>>({});
+compose.config = createUtilConfig<ComposeUtilConfig>({});

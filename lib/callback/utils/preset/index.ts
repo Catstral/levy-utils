@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { type Computable, compute } from "../../../misc";
 
-export interface PresetConfig {
+export interface PresetUtilConfig {
 	[key: string]: never;
 }
 
@@ -39,4 +39,4 @@ export function preset<const T extends (...args: never[]) => unknown, const Args
 	};
 }
 
-preset.config = createUtilConfig<UtilConfigDefinitionShape<PresetConfig>>({});
+preset.config = createUtilConfig<PresetUtilConfig>({});

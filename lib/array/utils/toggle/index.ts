@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import type { Key } from "../../../types";
 
 export type ToggleStrategy = "APPEND" | "PREPEND";
@@ -26,7 +26,7 @@ export interface ToggleOptions<T> {
 	strategy?: ToggleStrategy;
 }
 
-export interface ToggleConfig {
+export interface ToggleUtilConfig {
 	strategy: ToggleStrategy;
 }
 
@@ -71,7 +71,7 @@ export function toggle<const T>(list: T[], itemToToggle: T, options?: ToggleOpti
 	return currentList;
 }
 
-toggle.config = createUtilConfig<UtilConfigDefinitionShape<ToggleConfig>>({
+toggle.config = createUtilConfig<ToggleUtilConfig>({
 	strategy: {
 		default: () => "APPEND",
 	},

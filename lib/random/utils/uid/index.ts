@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
-export interface UidConfig {
+export interface UidUtilConfig {
 	length: number;
 	charset: string;
 }
@@ -45,7 +45,7 @@ export function uid(length: number = uid.config.length, charset: string = uid.co
 	return output;
 }
 
-uid.config = createUtilConfig<UtilConfigDefinitionShape<UidConfig>>({
+uid.config = createUtilConfig<UidUtilConfig>({
 	length: {
 		default: () => 8,
 	},

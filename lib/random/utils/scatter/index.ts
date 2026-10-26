@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { getCryptoSecureRandomNumber } from "../../../random/helper";
 
 export type ScatterBias = "FLOOR" | "ROUND" | "CEILING";
@@ -17,7 +17,7 @@ export interface ScatterOptions {
 	bias?: ScatterBias;
 }
 
-export interface ScatterConfig {
+export interface ScatterUtilConfig {
 	bias: ScatterBias;
 }
 
@@ -83,7 +83,7 @@ export function scatter<const T>(list: readonly T[], split: number = 0.5, option
 	return output;
 }
 
-scatter.config = createUtilConfig<UtilConfigDefinitionShape<ScatterConfig>>({
+scatter.config = createUtilConfig<ScatterUtilConfig>({
 	bias: {
 		default: () => "ROUND",
 	},

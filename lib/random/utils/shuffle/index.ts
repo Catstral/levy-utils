@@ -1,7 +1,7 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 import { getCryptoSecureRandomNumber } from "../../../random/helper";
 
-export interface ShuffleConfig {
+export interface ShuffleUtilConfig {
 	[key: string]: never;
 }
 
@@ -28,4 +28,4 @@ export function shuffle<const T>(list: readonly T[]): T[] {
 	return cloned;
 }
 
-shuffle.config = createUtilConfig<UtilConfigDefinitionShape<ShuffleConfig>>({});
+shuffle.config = createUtilConfig<ShuffleUtilConfig>({});

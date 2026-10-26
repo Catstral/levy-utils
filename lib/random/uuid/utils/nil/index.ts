@@ -1,6 +1,6 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 
-export interface UuidNilConfig {
+export interface UuidNilUtilConfig {
 	[key: string]: never;
 }
 
@@ -15,4 +15,4 @@ export function uuidNil(): string {
 	return "00000000-0000-0000-0000-000000000000";
 }
 
-uuidNil.config = createUtilConfig<UtilConfigDefinitionShape<UuidNilConfig>>({});
+uuidNil.config = createUtilConfig<UuidNilUtilConfig>({});

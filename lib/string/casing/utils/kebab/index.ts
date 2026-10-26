@@ -1,4 +1,4 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../../config";
+import { createUtilConfig } from "../../../../config";
 import {
 	readSplitCasingConfig,
 	SPLIT_CASE_CONFIG_SHAPE,
@@ -21,7 +21,7 @@ export interface KebabCaseOptions extends SplitCasingOptions {
 	screaming?: boolean;
 }
 
-export interface KebabCaseConfig extends SplitCasingConfig {
+export interface KebabCaseUtilConfig extends SplitCasingConfig {
 	screaming: boolean;
 }
 
@@ -56,14 +56,14 @@ export function kebabCase(str: string, options?: KebabCaseOptions): string {
 	});
 }
 
-kebabCase.config = createUtilConfig<UtilConfigDefinitionShape<KebabCaseConfig>>({
+kebabCase.config = createUtilConfig<KebabCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 	screaming: {
 		default: () => false,
 	},
 });
 
-export interface ScreamingKebabCaseConfig extends SplitCasingConfig {}
+export interface ScreamingKebabCaseUtilConfig extends SplitCasingConfig {}
 
 /**
  * Converts a string to SCREAMING-KEBAB-CASE.
@@ -86,6 +86,6 @@ export function screamingKebabCase(str: string, options?: Omit<KebabCaseOptions,
 	});
 }
 
-screamingKebabCase.config = createUtilConfig<UtilConfigDefinitionShape<ScreamingKebabCaseConfig>>({
+screamingKebabCase.config = createUtilConfig<ScreamingKebabCaseUtilConfig>({
 	...SPLIT_CASE_CONFIG_SHAPE,
 });

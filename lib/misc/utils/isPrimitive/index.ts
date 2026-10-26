@@ -1,8 +1,8 @@
-import { createUtilConfig, type UtilConfigDefinitionShape } from "../../../config";
+import { createUtilConfig } from "../../../config";
 
 export type Primitive = string | number | boolean | symbol | null | undefined;
 
-export interface IsPrimitiveConfig {
+export interface IsPrimitiveUtilConfig {
 	[key: string]: never;
 }
 
@@ -41,4 +41,4 @@ export function isPrimitive(value: unknown): value is Primitive {
 	}
 }
 
-isPrimitive.config = createUtilConfig<UtilConfigDefinitionShape<IsPrimitiveConfig>>({});
+isPrimitive.config = createUtilConfig<IsPrimitiveUtilConfig>({});
