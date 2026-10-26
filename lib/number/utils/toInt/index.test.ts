@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import type { Integer } from "../../types";
 import { toInt } from ".";
 
-// TODO: add tests for config
-
 describe("toInt", () => {
 	beforeEach(() => {
 		toInt.config.reset();
@@ -120,6 +118,19 @@ describe("toInt", () => {
 
 		test("Fallback is not used for valid values", () => {
 			expect(toInt("42", 5)).toBe(42);
+		});
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(toInt.config.default.fallback).toBe(0);
+			expect(toInt.config.fallback).toBe(0);
+		});
+
+		test("Custom fallback", () => {
+			toInt.config.fallback = 99;
+
+			expect(toInt("abc")).toBe(99);
 		});
 	});
 });
