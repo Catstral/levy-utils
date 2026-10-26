@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { min } from ".";
 
-// TODO: add tests for config
-
 describe("min", () => {
 	beforeEach(() => {
 		min.config.reset();
@@ -98,5 +96,26 @@ describe("min", () => {
 
 		expect(list).toEqual([3, 4, 5]);
 		expect(mappedSmallest).toBe(5);
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(min.config.default.direction).toBe("ASCENDING");
+			expect(min.config.direction).toBe("ASCENDING");
+		});
+
+		test("Setting the default config to descending", () => {
+			const first = {
+				value: 1,
+			};
+			const second = {
+				value: 1,
+			};
+			const largest = min([first, second], (item) => item.value, {
+				direction: "DESCENDING",
+			});
+
+			expect(largest).toBe(second);
+		});
 	});
 });
