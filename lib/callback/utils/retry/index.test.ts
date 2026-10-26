@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { RetryUtilError, retry } from ".";
 
-// TODO: add tests for config
-
 describe.concurrent("retry", () => {
 	beforeEach(() => {
 		retry.config.reset();
@@ -29,6 +27,8 @@ describe.concurrent("retry", () => {
 
 		try {
 			await retry(fn);
+
+			expect().fail("Expected retry to throw.");
 		} catch (err) {
 			thrown = err;
 		}
@@ -59,6 +59,8 @@ describe.concurrent("retry", () => {
 			await retry(fn, {
 				delay: 0,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch (err) {
 			thrown = err;
 		}
@@ -90,6 +92,8 @@ describe.concurrent("retry", () => {
 				delay: 100,
 				backoff: true,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch (err) {
 			thrown = err;
 		}
@@ -120,6 +124,8 @@ describe.concurrent("retry", () => {
 			await retry(fn, {
 				attempts: 1,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch (err) {
 			thrown = err;
 		}
@@ -189,6 +195,8 @@ describe.concurrent("retry", () => {
 			await retry(fn, {
 				attempts: 1,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch (err) {
 			thrown = err;
 		}
@@ -233,6 +241,8 @@ describe.concurrent("retry", () => {
 			await retry(fn, {
 				delay: 100,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch {
 			// expected
 		}
@@ -285,6 +295,8 @@ describe.concurrent("retry", () => {
 				delay: 30,
 				backoff: true,
 			});
+
+			expect().fail("Expected retry to throw.");
 		} catch {
 			// expected
 		}
@@ -295,5 +307,145 @@ describe.concurrent("retry", () => {
 		// 2 retries: first waits 30ms, then delay doubles to 60ms for the second wait = ~90ms total.
 		expect(elapsed).toBeGreaterThanOrEqual(80);
 		expect(elapsed).toBeLessThan(150);
+	});
+
+	describe.concurrent("config", () => {
+		test.concurrent("Reading the default configuration values (regression test)", () => {
+			expect(retry.config.default.attempts).toBe(3);
+			expect(retry.config.default.delay).toBe(1000);
+			expect(retry.config.default.backoff).toBeFalse();
+			expect(retry.config.default.onRetry).toBeUndefined();
+			expect(retry.config.attempts).toBe(3);
+			expect(retry.config.delay).toBe(1000);
+			expect(retry.config.backoff).toBeFalse();
+			expect(retry.config.onRetry).toBeUndefined();
+		});
+
+		test.concurrent("Small retry delay", async () => {
+			retry.config.delay = 100;
+
+			const fn = mock(() => {
+				throw new Error("Some failure");
+			});
+
+			const start = performance.now();
+
+			try {
+				await retry(fn);
+
+				expect().fail("Expected retry to throw.");
+			} catch {
+				// expected
+			}
+
+			const elapsed = performance.now() - start;
+
+			expect(fn).toBeCalledTimes(3);
+			// 2 retries at a constant 100ms delay each = ~200ms total. If backoff were mistakenly on by
+			// default, this would instead be ~300ms (100 + 200). A wide tolerance is allowed for timer jitter.
+			expect(elapsed).toBeGreaterThanOrEqual(170);
+			expect(elapsed).toBeLessThan(270);
+		});
+
+		test.concurrent("Exponential backoff", async () => {
+			retry.config.backoff = true;
+
+			const fn = mock(() => {
+				throw new Error("Some failure");
+			});
+
+			let thrown: unknown;
+
+			try {
+				await retry(fn);
+
+				expect().fail("Expected retry to throw.");
+			} catch (err) {
+				thrown = err;
+			}
+
+			expect(thrown).toBeInstanceOf(RetryUtilError);
+			expect((thrown as RetryUtilError).util).toBe("retry");
+			expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+			expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+			expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("throw");
+			}
+		});
+
+		test.concurrent("Single attempt", async () => {
+			retry.config.attempts = 1;
+
+			const fn = mock(() => {
+				throw new Error("Some failure");
+			});
+
+			let thrown: unknown;
+
+			try {
+				await retry(fn);
+
+				expect().fail("Expected retry to throw.");
+			} catch (err) {
+				thrown = err;
+			}
+
+			expect(thrown).toBeInstanceOf(RetryUtilError);
+			expect((thrown as RetryUtilError).util).toBe("retry");
+			expect((thrown as RetryUtilError).message).toBe("Callback failed too often, stopping retry loop");
+			expect((thrown as RetryUtilError).cause).toBeInstanceOf(Error);
+			expect(((thrown as RetryUtilError).cause as Error).message).toBe("Some failure");
+
+			expect(fn).toBeCalledTimes(1);
+
+			const calls = fn.mock.results;
+
+			for (const call of calls) {
+				expect(call.type).toBe("throw");
+			}
+		});
+
+		test.concurrent("onRetry function", async () => {
+			let currentAttempt = 0;
+
+			const onRetry = mock((_: unknown, attempt: number) => {
+				currentAttempt = attempt;
+			});
+
+			retry.config.onRetry = onRetry;
+
+			const fn = mock((attempt: number) => {
+				if (attempt > 1) {
+					return;
+				}
+
+				throw new Error("Some failure");
+			});
+
+			await retry(() => fn(currentAttempt));
+
+			expect(fn).toBeCalledTimes(3);
+
+			const calls = fn.mock.results;
+
+			expect(calls[0].type).toBe("throw");
+			expect(calls[1].type).toBe("throw");
+			expect(calls[2].type).toBe("return");
+
+			expect(onRetry).toBeCalledTimes(2);
+
+			const retryCalls = onRetry.mock.calls;
+
+			expect(retryCalls[0][0]).toBeInstanceOf(Error);
+			expect(retryCalls[0][1]).toBe(1);
+			expect(retryCalls[1][0]).toBeInstanceOf(Error);
+			expect(retryCalls[1][1]).toBe(2);
+		});
 	});
 });
