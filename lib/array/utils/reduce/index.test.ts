@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, expectTypeOf, mock, test } from "bun:test";
 import { reduce } from ".";
 
-// TODO: add tests for config
-
 describe("reduce", () => {
 	beforeEach(() => {
 		reduce.config.reset();
@@ -87,13 +85,17 @@ describe("reduce", () => {
 		});
 
 		test("Iterates in ascending order when explicitly set", () => {
-			const reduced = reduce(["a", "b", "c"], "", (acc, value) => acc + value, { direction: "ASCENDING" });
+			const reduced = reduce(["a", "b", "c"], "", (acc, value) => acc + value, {
+				direction: "ASCENDING",
+			});
 
 			expect(reduced).toBe("abc");
 		});
 
 		test("Iterates in descending order", () => {
-			const reduced = reduce(["a", "b", "c"], "", (acc, value) => acc + value, { direction: "DESCENDING" });
+			const reduced = reduce(["a", "b", "c"], "", (acc, value) => acc + value, {
+				direction: "DESCENDING",
+			});
 
 			expect(reduced).toBe("cba");
 		});
@@ -102,7 +104,9 @@ describe("reduce", () => {
 			const list = ["a", "b", "c"];
 			const callback = mock((acc: string[], value: string, index: number) => [...acc, `${value}${index}`]);
 
-			reduce(list, [] as string[], callback, { direction: "DESCENDING" });
+			reduce(list, [] as string[], callback, {
+				direction: "DESCENDING",
+			});
 
 			expect(callback).toHaveBeenNthCalledWith(1, [], "c", 2, list);
 			expect(callback).toHaveBeenNthCalledWith(2, ["c2"], "b", 1, list);
@@ -112,7 +116,9 @@ describe("reduce", () => {
 		test("Empty list with a descending direction returns the initial value", () => {
 			const callback = mock((acc: number, value: number) => acc + value);
 
-			const reduced = reduce([], 0, callback, { direction: "DESCENDING" });
+			const reduced = reduce([], 0, callback, {
+				direction: "DESCENDING",
+			});
 
 			expect(reduced).toBe(0);
 			expect(callback).not.toBeCalled();
@@ -131,7 +137,9 @@ describe("reduce", () => {
 		test("Is called exactly once with the final accumulator", () => {
 			const result = mock((acc: number) => acc * 2);
 
-			reduce([1, 2, 3], 0, (acc: number, value: number) => acc + value, { result });
+			reduce([1, 2, 3], 0, (acc: number, value: number) => acc + value, {
+				result,
+			});
 
 			expect(result).toBeCalledTimes(1);
 			expect(result).toHaveBeenNthCalledWith(1, 6);
@@ -140,7 +148,11 @@ describe("reduce", () => {
 		test("Is called with the initial value for an empty list", () => {
 			const result = mock((acc: number) => acc * 2);
 
-			expect(reduce([], 5, (acc: number, value: number) => acc + value, { result })).toBe(10);
+			expect(
+				reduce([], 5, (acc: number, value: number) => acc + value, {
+					result,
+				}),
+			).toBe(10);
 			expect(result).toHaveBeenNthCalledWith(1, 5);
 		});
 
@@ -160,8 +172,25 @@ describe("reduce", () => {
 
 		test("Returns the transformed result type when `result` is provided", () => {
 			expectTypeOf(
-				reduce(list, 0, (acc, value) => acc + value, { result: (acc) => String(acc) }),
+				reduce(list, 0, (acc, value) => acc + value, {
+					result: (acc) => String(acc),
+				}),
 			).toEqualTypeOf<string>();
+		});
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(reduce.config.default.direction).toBe("ASCENDING");
+			expect(reduce.config.direction).toBe("ASCENDING");
+		});
+
+		test("Setting the default config to descending", () => {
+			const reduced = reduce(["a", "b", "c"], "", (acc, value) => acc + value, {
+				direction: "DESCENDING",
+			});
+
+			expect(reduced).toBe("cba");
 		});
 	});
 });
