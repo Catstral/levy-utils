@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { trunc } from ".";
 
-// TODO: add tests for config
-
 describe("trunc", () => {
 	beforeEach(() => {
 		trunc.config.reset();
@@ -46,5 +44,18 @@ describe("trunc", () => {
 
 	test("Throws for more than 100 fraction digits", () => {
 		expect(() => trunc(123.456, 101)).toThrow(RangeError);
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(trunc.config.default.fractionDigits).toBe(0);
+			expect(trunc.config.fractionDigits).toBe(0);
+		});
+
+		test("With fraction digits", () => {
+			trunc.config.fractionDigits = 2;
+
+			expect(trunc(123.456)).toBe(123.45);
+		});
 	});
 });
