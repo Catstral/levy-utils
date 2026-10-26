@@ -25,7 +25,7 @@ describe("createUtilConfig", () => {
 	test("Changing the config value", () => {
 		const config = createUtilConfig({
 			foo: {
-				default: () => "bar",
+				default: (): string => "bar",
 			},
 		});
 
@@ -37,7 +37,7 @@ describe("createUtilConfig", () => {
 	test("Changing the config value does not touch the default values", () => {
 		const config = createUtilConfig({
 			foo: {
-				default: () => "bar",
+				default: (): string => "bar",
 			},
 		});
 
@@ -50,7 +50,7 @@ describe("createUtilConfig", () => {
 	test("Resetting config goes back to default values", () => {
 		const config = createUtilConfig({
 			foo: {
-				default: () => "bar",
+				default: (): string => "bar",
 			},
 		});
 
