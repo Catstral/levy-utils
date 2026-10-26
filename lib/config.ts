@@ -24,10 +24,8 @@ export type UtilConfigShape<S extends AnyRecord> = {
 	[K in keyof S]: UtilConfigDefinition<S[K]>;
 };
 
-export function createUtilConfig<const T extends AnyRecord, const S extends UtilConfigShape<T> = UtilConfigShape<T>>(
-	shape: S,
-): UtilConfig<T> {
-	const entries = Object.entries(shape) as Entries<S>;
+export function createUtilConfig<const T extends AnyRecord>(shape: UtilConfigShape<T>): UtilConfig<T> {
+	const entries = Object.entries(shape) as Entries<UtilConfigShape<T>>;
 	const config: AnyRecord = {
 		...Object.fromEntries(entries.map(([key, definition]) => [key, definition.default()])),
 		default: {},
