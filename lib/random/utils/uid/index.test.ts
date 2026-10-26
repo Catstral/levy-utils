@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { uid } from ".";
 
-// TODO: add tests for config
-
 describe("uid", () => {
 	beforeEach(() => {
 		uid.config.reset();
@@ -23,5 +21,26 @@ describe("uid", () => {
 
 		expect(id).toHaveLength(10);
 		expect(id).toBe("aaaaaaaaaa");
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(uid.config.default.length).toBe(8);
+			expect(uid.config.default.charset).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+			expect(uid.config.length).toBe(8);
+			expect(uid.config.charset).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+		});
+
+		test("Custom length", () => {
+			uid.config.length = 10;
+
+			expect(uid()).toHaveLength(10);
+		});
+
+		test("Custom charset", () => {
+			uid.config.charset = "a";
+
+			expect(uid()).toBe("aaaaaaaa");
+		});
 	});
 });
