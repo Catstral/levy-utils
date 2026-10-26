@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { toFloat } from ".";
 
-// TODO: add tests for config
-
 describe("toFloat", () => {
 	beforeEach(() => {
 		toFloat.config.reset();
@@ -118,6 +116,19 @@ describe("toFloat", () => {
 
 		test("Not used when the value is valid", () => {
 			expect(toFloat("3.14", 99)).toBe(3.14);
+		});
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(toFloat.config.default.fallback).toBe(0);
+			expect(toFloat.config.fallback).toBe(0);
+		});
+
+		test("Custom fallback", () => {
+			toFloat.config.fallback = 99;
+
+			expect(toFloat("abc")).toBe(99);
 		});
 	});
 });
