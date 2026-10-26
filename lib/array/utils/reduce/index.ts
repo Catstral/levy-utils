@@ -6,7 +6,7 @@ export type ReduceDirection = "ASCENDING" | "DESCENDING";
 
 export interface ReduceOptions<Acc = unknown, R = Acc> {
 	/**
-	 * The direction the list should be checked in..
+	 * The direction the list should be checked in.
 	 *
 	 * @default "ASCENDING"
 	 */
