@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { max } from ".";
 
-// TODO: add tests for config
-
 describe("max", () => {
 	beforeEach(() => {
 		max.config.reset();
@@ -58,7 +56,9 @@ describe("max", () => {
 	});
 
 	test("Checks the list in descending direction", () => {
-		const largest = max([1, 2, 3, 3], undefined, { direction: "DESCENDING" });
+		const largest = max([1, 2, 3, 3], undefined, {
+			direction: "DESCENDING",
+		});
 
 		expect(largest).toBe(3);
 	});
@@ -82,7 +82,9 @@ describe("max", () => {
 		const second = {
 			value: 1,
 		};
-		const largest = max([first, second], (item) => item.value, { direction: "DESCENDING" });
+		const largest = max([first, second], (item) => item.value, {
+			direction: "DESCENDING",
+		});
 
 		expect(largest).toBe(second);
 	});
@@ -98,5 +100,26 @@ describe("max", () => {
 
 		expect(list).toEqual([3, 4, 5]);
 		expect(mappedLargest).toBe(3);
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(max.config.default.direction).toBe("ASCENDING");
+			expect(max.config.direction).toBe("ASCENDING");
+		});
+
+		test("Setting the default config to descending", () => {
+			const first = {
+				value: 1,
+			};
+			const second = {
+				value: 1,
+			};
+			const largest = max([first, second], (item) => item.value, {
+				direction: "DESCENDING",
+			});
+
+			expect(largest).toBe(second);
+		});
 	});
 });
