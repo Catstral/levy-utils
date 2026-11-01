@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { httpHeaderCase } from ".";
 
-// TODO: add tests for config
-
 describe("httpHeaderCase", () => {
 	beforeEach(() => {
 		httpHeaderCase.config.reset();
@@ -30,5 +28,16 @@ describe("httpHeaderCase", () => {
 
 	test("Works without options", () => {
 		expect(httpHeaderCase("content type")).toBe("Content-Type");
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(httpHeaderCase.config.default.groupNumbers).toBeFalse();
+			expect(httpHeaderCase.config.default.groupUppercaseLetters).toBeTrue();
+			expect(httpHeaderCase.config.default.parser).toBeUndefined();
+			expect(httpHeaderCase.config.groupNumbers).toBeFalse();
+			expect(httpHeaderCase.config.groupUppercaseLetters).toBeTrue();
+			expect(httpHeaderCase.config.parser).toBeUndefined();
+		});
 	});
 });
