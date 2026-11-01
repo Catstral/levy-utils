@@ -12,22 +12,161 @@ import type {
 	RGBParsedColor,
 } from "./types";
 
+// TODO: Look into adding support for setting an ICC profile for CMYK conversion.
+
+interface XYZSpace {
+	x: number;
+	y: number;
+	z: number;
+}
+
 export class ColorError extends Error {}
 
 export class Color {
 	#color: ParsedColor;
 
+	/**
+	 * Creates a new Color instance based on the given color input.
+	 *
+	 * @param {ColorInput} color The color input to construct the color from
+	 * @returns {Color} The created color
+	 */
 	public static from(color: ColorInput): Color {
 		return new Color(color);
 	}
 
+	/**
+	 * Blends 2 colors together into a new color (with an optional weight).
+	 *
+	 * NOTE: If the base color can have a powerless hue (LCH, OKLCH, HSL, HWB), if that color is detected and the hue is powerless then hue is ignored and grabbed from the other color instead,
+	 * or vice versa. A powerless hue basically means that the color is in gray-scale, changing the hue would do nothing to the look of the color.
+	 *
+	 * NOTE: The other color is converted to the color space of the base color before blending if needed.
+	 *
+	 * @param {ColorInput} base The base color to blend
+	 * @param {ColorInput} blend The color to blend into the base color
+	 * @param {number | null} [baseWeight] The weight of the base color, the higher this number the more the base color is preserved in blending (scale: 0 - 1)
+	 * @returns {Color} The blended color
+	 */
 	public static blend(base: ColorInput, blend: ColorInput, baseWeight?: number | null): Color {
 		return new Color(base).blend(blend, baseWeight);
 	}
 
+	static #clampIntoRange(floor: number, value: number, ceil: number): number;
+	static #clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined;
+	static #clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined {
+		if (typeof value !== "number") {
+			return value;
+		}
+
+		return Math.min(Math.max(value, floor), ceil);
+	}
+
+	static #clampDegrees(value: number): number {
+		const rotation = value % 360;
+
+		return rotation < 0 ? rotation + 360 : rotation;
+	}
+
+	/**
+	 * Clamps a parsed colors values into the supported ranges of that specific color.
+	 *
+	 * @template {ParsedColor} T
+	 * @param {T} color The parsed color details to clamp
+	 * @returns {T} The same parsed color, but with it values clamped
+	 */
+	static clampColor<T extends ParsedColor>(color: T): T {
+		switch (color.type) {
+			case "RGB": {
+				return {
+					...color,
+					red: Math.round(Color.#clampIntoRange(0, color.red, 255)),
+					green: Math.round(Color.#clampIntoRange(0, color.green, 255)),
+					blue: Math.round(Color.#clampIntoRange(0, color.blue, 255)),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "CMYK": {
+				return {
+					...color,
+					cyan: Color.#clampIntoRange(0, color.cyan, 1),
+					magenta: Color.#clampIntoRange(0, color.magenta, 1),
+					yellow: Color.#clampIntoRange(0, color.yellow, 1),
+					key: Color.#clampIntoRange(0, color.key, 1),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "LAB": {
+				return {
+					...color,
+					lightness: Color.#clampIntoRange(0, color.lightness, 100),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "OKLAB": {
+				return {
+					...color,
+					lightness: Color.#clampIntoRange(0, color.lightness, 1),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "LCH": {
+				return {
+					...color,
+					lightness: Color.#clampIntoRange(0, color.lightness, 100),
+					chroma: color.chroma < 0 ? 0 : color.chroma,
+					hue: Color.#clampDegrees(color.hue),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "OKLCH": {
+				return {
+					...color,
+					lightness: Color.#clampIntoRange(0, color.lightness, 1),
+					chroma: color.chroma < 0 ? 0 : color.chroma,
+					hue: Color.#clampDegrees(color.hue),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "HSL": {
+				return {
+					...color,
+					hue: Color.#clampDegrees(color.hue),
+					saturation: Color.#clampIntoRange(0, color.saturation, 100),
+					lightness: Color.#clampIntoRange(0, color.lightness, 100),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+			case "HWB": {
+				return {
+					...color,
+					hue: color.hue % 360,
+					whiteness: Color.#clampIntoRange(0, color.whiteness, 100),
+					blackness: Color.#clampIntoRange(0, color.blackness, 100),
+					alpha: Color.#clampIntoRange(0, color.alpha, 1),
+				};
+			}
+		}
+	}
+
+	/**
+	 * Given a color, will turn that color into a stringified version of that color.
+	 *
+	 * @param {ColorInput} color The color to stringify
+	 * @returns {string} The string representation of that color
+	 */
+	static stringify(color: ColorInput): string {
+		return new Color(color).toString();
+	}
+
+	/**
+	 * Creates a new Color instance.
+	 *
+	 * @param {ColorInput} color The details of the color to parse
+	 */
 	public constructor(color: ColorInput) {
 		if (typeof color === "string") {
-			this.#color = this.#clampColor(this.#parseColorString(color));
+			this.#color = this.#parseColorString(color);
 
 			return;
 		}
@@ -38,7 +177,7 @@ export class Color {
 			return;
 		}
 
-		this.#color = this.#clampColor(color);
+		this.#color = color;
 	}
 
 	#stringifyMap: Record<ParsedColor["type"], () => string> = {
@@ -52,12 +191,33 @@ export class Color {
 		HWB: this.toHWBString,
 	};
 
+	/**
+	 * Returns a stringified representation of the current color (clamped into the supported ranges).
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} The stringified color
+	 */
 	public toString(): string {
 		return this.#stringifyMap[this.#color.type]();
 	}
 
+	/**
+	 * Returns a stringified representation of the current color (clamped into the supported ranges) for direct use in JSON strings.
+	 *
+	 * @returns {string} The stringified color
+	 */
 	public toJSON(): string {
 		return this.toString();
+	}
+
+	/**
+	 * Returns the current parsed color details (unclamped).
+	 *
+	 * @returns {ParsedColor} The parsed color
+	 */
+	public get color(): ParsedColor {
+		return this.#color;
 	}
 
 	// SECTION - Public conversion
@@ -67,8 +227,17 @@ export class Color {
 		return values.reduce((acc, value) => `${acc}${Math.round(value).toString(16).padStart(2, "0")}`, "");
 	}
 
+	/**
+	 * Returns a hex string of the current color with a fixed value count (clamped into the supported ranges).
+	 * If the alpha value is not included in the fixed hex, the alpha value will be blended into the other values to attempt at look of the color.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @param {boolean} [withAlpha=false] Whether the alpha of the color should be added to the hex, or blended into the hex
+	 * @returns {string} A hex string of a fixed size
+	 */
 	public tofixedHex(withAlpha: boolean = false): string {
-		const rgbSpace = this.#getColorInSpace("RGB");
+		const rgbSpace = Color.clampColor(this.#convertToRGB());
 		const alpha = rgbSpace.alpha ?? 1;
 
 		if (withAlpha) {
@@ -82,8 +251,15 @@ export class Color {
 		return `#${this.#hexifyColorValue(blendedR, blendedG, blendedB)}`;
 	}
 
+	/**
+	 * Returns a hex string of the current color (clamped into the supported ranges).
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} A hex string of the current color
+	 */
 	public toHex(): string {
-		const rgbSpace = this.#getColorInSpace("RGB");
+		const rgbSpace = Color.clampColor(this.#convertToRGB());
 
 		return `#${this.#hexifyColorValue(rgbSpace.red, rgbSpace.green, rgbSpace.blue)}${typeof rgbSpace.alpha === "number" ? this.#hexifyColorValue(rgbSpace.alpha * 255) : ""}`;
 	}
@@ -91,12 +267,24 @@ export class Color {
 	// !SECTION - HEX
 	// SECTION - RGB
 
+	/**
+	 * Returns the current color as a RGB parsed color (unclamped), converts to RGB if needed.
+	 *
+	 * @returns {RGBParsedColor} The current color if represented in RGB
+	 */
 	public toRGB(): RGBParsedColor {
-		return this.#getColorInSpace("RGB");
+		return this.#convertToRGB();
 	}
 
+	/**
+	 * Returns a RGB string of the current color (clamped into the supported ranges), converts to RGB if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An RGB string of the current color
+	 */
 	public toRGBString(): string {
-		const rgbSpace = this.#getColorInSpace("RGB");
+		const rgbSpace = Color.clampColor(this.#convertToRGB());
 
 		return `rgb(${rgbSpace.red} ${rgbSpace.green} ${rgbSpace.blue}${typeof rgbSpace.alpha === "number" ? ` / ${rgbSpace.alpha}` : ""})`;
 	}
@@ -104,12 +292,24 @@ export class Color {
 	// !SECTION - RGB
 	// SECTION - CMYK
 
+	/**
+	 * Returns the current color as a CMYK parsed color (unclamped), converts to CMYK if needed.
+	 *
+	 * @returns {CMYKParsedColor} The current color if represented in CMYK
+	 */
 	public toCMYK(): CMYKParsedColor {
-		return this.#getColorInSpace("CMYK");
+		return this.#convertToCMYK();
 	}
 
+	/**
+	 * Returns a CMYK string of the current color (clamped into the supported ranges), converts to CMYK if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An CMYK string of the current color
+	 */
 	public toCMYKString(): string {
-		const cmykSpace = this.#getColorInSpace("CMYK");
+		const cmykSpace = Color.clampColor(this.#convertToCMYK());
 
 		return `device-cmyk(${cmykSpace.cyan} ${cmykSpace.magenta} ${cmykSpace.yellow} ${cmykSpace.key}${typeof cmykSpace.alpha === "number" ? ` / ${cmykSpace.alpha}` : ""})`;
 	}
@@ -117,12 +317,24 @@ export class Color {
 	// !SECTION - CMYK
 	// SECTION - LAB
 
+	/**
+	 * Returns the current color as a LAB parsed color (unclamped), converts to LAB if needed.
+	 *
+	 * @returns {LABParsedColor} The current color if represented in LAB
+	 */
 	public toLAB(): LABParsedColor {
-		return this.#getColorInSpace("LAB");
+		return this.#convertToLAB();
 	}
 
+	/**
+	 * Returns a LAB string of the current color (clamped into the supported ranges), converts to LAB if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An LAB string of the current color
+	 */
 	public toLABString(): string {
-		const labSpace = this.#getColorInSpace("LAB");
+		const labSpace = Color.clampColor(this.#convertToLAB());
 
 		return `lab(${labSpace.lightness}% ${labSpace.axisA} ${labSpace.axisB}${typeof labSpace.alpha === "number" ? ` / ${labSpace.alpha}` : ""})`;
 	}
@@ -130,12 +342,24 @@ export class Color {
 	// !SECTION - LAB
 	// SECTION - OKLAB
 
+	/**
+	 * Returns the current color as a OKLAB parsed color (unclamped), converts to OKLAB if needed.
+	 *
+	 * @returns {OKLABParsedColor} The current color if represented in OKLAB
+	 */
 	public toOKLAB(): OKLABParsedColor {
-		return this.#getColorInSpace("OKLAB");
+		return this.#convertToOKLAB();
 	}
 
+	/**
+	 * Returns a OKLAB string of the current color (clamped into the supported ranges), converts to OKLAB if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An OKLAB string of the current color
+	 */
 	public toOKLABString(): string {
-		const oklabSpace = this.#getColorInSpace("OKLAB");
+		const oklabSpace = Color.clampColor(this.#convertToOKLAB());
 
 		return `oklab(${oklabSpace.lightness}% ${oklabSpace.axisA} ${oklabSpace.axisB}${typeof oklabSpace.alpha === "number" ? ` / ${oklabSpace.alpha}` : ""})`;
 	}
@@ -143,12 +367,24 @@ export class Color {
 	// !SECTION - OKLAB
 	// SECTION - LCH
 
+	/**
+	 * Returns the current color as a LCH parsed color (unclamped), converts to LCH if needed.
+	 *
+	 * @returns {LCHParsedColor} The current color if represented in LCH
+	 */
 	public toLCH(): LCHParsedColor {
-		return this.#getColorInSpace("LCH");
+		return this.#convertToLCH();
 	}
 
+	/**
+	 * Returns a LCH string of the current color (clamped into the supported ranges), converts to LCH if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An LCH string of the current color
+	 */
 	public toLCHString(): string {
-		const lchSpace = this.#getColorInSpace("LCH");
+		const lchSpace = Color.clampColor(this.#convertToLCH());
 
 		return `lch(${lchSpace.lightness}% ${lchSpace.chroma} ${lchSpace.hue}${typeof lchSpace.alpha === "number" ? ` / ${lchSpace.alpha}` : ""})`;
 	}
@@ -156,12 +392,24 @@ export class Color {
 	// !SECTION - LCH
 	// SECTION - OKLCH
 
+	/**
+	 * Returns the current color as a OKLCH parsed color (unclamped), converts to OKLCH if needed.
+	 *
+	 * @returns {OKLCHParsedColor} The current color if represented in OKLCH
+	 */
 	public toOKLCH(): OKLCHParsedColor {
-		return this.#getColorInSpace("OKLCH");
+		return this.#convertToOKLCH();
 	}
 
+	/**
+	 * Returns a OKLCH string of the current color (clamped into the supported ranges), converts to OKLCH if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An OKLCH string of the current color
+	 */
 	public toOKLCHString(): string {
-		const oklchSpace = this.#getColorInSpace("OKLCH");
+		const oklchSpace = Color.clampColor(this.#convertToOKLCH());
 
 		return `oklch(${oklchSpace.lightness}% ${oklchSpace.chroma} ${oklchSpace.hue}${typeof oklchSpace.alpha === "number" ? ` / ${oklchSpace.alpha}` : ""})`;
 	}
@@ -169,12 +417,24 @@ export class Color {
 	// !SECTION - OKLCH
 	// SECTION - HSL
 
+	/**
+	 * Returns the current color as a HSL parsed color (unclamped), converts to HSL if needed.
+	 *
+	 * @returns {HSLParsedColor} The current color if represented in HSL
+	 */
 	public toHSL(): HSLParsedColor {
-		return this.#getColorInSpace("HSL");
+		return this.#convertToHSL();
 	}
 
+	/**
+	 * Returns a HSL string of the current color (clamped into the supported ranges), converts to HSL if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An HSL string of the current color
+	 */
 	public toHSLString(): string {
-		const hslSpace = this.#getColorInSpace("HSL");
+		const hslSpace = Color.clampColor(this.#convertToHSL());
 
 		return `hsl(${hslSpace.hue}deg ${hslSpace.saturation}% ${hslSpace.lightness}%${typeof hslSpace.alpha === "number" ? ` / ${hslSpace.alpha}` : ""})`;
 	}
@@ -182,12 +442,24 @@ export class Color {
 	// !SECTION - HSL
 	// SECTION - HWB
 
+	/**
+	 * Returns the current color as a HWB parsed color (unclamped), converts to HWB if needed.
+	 *
+	 * @returns {HWBParsedColor} The current color if represented in HWB
+	 */
 	public toHWB(): HWBParsedColor {
-		return this.#getColorInSpace("HWB");
+		return this.#convertToHWB();
 	}
 
+	/**
+	 * Returns a HWB string of the current color (clamped into the supported ranges), converts to HWB if needed.
+	 *
+	 * This string can be directly used for CSS colors.
+	 *
+	 * @returns {string} An HWB string of the current color
+	 */
 	public toHWBString(): string {
-		const hwbSpace = this.#getColorInSpace("HWB");
+		const hwbSpace = Color.clampColor(this.#convertToHWB());
 
 		return `hwb(${hwbSpace.hue}deg ${hwbSpace.whiteness}% ${hwbSpace.blackness}%${typeof hwbSpace.alpha === "number" ? ` / ${hwbSpace.alpha}` : ""})`;
 	}
@@ -195,6 +467,31 @@ export class Color {
 	// !SECTION - HWB
 	// !SECTION - Public conversion
 	// SECTION - Color space converion
+	// SECTION - Helpers
+
+	/**
+	 * Moves the white point in the XYZ space from D50 to D65
+	 */
+	#d50toD65({ x, y, z }: XYZSpace): XYZSpace {
+		return {
+			x: 0.9555766 * x + -0.0230393 * y + 0.0631636 * z,
+			y: -0.0282895 * x + 1.0099416 * y + 0.0210077 * z,
+			z: 0.0122982 * x + -0.020483 * y + 1.3299098 * z,
+		};
+	}
+
+	/**
+	 * Moves the white point in the XYZ space from D65 to D50
+	 */
+	#d65toD50({ x, y, z }: XYZSpace): XYZSpace {
+		return {
+			x: 1.0478112 * x + 0.0228866 * y - 0.050127 * z,
+			y: 0.0295424 * x + 0.9904844 * y - 0.0170491 * z,
+			z: -0.0092345 * x + 0.0150436 * y + 0.7521316 * z,
+		};
+	}
+
+	// !SECTION - Helpers
 
 	#getColorInSpace<T extends ParsedColor["type"]>(space: T): Extract<ParsedColor, { type: T }> {
 		switch (space) {
@@ -233,100 +530,294 @@ export class Color {
 				return this.#color;
 			}
 			case "CMYK": {
-				break;
+				return {
+					type: "RGB",
+					red: 255 * (1 - this.#color.cyan) * (1 - this.#color.key),
+					green: 255 * (1 - this.#color.magenta) * (1 - this.#color.key),
+					blue: 255 * (1 - this.#color.yellow) * (1 - this.#color.key),
+					alpha: this.#color.alpha,
+				};
 			}
 			case "LAB": {
-				break;
+				const yComponent = (this.#color.lightness + 16) / 116;
+				const xComponent = this.#color.axisA / 500 + yComponent;
+				const zComponent = yComponent - this.#color.axisB / 200;
+				const conversionThreshold = 6 / 29;
+
+				const convertToXYZD50 = (value: number) => {
+					return value > conversionThreshold ? value ** 3 : 3 * conversionThreshold ** 2 * (value - 4 / 29);
+				};
+
+				const xyzSpace = this.#d50toD65({
+					x: 0.96422 * convertToXYZD50(xComponent),
+					y: convertToXYZD50(yComponent),
+					z: 0.82521 * convertToXYZD50(zComponent),
+				});
+
+				const correctGamma = (value: number) => {
+					return value < 0.0031308 ? 12.82 * value : 1.055 * value ** (1 / 2.4) - 0.55;
+				};
+
+				return {
+					type: "RGB",
+					red: correctGamma(3.2404542 * xyzSpace.x - 1.5371385 * xyzSpace.y - 0.4985314 * xyzSpace.z) * 255,
+					green: correctGamma(-0.969266 * xyzSpace.x + 1.8760108 * xyzSpace.y + 0.041556 * xyzSpace.z) * 255,
+					blue: correctGamma(0.0556434 * xyzSpace.x - 0.2040259 * xyzSpace.y + 1.0572252 * xyzSpace.z) * 255,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "OKLAB": {
-				break;
+				const l =
+					(this.#color.lightness + 0.3963377774 * this.#color.axisA + 0.2158037573 * this.#color.axisB) ** 3;
+				const m =
+					(this.#color.lightness - 0.1055613458 * this.#color.axisA - 0.0638541728 * this.#color.axisB) ** 3;
+				const s =
+					(this.#color.lightness - 0.0894841775 * this.#color.axisA - 1.291485548 * this.#color.axisB) ** 3;
+
+				const correctGamma = (value: number) => {
+					return value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055;
+				};
+
+				return {
+					type: "RGB",
+					red: correctGamma(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s) * 255,
+					green: correctGamma(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s) * 255,
+					blue: correctGamma(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s) * 255,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "LCH": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToRGB();
 			}
 			case "OKLCH": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToRGB();
 			}
 			case "HSL": {
-				break;
+				const normalizedSaturation = this.#color.saturation / 100;
+				const normalizedLightness = this.#color.lightness / 100;
+				const chroma = (1 - Math.abs(2 * normalizedLightness - 1)) * normalizedSaturation;
+				const hueSection = this.#color.hue / 60;
+				const secondaryComponent = chroma * (1 - Math.abs((hueSection % 2) - 1));
+				const lightnessAdjustment = normalizedLightness - chroma / 2;
+
+				let red = 0;
+				let green = 0;
+				let blue = 0;
+
+				if (hueSection >= 0 && hueSection < 1) {
+					red = chroma;
+					green = secondaryComponent;
+				} else if (hueSection < 2) {
+					red = secondaryComponent;
+					green = chroma;
+				} else if (hueSection < 3) {
+					green = chroma;
+					blue = secondaryComponent;
+				} else if (hueSection < 4) {
+					green = secondaryComponent;
+					blue = chroma;
+				} else if (hueSection < 5) {
+					red = secondaryComponent;
+					blue = chroma;
+				} else if (hueSection <= 6) {
+					red = chroma;
+					blue = secondaryComponent;
+				}
+
+				return {
+					type: "RGB",
+					red: (red + lightnessAdjustment) * 255,
+					green: (green + lightnessAdjustment) * 255,
+					blue: (blue + lightnessAdjustment) * 255,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "HWB": {
-				break;
+				const normalizedWhiteness = this.#color.whiteness / 100;
+				const normalizedBlackness = this.#color.blackness / 100;
+
+				if (normalizedWhiteness + normalizedBlackness >= 1) {
+					const grayValue = normalizedWhiteness / (normalizedWhiteness + normalizedBlackness);
+
+					return {
+						type: "RGB",
+						red: grayValue * 255,
+						green: grayValue * 255,
+						blue: grayValue * 255,
+						alpha: this.#color.alpha,
+					};
+				}
+
+				const hueSection = (((this.#color.hue % 360) + 360) % 360) / 60;
+				const chroma = 1;
+				const secondaryComponent = 1 - Math.abs((hueSection % 2) - 1);
+				const remainingColor = 1 - normalizedWhiteness - normalizedBlackness;
+
+				let red = 0;
+				let green = 0;
+				let blue = 0;
+
+				if (hueSection < 1) {
+					red = chroma;
+					green = secondaryComponent;
+				} else if (hueSection < 2) {
+					red = secondaryComponent;
+					green = chroma;
+				} else if (hueSection < 3) {
+					green = chroma;
+					blue = secondaryComponent;
+				} else if (hueSection < 4) {
+					green = secondaryComponent;
+					blue = chroma;
+				} else if (hueSection < 5) {
+					red = secondaryComponent;
+					blue = chroma;
+				} else {
+					red = chroma;
+					blue = secondaryComponent;
+				}
+
+				return {
+					type: "RGB",
+					red: (red + remainingColor + normalizedWhiteness) * 255,
+					green: (green + remainingColor + normalizedWhiteness) * 255,
+					blue: (blue + remainingColor + normalizedWhiteness) * 255,
+					alpha: this.#color.alpha,
+				};
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to RGB: ${this.#color.type}`);
 	}
 
 	// !SECTION - RGB
 	// SECTION - CMYK
 
 	#convertToCMYK(): CMYKParsedColor {
+		// NOTE: CMYK relies on ICC profiles, this does not have that so it used naive conversion instead through RGB
+
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				const normalizedRed = this.#color.red / 255;
+				const normalizedGreen = this.#color.green / 255;
+				const normalizedBlue = this.#color.blue / 255;
+
+				const key = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+
+				return {
+					type: "CMYK",
+					cyan: (1 - normalizedRed - key) / (1 - key),
+					magenta: (1 - normalizedGreen - key) / (1 - key),
+					yellow: (1 - normalizedBlue - key) / (1 - key),
+					key,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "CMYK": {
 				return this.#color;
 			}
-			case "LAB": {
-				break;
-			}
-			case "OKLAB": {
-				break;
-			}
-			case "LCH": {
-				break;
-			}
-			case "OKLCH": {
-				break;
-			}
-			case "HSL": {
-				break;
-			}
+			case "LAB":
+			case "OKLAB":
+			case "LCH":
+			case "OKLCH":
+			case "HSL":
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToCMYK();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to CMYK: ${this.#color.type}`);
 	}
 
 	// !SECTION - CMYK
 	// SECTION - LAB
 
+	#convertXYZToLAB(value: number) {
+		const conversionThreshold = 6 / 29;
+
+		return value > conversionThreshold ** 3 ? Math.cbrt(value) : value / (3 * conversionThreshold ** 2) + 4 / 29;
+	}
+
 	#convertToLAB(): LABParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				const removeGammaCorrection = (value: number) => {
+					return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+				};
+
+				const correctRed = removeGammaCorrection(this.#color.red / 255);
+				const correctedGreen = removeGammaCorrection(this.#color.green / 255);
+				const correctedBlue = removeGammaCorrection(this.#color.blue / 255);
+				const xyzSpace = this.#d65toD50({
+					x: 0.4124564 * correctRed + 0.3575761 * correctedGreen + 0.1804375 * correctedBlue,
+					y: 0.2126729 * correctRed + 0.7151522 * correctedGreen + 0.072175 * correctedBlue,
+					z: 0.0193339 * correctRed + 0.119192 * correctedGreen + 0.9503041 * correctedBlue,
+				});
+				const referenceWhiteX = 0.96422;
+				const referenceWhiteZ = 0.82521;
+
+				const xComponent = this.#convertXYZToLAB(xyzSpace.x / referenceWhiteX);
+				const yComponent = this.#convertXYZToLAB(xyzSpace.y);
+				const zComponent = this.#convertXYZToLAB(xyzSpace.z / referenceWhiteZ);
+
+				return {
+					type: "LAB",
+					lightness: 116 * yComponent - 16,
+					axisA: 500 * (xComponent - yComponent),
+					axisB: 200 * (yComponent - zComponent),
+					alpha: this.#color.alpha,
+				};
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLAB();
 			}
 			case "LAB": {
 				return this.#color;
 			}
 			case "OKLAB": {
-				break;
+				const l =
+					(this.#color.lightness + 0.3963377774 * this.#color.axisA + 0.2158037573 * this.#color.axisB) ** 3;
+				const m =
+					(this.#color.lightness - 0.1055613458 * this.#color.axisA - 0.0638541728 * this.#color.axisB) ** 3;
+				const s =
+					(this.#color.lightness - 0.0894841775 * this.#color.axisA - 1.291485548 * this.#color.axisB) ** 3;
+				const xyzSpace = this.#d65toD50({
+					x: 1.2270138511 * l - 0.5577999807 * m + 0.281256149 * s,
+					y: -0.0405801784 * l + 1.1122568696 * m - 0.0716766787 * s,
+					z: -0.0763812845 * l - 0.4214819784 * m + 1.5861632204 * s,
+				});
+				const referenceWhiteX = 0.96422;
+				const referenceWhiteZ = 0.82521;
+				const xComponent = this.#convertXYZToLAB(xyzSpace.x / referenceWhiteX);
+				const yComponent = this.#convertXYZToLAB(xyzSpace.y);
+				const zComponent = this.#convertXYZToLAB(xyzSpace.z / referenceWhiteZ);
+
+				return {
+					type: "LAB",
+					lightness: 116 * yComponent - 16,
+					axisA: 500 * (xComponent - yComponent),
+					axisB: 200 * (yComponent - zComponent),
+					alpha: this.#color.alpha,
+				};
 			}
+
 			case "LCH": {
-				break;
+				const hueRadians = this.#color.hue * (Math.PI / 180);
+
+				return {
+					type: "LAB",
+					lightness: this.#color.lightness,
+					axisA: this.#color.chroma * Math.cos(hueRadians),
+					axisB: this.#color.chroma * Math.sin(hueRadians),
+					alpha: this.#color.alpha,
+				};
 			}
 			case "OKLCH": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToLAB();
 			}
 			case "HSL": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLAB();
 			}
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLAB();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to LAB: ${this.#color.type}`);
 	}
 
 	// !SECTION - LAB
@@ -335,33 +826,85 @@ export class Color {
 	#convertToOKLAB(): OKLABParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				const removeGammaCorrection = (value: number) => {
+					return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+				};
+
+				const correctRed = removeGammaCorrection(this.#color.red / 255);
+				const correctedGreen = removeGammaCorrection(this.#color.green / 255);
+				const correctedBlue = removeGammaCorrection(this.#color.blue / 255);
+				const l = Math.cbrt(
+					0.4122214708 * correctRed + 0.5363325363 * correctedGreen + 0.0514459929 * correctedBlue,
+				);
+				const m = Math.cbrt(
+					0.2119034982 * correctRed + 0.6806995451 * correctedGreen + 0.1073969566 * correctedBlue,
+				);
+				const s = Math.cbrt(
+					0.0883024619 * correctRed + 0.2817188376 * correctedGreen + 0.6299787005 * correctedBlue,
+				);
+
+				return {
+					type: "OKLAB",
+					lightness: 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+					axisA: 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+					axisB: 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLAB();
 			}
 			case "LAB": {
-				break;
+				const yComponent = (this.#color.lightness + 16) / 116;
+				const xComponent = this.#color.axisA / 500 + yComponent;
+				const zComponent = yComponent - this.#color.axisB / 200;
+				const conversionThreshold = 6 / 29;
+
+				const convertLabToXyz = (value: number) => {
+					return value > conversionThreshold ? value ** 3 : 3 * conversionThreshold ** 2 * (value - 4 / 29);
+				};
+
+				const xyzSpace = this.#d50toD65({
+					x: 0.96422 * convertLabToXyz(xComponent),
+					y: convertLabToXyz(yComponent),
+					z: 0.82521 * convertLabToXyz(zComponent),
+				});
+				const l = Math.cbrt(0.8189330101 * xyzSpace.x + 0.3618667424 * xyzSpace.y - 0.1288597137 * xyzSpace.z);
+				const m = Math.cbrt(0.0329845436 * xyzSpace.x + 0.9293118715 * xyzSpace.y + 0.0361456387 * xyzSpace.z);
+				const s = Math.cbrt(0.0482003018 * xyzSpace.x + 0.2643662691 * xyzSpace.y + 0.633851707 * xyzSpace.z);
+
+				return {
+					type: "OKLAB",
+					lightness: 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+					axisA: 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+					axisB: 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "OKLAB": {
 				return this.#color;
 			}
 			case "LCH": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToOKLAB();
 			}
 			case "OKLCH": {
-				break;
+				const hueRadians = this.#color.hue * (Math.PI / 180);
+
+				return {
+					type: "OKLAB",
+					lightness: this.#color.lightness,
+					axisA: this.#color.chroma * Math.cos(hueRadians),
+					axisB: this.#color.chroma * Math.sin(hueRadians),
+					alpha: this.#color.alpha,
+				};
 			}
 			case "HSL": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLAB();
 			}
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLAB();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to OKLAB: ${this.#color.type}`);
 	}
 
 	// !SECTION - OKLAB
@@ -370,33 +913,44 @@ export class Color {
 	#convertToLCH(): LCHParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToLCH();
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLCH();
 			}
 			case "LAB": {
-				break;
+				const chroma = Math.sqrt(this.#color.axisA ** 2 + this.#color.axisB ** 2);
+
+				let hue = Math.atan2(this.#color.axisB, this.#color.axisA) * (180 / Math.PI);
+
+				if (hue < 0) {
+					hue += 360;
+				}
+
+				return {
+					type: "LCH",
+					lightness: this.#color.lightness,
+					chroma,
+					hue,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "OKLAB": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToLCH();
 			}
 			case "LCH": {
 				return this.#color;
 			}
 			case "OKLCH": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToLCH();
 			}
 			case "HSL": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLCH();
 			}
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToLCH();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to LCH: ${this.#color.type}`);
 	}
 
 	// !SECTION - LCH
@@ -405,33 +959,44 @@ export class Color {
 	#convertToOKLCH(): OKLCHParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToOKLCH();
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLCH();
 			}
 			case "LAB": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToOKLCH();
 			}
 			case "OKLAB": {
-				break;
+				const chroma = Math.sqrt(this.#color.axisA ** 2 + this.#color.axisB ** 2);
+
+				let hue = Math.atan2(this.#color.axisB, this.#color.axisA) * (180 / Math.PI);
+
+				if (hue < 0) {
+					hue += 360;
+				}
+
+				return {
+					type: "OKLCH",
+					lightness: this.#color.lightness,
+					chroma,
+					hue,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "LCH": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToOKLCH();
 			}
 			case "OKLCH": {
 				return this.#color;
 			}
 			case "HSL": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLCH();
 			}
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToOKLCH();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to OKLCH: ${this.#color.type}`);
 	}
 
 	// !SECTION - OKLCH
@@ -440,33 +1005,66 @@ export class Color {
 	#convertToHSL(): HSLParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				const normalizedRed = this.#color.red / 255;
+				const normalizedGreen = this.#color.green / 255;
+				const normalizedBlue = this.#color.blue / 255;
+				const maximumComponent = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+				const minimumComponent = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
+				const chroma = maximumComponent - minimumComponent;
+				const lightness = (maximumComponent + minimumComponent) / 2;
+
+				let saturation = 0;
+
+				if (chroma !== 0) {
+					saturation = chroma / (1 - Math.abs(2 * lightness - 1));
+				}
+
+				let hue = 0;
+
+				if (chroma !== 0) {
+					if (maximumComponent === normalizedRed) {
+						hue = 60 * (((normalizedGreen - normalizedBlue) / chroma) % 6);
+					} else if (maximumComponent === normalizedGreen) {
+						hue = 60 * ((normalizedBlue - normalizedRed) / chroma + 2);
+					} else {
+						hue = 60 * ((normalizedRed - normalizedGreen) / chroma + 4);
+					}
+
+					if (hue < 0) {
+						hue += 360;
+					}
+				}
+
+				return {
+					type: "HSL",
+					hue,
+					saturation: saturation * 100,
+					lightness: lightness * 100,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHSL();
 			}
 			case "LAB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHSL();
 			}
 			case "OKLAB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHSL();
 			}
 			case "LCH": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToHSL();
 			}
 			case "OKLCH": {
-				break;
+				return new Color(this.#convertToOKLAB()).#convertToHSL();
 			}
 			case "HSL": {
 				return this.#color;
 			}
 			case "HWB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHSL();
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to HSL: ${this.#color.type}`);
 	}
 
 	// !SECTION - HSL
@@ -475,166 +1073,322 @@ export class Color {
 	#convertToHWB(): HWBParsedColor {
 		switch (this.#color.type) {
 			case "RGB": {
-				break;
+				const normalizedRed = this.#color.red / 255;
+				const normalizedGreen = this.#color.green / 255;
+				const normalizedBlue = this.#color.blue / 255;
+				const maximumComponent = Math.max(normalizedRed, normalizedGreen, normalizedBlue);
+				const minimumComponent = Math.min(normalizedRed, normalizedGreen, normalizedBlue);
+				const chroma = maximumComponent - minimumComponent;
+
+				let hue = 0;
+
+				if (chroma !== 0) {
+					if (maximumComponent === normalizedRed) {
+						hue = 60 * (((normalizedGreen - normalizedBlue) / chroma) % 6);
+					} else if (maximumComponent === normalizedGreen) {
+						hue = 60 * ((normalizedBlue - normalizedRed) / chroma + 2);
+					} else {
+						hue = 60 * ((normalizedRed - normalizedGreen) / chroma + 4);
+					}
+
+					if (hue < 0) {
+						hue += 360;
+					}
+				}
+
+				return {
+					type: "HWB",
+					hue,
+					whiteness: minimumComponent * 100,
+					blackness: (1 - maximumComponent) * 100,
+					alpha: this.#color.alpha,
+				};
 			}
 			case "CMYK": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHWB();
 			}
 			case "LAB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHWB();
 			}
 			case "OKLAB": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHWB();
 			}
 			case "LCH": {
-				break;
+				return new Color(this.#convertToLAB()).#convertToHWB();
 			}
 			case "OKLCH": {
-				break;
+				return new Color(this.#convertToOKLCH()).#convertToHWB();
 			}
 			case "HSL": {
-				break;
+				return new Color(this.#convertToRGB()).#convertToHWB();
 			}
 			case "HWB": {
 				return this.#color;
 			}
 		}
-
-		// TODO: Remove error once all conversions are written
-		throw new ColorError(`Tried to convert an unsupported color type to HWB: ${this.#color.type}`);
 	}
 
 	// !SECTION - HWB
 	// !SECTION - Color space conversion
 	// SECTION - Color blending
 
-	public blend(color: ColorInput, baseWeight?: number | null): Color {
-		const blend = new Color(color).#getColorInSpace("RGB");
-		const rgbSpace = this.#getColorInSpace("RGB");
+	#blendColorValue(base: number, other: number, baseWeight: number): number {
+		return base * baseWeight + other * (1 - baseWeight);
+	}
 
-		const r = this.#blendColorValue(rgbSpace.red, blend.red, baseWeight);
-		const g = this.#blendColorValue(rgbSpace.green, blend.green, baseWeight);
-		const b = this.#blendColorValue(rgbSpace.blue, blend.blue, baseWeight);
+	#blendColorHue(base: number, other: number, baseWeight: number): number {
+		const hueDiff = ((other - base + 540) % 360) - 180;
 
-		let alpha: number | null = null;
+		return (base + hueDiff * (1 - baseWeight) + 360) % 360;
+	}
 
-		if (rgbSpace.alpha !== null || blend.alpha !== null) {
-			alpha = this.#blendColorValue(rgbSpace.alpha ?? 1, blend.alpha ?? 1, baseWeight);
+	#blendAlpha(
+		base: number | null | undefined,
+		other: number | null | undefined,
+		baseWeight: number,
+	): number | null | undefined {
+		if (base !== null || other !== null) {
+			return this.#blendColorValue(base ?? 1, other ?? 1, baseWeight);
 		}
+
+		if (base === null || other === null) {
+			return null;
+		}
+
+		return undefined;
+	}
+
+	/**
+	 * Blends a color into the current color (optionally with a weight) and returns the new weight.
+	 *
+	 * NOTE: if the current color can have a powerless hue (LCH, OKLCH, HSL, HWB), if that color is detected and the hue is powerless, then hue is ignored and grabbed from the other color instead,
+	 * or vice versa. A powerless hue basically means that the color is in gray-scale, changing the hue would do nothing to the look of the color.
+	 *
+	 * NOTE: The given color is converted to the color space of the base color before blending if needed.
+	 *
+	 * @param {ColorInput} color The color to blend into the current color
+	 * @param {number | null} [baseWeight] The weight of the base color for blending, the higher the number the more it looks like the current color (scale: 0 - 1)
+	 * @returns {Color} The blended color
+	 */
+	public blend(color: ColorInput, baseWeight?: number | null): Color {
+		const finalBaseWeight = baseWeight ?? 0.5;
+		const other = new Color(color);
+
+		if (finalBaseWeight <= 0) {
+			return new Color(other.#getColorInSpace(this.#color.type));
+		}
+
+		if (finalBaseWeight >= 1) {
+			return new Color(this.#color);
+		}
+
+		switch (this.#color.type) {
+			case "RGB": {
+				return this.#blendRGB(other, finalBaseWeight);
+			}
+			case "CMYK": {
+				return this.#blendCMYK(other, finalBaseWeight);
+			}
+			case "LAB": {
+				return this.#blendLAB(other, finalBaseWeight);
+			}
+			case "OKLAB": {
+				return this.#blendOKLAB(other, finalBaseWeight);
+			}
+			case "LCH": {
+				return this.#blendLCH(other, finalBaseWeight);
+			}
+			case "OKLCH": {
+				return this.#blendOKLCH(other, finalBaseWeight);
+			}
+			case "HSL": {
+				return this.#blendHSL(other, finalBaseWeight);
+			}
+			case "HWB": {
+				return this.#blendHWB(other, finalBaseWeight);
+			}
+		}
+	}
+
+	// SECTION - RGB
+
+	#blendRGB(color: Color, baseWeight: number): Color {
+		const base = this.#convertToRGB();
+		const other = color.#convertToRGB();
 
 		return new Color({
 			type: "RGB",
-			red: r,
-			green: g,
-			blue: b,
-			alpha,
+			red: this.#blendColorValue(base.red, other.red, baseWeight),
+			green: this.#blendColorValue(base.green, other.green, baseWeight),
+			blue: this.#blendColorValue(base.blue, other.blue, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
 		});
 	}
 
-	#blendColorValue(base: number, blend: number, baseWeight?: number | null): number {
-		const finalBaseWeight = baseWeight ?? 0.5;
+	// !SECTION - RGB
+	// SECTION - CMYK
 
-		const blendWeight = 1 - finalBaseWeight;
+	#blendCMYK(color: Color, baseWeight: number): Color {
+		const base = this.#convertToCMYK();
+		const other = color.#convertToCMYK();
 
-		if (blendWeight <= 0) {
-			return base;
-		} else if (blendWeight >= 1) {
-			return blend;
-		}
-
-		return base * finalBaseWeight + blend * blendWeight;
+		return new Color({
+			type: "CMYK",
+			cyan: this.#blendColorValue(base.cyan, other.cyan, baseWeight),
+			magenta: this.#blendColorValue(base.magenta, other.magenta, baseWeight),
+			yellow: this.#blendColorValue(base.yellow, other.yellow, baseWeight),
+			key: this.#blendColorValue(base.key, other.key, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
 	}
 
+	// !SECTION - CMYK
+	// SECTION - LAB
+
+	#blendLAB(color: Color, baseWeight: number): Color {
+		const base = this.#convertToLAB();
+		const other = color.#convertToLAB();
+
+		return new Color({
+			type: "LAB",
+			lightness: this.#blendColorValue(base.lightness, other.lightness, baseWeight),
+			axisA: this.#blendColorValue(base.axisA, other.axisA, baseWeight),
+			axisB: this.#blendColorValue(base.axisB, other.axisB, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - LAB
+	// SECTION - OKLAB
+
+	#blendOKLAB(color: Color, baseWeight: number): Color {
+		const base = this.#convertToOKLAB();
+		const other = color.#convertToOKLAB();
+
+		return new Color({
+			type: "OKLAB",
+			lightness: this.#blendColorValue(base.lightness, other.lightness, baseWeight),
+			axisA: this.#blendColorValue(base.axisA, other.axisA, baseWeight),
+			axisB: this.#blendColorValue(base.axisB, other.axisB, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - OKLAB
+	// SECTION - LCH
+
+	#blendLCH(color: Color, baseWeight: number): Color {
+		const base = this.#convertToLCH();
+		const other = color.#convertToLCH();
+
+		// NOTE: if there is no chroma, the color is grayscale and the hue becomes powerless, this is solved by borrowing the hue
+		let baseHue = base.hue;
+		let otherHue = other.hue;
+
+		if (base.chroma === 0) {
+			baseHue = otherHue;
+		}
+
+		if (other.chroma === 0) {
+			otherHue = baseHue;
+		}
+
+		return new Color({
+			type: "LCH",
+			lightness: this.#blendColorValue(base.lightness, other.lightness, baseWeight),
+			chroma: this.#blendColorValue(base.chroma, other.chroma, baseWeight),
+			hue: this.#blendColorHue(base.hue, other.hue, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - LCH
+	// SECTION - OKLCH
+
+	#blendOKLCH(color: Color, baseWeight: number): Color {
+		const base = this.#convertToOKLCH();
+		const other = color.#convertToOKLCH();
+
+		// NOTE: if there is no chroma, the color is grayscale and the hue becomes powerless, this is solved by borrowing the hue
+		let baseHue = base.hue;
+		let otherHue = other.hue;
+
+		if (base.chroma === 0) {
+			baseHue = otherHue;
+		}
+
+		if (other.chroma === 0) {
+			otherHue = baseHue;
+		}
+
+		return new Color({
+			type: "OKLCH",
+			lightness: this.#blendColorValue(base.lightness, other.lightness, baseWeight),
+			chroma: this.#blendColorValue(base.chroma, other.chroma, baseWeight),
+			hue: this.#blendColorHue(base.hue, other.hue, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - OKLCH
+	// SECTION - HSL
+
+	#blendHSL(color: Color, baseWeight: number): Color {
+		const base = this.#convertToHSL();
+		const other = color.#convertToHSL();
+
+		// NOTE: if there is no saturation, the color is grayscale and the hue becomes powerless, this is solved by borrowing the hue
+		let baseHue = base.hue;
+		let otherHue = other.hue;
+
+		if (base.saturation === 0) {
+			baseHue = otherHue;
+		}
+
+		if (other.saturation === 0) {
+			otherHue = baseHue;
+		}
+
+		return new Color({
+			type: "HSL",
+			lightness: this.#blendColorValue(base.lightness, other.lightness, baseWeight),
+			saturation: this.#blendColorValue(base.saturation, other.saturation, baseWeight),
+			hue: this.#blendColorHue(baseHue, otherHue, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - HSL
+	// SECTION - HWB
+
+	#blendHWB(color: Color, baseWeight: number): Color {
+		const base = this.#convertToHWB();
+		const other = color.#convertToHWB();
+
+		// NOTE: if whiteness and blackness together exceed 1 (100%), the color is grayscale and the hue becomes powerless, this is solved by borrowing the hue
+		let baseHue = base.hue;
+		let otherHue = other.hue;
+
+		if (base.whiteness + base.blackness >= 1) {
+			baseHue = otherHue;
+		}
+
+		if (other.whiteness + other.blackness >= 1) {
+			otherHue = baseHue;
+		}
+
+		return new Color({
+			type: "HWB",
+			hue: this.#blendColorHue(baseHue, otherHue, baseWeight),
+			whiteness: this.#blendColorValue(base.whiteness, other.whiteness, baseWeight),
+			blackness: this.#blendColorValue(base.blackness, other.blackness, baseWeight),
+			alpha: this.#blendAlpha(base.alpha, other.alpha, baseWeight),
+		});
+	}
+
+	// !SECTION - HWB
 	// !SECTION - Color blending
 	// SECTION - Color clamping
-
-	#clampIntoRange(floor: number, value: number, ceil: number): number;
-	#clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined;
-	#clampIntoRange(floor: number, value: number | null | undefined, ceil: number): number | null | undefined {
-		if (typeof value !== "number") {
-			return value;
-		}
-
-		return Math.min(Math.max(value, floor), ceil);
-	}
-
-	#clampColor<T extends ParsedColor>(color: T): T {
-		switch (color.type) {
-			case "RGB": {
-				return {
-					...color,
-					red: this.#clampIntoRange(0, color.red, 255),
-					green: this.#clampIntoRange(0, color.green, 255),
-					blue: this.#clampIntoRange(0, color.blue, 255),
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "CMYK": {
-				return {
-					...color,
-					cyan: this.#clampIntoRange(0, color.cyan, 1),
-					magenta: this.#clampIntoRange(0, color.magenta, 1),
-					yellow: this.#clampIntoRange(0, color.yellow, 1),
-					key: this.#clampIntoRange(0, color.key, 1),
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "LAB": {
-				return {
-					...color,
-					lightness: this.#clampIntoRange(0, color.lightness, 100),
-					axisA: this.#clampIntoRange(-125, color.axisA, 125),
-					axisB: this.#clampIntoRange(-125, color.axisB, 125),
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "OKLAB": {
-				return {
-					...color,
-					lightness: this.#clampIntoRange(0, color.lightness, 100),
-					axisA: this.#clampIntoRange(-0.4, color.axisA, 0.4),
-					axisB: this.#clampIntoRange(-0.4, color.axisB, 0.4),
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "LCH": {
-				return {
-					...color,
-					lightness: this.#clampIntoRange(0, color.lightness, 100),
-					chroma: this.#clampIntoRange(0, color.chroma, 150),
-					hue: color.hue % 360,
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "OKLCH": {
-				return {
-					...color,
-					lightness: this.#clampIntoRange(0, color.lightness, 1),
-					chroma: this.#clampIntoRange(0, color.chroma, 0.4),
-					hue: color.hue % 360,
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "HSL": {
-				return {
-					...color,
-					lightness: this.#clampIntoRange(0, color.lightness, 100),
-					saturation: this.#clampIntoRange(0, color.saturation, 100),
-					hue: color.hue % 360,
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-			case "HWB": {
-				return {
-					...color,
-					hue: color.hue % 360,
-					lightness: this.#clampIntoRange(0, color.whiteness, 100),
-					saturation: this.#clampIntoRange(0, color.blackness, 100),
-					alpha: this.#clampIntoRange(0, color.alpha, 1),
-				};
-			}
-		}
-	}
 
 	// !SECTION
 	// SECTION - Parsing
@@ -715,7 +1469,9 @@ export class Color {
 
 	// SECTION - HEX
 
-	#parseHex(color: string): RGBParsedColor | null {
+	#parseHex(color: string, strict: true): RGBParsedColor;
+	#parseHex(color: string, strict: false): RGBParsedColor | null;
+	#parseHex(color: string, strict: boolean): RGBParsedColor | null {
 		if (/#[0-9a-fA-F]+/.test(color)) {
 			const hex = color.slice(1);
 
@@ -769,6 +1525,10 @@ export class Color {
 				blue: b,
 				alpha: alpha,
 			};
+		}
+
+		if (strict) {
+			throw new ColorError("Invalid hex detected.");
 		}
 
 		return null;
@@ -933,7 +1693,7 @@ export class Color {
 
 			return {
 				type: "OKLAB",
-				lightness: this.#parsePercentage(l, true, 100),
+				lightness: this.#parsePercentage(l, true, 1),
 				axisA: axisA,
 				axisB: axisB,
 				alpha: this.#parsePercentage(alpha, alphaIsPercentage, 1),
@@ -1250,13 +2010,7 @@ export class Color {
 			const namedColor = this.#namedColors[color as NamedColor];
 
 			if (typeof namedColor === "string") {
-				const hex = this.#parseHex(namedColor);
-
-				if (!hex) {
-					throw new ColorError("Failed to parse named color");
-				}
-
-				return hex;
+				return this.#parseHex(namedColor, true);
 			}
 
 			return {
@@ -1266,7 +2020,7 @@ export class Color {
 			};
 		}
 
-		const hex = this.#parseHex(color);
+		const hex = this.#parseHex(color, false);
 
 		if (hex) {
 			return hex;

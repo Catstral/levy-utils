@@ -153,7 +153,7 @@ export type NamedColor =
 	| "yellowgreen";
 
 // NOTE - This is based on CSS specifications
-// While it is possible to go outside the specified scale, it will be clamped down
+// While it is possible to go outside the specified scale, it will be clamped down when it is stringified (unless unbounded)
 // The scale is designed so that it fits perfectly into the allowed percentages (on a 0 - 100 scale usually)
 // Do note that some percentages are allowed to also go to -100
 
@@ -231,13 +231,13 @@ export type LABParsedColor = {
 	 */
 	lightness: number;
 	/**
-	 * Scale: -125 - 125
+	 * Scale: -125 - 125 (in normal operation, but is unbounded and will never be clamped)
 	 *
 	 * Converted to floats
 	 */
 	axisA: number;
 	/**
-	 * Scale: -125 - 125
+	 * Scale: -125 - 125 (in normal operation, but is unbounded and will never be clamped)
 	 *
 	 * Converted to floats
 	 */
@@ -254,19 +254,19 @@ export type LABParsedColor = {
 export type OKLABParsedColor = {
 	type: "OKLAB";
 	/**
-	 * Scale: 0 - 100
+	 * Scale: 0 - 1
 	 *
 	 * Converted to floats
 	 */
 	lightness: number;
 	/**
-	 * Scale: -0.4 - 0.4
+	 * Scale: -0.4 - 0.4 (in normal operation, but is unbounded and will never be clamped)
 	 *
 	 * Converted to floats
 	 */
 	axisA: number;
 	/**
-	 * Scale: -0.4 - 0.4
+	 * Scale: -0.4 - 0.4 (in normal operation, but is unbounded and will never be clamped)
 	 *
 	 * Converted to floats
 	 */
@@ -289,7 +289,7 @@ export type LCHParsedColor = {
 	 */
 	lightness: number;
 	/**
-	 * Scale: 0 - 150
+	 * Scale: 0 - 150 (in normal operation, but is unbounded at the upper end and will never be clamped down)
 	 *
 	 * Converted to floats
 	 */
@@ -318,7 +318,7 @@ export type OKLCHParsedColor = {
 	 */
 	lightness: number;
 	/**
-	 * Scale: 0 - 0.4
+	 * Scale: 0 - 0.4 (in normal operation, but is unbounded at the upper end and will never be clamped down)
 	 *
 	 * Converted to floats
 	 */
