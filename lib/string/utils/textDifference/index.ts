@@ -681,7 +681,6 @@ function mergeAdjacentNodes(nodesToMerge: TextDifferenceNode[]): TextDifferenceN
 }
 
 export interface TextDifferenceUtilConfig {
-	raw: boolean;
 	htmlAware: boolean;
 	tags: TextDifferenceOptionsStringContextTags | TextDifferenceOptionsStringTags;
 }
@@ -714,7 +713,7 @@ export function textDifference(
 	options?: TextDifferenceOptionsString | TextDifferenceOptionsNodes,
 ): string | TextDifferenceNode[] {
 	const htmlAware = options?.htmlAware ?? textDifference.config.htmlAware;
-	const keepRaw = options?.raw ?? textDifference.config.raw;
+	const keepRaw = options?.raw;
 	const nodes: TextDifferenceNode[] = [];
 
 	if (htmlAware) {
@@ -912,9 +911,6 @@ export function textDifference(
 }
 
 textDifference.config = createUtilConfig<TextDifferenceUtilConfig>({
-	raw: {
-		default: () => false,
-	},
 	htmlAware: {
 		default: () => false,
 	},
