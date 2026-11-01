@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { group } from ".";
 
 describe("group", () => {
+	beforeEach(() => {
+		group.config.reset();
+	});
+
 	test("Groups items by a string key", () => {
 		const grouped = group(
 			[
