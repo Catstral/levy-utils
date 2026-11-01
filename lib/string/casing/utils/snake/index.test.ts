@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { screamingSnakeCase, snakeCase } from ".";
 
-// TODO: add tests for config
-
 describe("snakeCase", () => {
 	beforeEach(() => {
 		snakeCase.config.reset();
