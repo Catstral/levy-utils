@@ -1,4 +1,10 @@
+import { createUtilConfig } from "../../../config";
+
 export type Computable<T, Args extends unknown[] = never[]> = T | ((...args: Args) => T);
+
+export interface IsComputationUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Check if a given value can be executed/computed.
@@ -16,6 +22,12 @@ export function isComputation<const T, const Args extends unknown[]>(
 	return typeof value === "function";
 }
 
+isComputation.config = createUtilConfig<IsComputationUtilConfig>({});
+
+export interface ComputeUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Computes a computable value.
  *
@@ -30,3 +42,5 @@ export function isComputation<const T, const Args extends unknown[]>(
 export function compute<const T, const Args extends unknown[] = never[]>(value: Computable<T, Args>, ...args: Args): T {
 	return isComputation(value) ? value(...args) : value;
 }
+
+compute.config = createUtilConfig<ComputeUtilConfig>({});

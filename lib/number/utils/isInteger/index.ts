@@ -1,4 +1,9 @@
-import type { IsInteger } from "~/number";
+import { createUtilConfig } from "../../../config";
+import type { IsInteger } from "../../../number";
+
+export interface IsIntegerUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Checks if the given value is an integer.
@@ -12,3 +17,5 @@ import type { IsInteger } from "~/number";
 export function isInteger<const T extends number>(value: T): IsInteger<T> {
 	return Number.isInteger(value) as IsInteger<T>;
 }
+
+isInteger.config = createUtilConfig<IsIntegerUtilConfig>({});

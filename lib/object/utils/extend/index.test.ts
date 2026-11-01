@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { extend } from ".";
 
 describe("extend", () => {
+	beforeEach(() => {
+		extend.config.reset();
+	});
+
 	test("Extending with a non-overlapping object merges both objects' keys", () => {
 		const extended = extend(
 			{

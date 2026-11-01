@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface PickUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Picks certain keys off of an object and returns a new object with only those keys (and values)
  *
@@ -22,3 +28,5 @@ export function pick<const T extends Record<string, unknown>, const K extends ke
 
 	return picked;
 }
+
+pick.config = createUtilConfig<PickUtilConfig>({});

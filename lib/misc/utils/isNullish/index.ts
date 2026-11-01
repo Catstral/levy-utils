@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface IsNullishUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is nullish.
  *
@@ -13,3 +19,5 @@
 export function isNullish(value: unknown): value is undefined | null {
 	return value == null;
 }
+
+isNullish.config = createUtilConfig<IsNullishUtilConfig>({});

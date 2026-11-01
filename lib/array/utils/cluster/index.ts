@@ -1,7 +1,12 @@
-import { UtilError } from "~/error";
+import { createUtilConfig } from "../../../config";
+import { UtilError } from "../../../error";
 
 export class ClusterUtilError extends UtilError {
 	public readonly util = "cluster";
+}
+
+export interface ClusterUtilConfig {
+	[key: string]: never;
 }
 
 /**
@@ -40,3 +45,5 @@ export function cluster<const T>(items: T[], size: number): T[][] {
 
 	return clustered;
 }
+
+cluster.config = createUtilConfig<ClusterUtilConfig>({});

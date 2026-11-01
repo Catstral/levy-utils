@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface NoopUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * No operation, this function does nothing.
  *
@@ -6,3 +12,5 @@
  * @returns {void}
  */
 export function noop(): void {}
+
+noop.config = createUtilConfig<NoopUtilConfig>({});

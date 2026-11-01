@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isUndefined } from ".";
 
 describe("isUndefined", () => {
+	beforeEach(() => {
+		isUndefined.config.reset();
+	});
+
 	describe("Undefined values", () => {
 		test("Undefined", () => {
 			expect(isUndefined(undefined)).toBeTrue();

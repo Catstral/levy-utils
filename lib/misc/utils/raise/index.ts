@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface RaiseUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Throws the given value.
  *
@@ -29,3 +35,5 @@ export function raise(value: unknown): never {
 		}
 	}
 }
+
+raise.config = createUtilConfig<RaiseUtilConfig>({});

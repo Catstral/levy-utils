@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { trunc } from ".";
 
 describe("trunc", () => {
+	beforeEach(() => {
+		trunc.config.reset();
+	});
+
 	test("Integer", () => {
 		expect(trunc(123)).toBe(123);
 	});
@@ -35,10 +39,23 @@ describe("trunc", () => {
 	});
 
 	test("Throws for negative fraction digits", () => {
-		expect(() => trunc(123.456, -1)).toThrow(RangeError);
+		expect(() => trunc(123.456, -1 as number)).toThrow(RangeError);
 	});
 
 	test("Throws for more than 100 fraction digits", () => {
 		expect(() => trunc(123.456, 101)).toThrow(RangeError);
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(trunc.config.default.fractionDigits).toBe(0);
+			expect(trunc.config.fractionDigits).toBe(0);
+		});
+
+		test("With fraction digits", () => {
+			trunc.config.fractionDigits = 2;
+
+			expect(trunc(123.456)).toBe(123.45);
+		});
 	});
 });

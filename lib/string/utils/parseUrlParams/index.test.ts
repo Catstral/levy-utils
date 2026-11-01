@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { parseUrlParams } from ".";
 
 describe("parseUrlParams", () => {
+	beforeEach(() => {
+		parseUrlParams.config.reset();
+	});
+
 	test("Without transformation", () => {
 		const parsed = parseUrlParams("https://example.com?page=2&active=true");
 

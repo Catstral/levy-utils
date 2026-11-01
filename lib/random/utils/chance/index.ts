@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface ChanceUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a boolean based on the given chance percentage.
  *
@@ -23,3 +29,5 @@ export function chance(percentage: number): boolean {
 
 	return crypto.getRandomValues(new Uint8Array(1))[0] < fullPercentage * percentage;
 }
+
+chance.config = createUtilConfig<ChanceUtilConfig>({});

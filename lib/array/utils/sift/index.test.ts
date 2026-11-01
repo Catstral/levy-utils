@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { sift } from ".";
 
 describe("sift", () => {
+	beforeEach(() => {
+		sift.config.reset();
+	});
+
 	test("Empty list", () => {
 		expect(sift([])).toBeArrayOfSize(0);
 	});

@@ -1,4 +1,9 @@
-import type { Promisable } from "~/types";
+import { createUtilConfig } from "../../../config";
+import type { Promisable } from "../../../types";
+
+export interface MapUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns a new list of items based on mapped values of a given list.
@@ -54,3 +59,5 @@ export function map(
 
 	return isPromise ? Promise.all(result) : result;
 }
+
+map.config = createUtilConfig<MapUtilConfig>({});

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { pick } from ".";
 
 describe("pick", () => {
+	beforeEach(() => {
+		pick.config.reset();
+	});
+
 	test("Picking one of two keys (literal) returns only that key", () => {
 		const picked = pick(
 			{

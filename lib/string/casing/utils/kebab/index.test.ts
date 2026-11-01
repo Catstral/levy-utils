@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { kebabCase, screamingKebabCase } from ".";
 
 describe("kebabCase", () => {
+	beforeEach(() => {
+		kebabCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(kebabCase("hello world")).toBe("hello-world");
 	});
@@ -41,9 +45,32 @@ describe("kebabCase", () => {
 	test("Works with an empty options object", () => {
 		expect(kebabCase("hello world", {})).toBe("hello-world");
 	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(kebabCase.config.default.groupNumbers).toBeFalse();
+			expect(kebabCase.config.default.groupUppercaseLetters).toBeTrue();
+			expect(kebabCase.config.default.parser).toBeUndefined();
+			expect(kebabCase.config.default.screaming).toBeFalse();
+			expect(kebabCase.config.groupNumbers).toBeFalse();
+			expect(kebabCase.config.groupUppercaseLetters).toBeTrue();
+			expect(kebabCase.config.parser).toBeUndefined();
+			expect(kebabCase.config.screaming).toBeFalse();
+		});
+
+		test("Uppercases every word when screaming is true", () => {
+			kebabCase.config.screaming = true;
+
+			expect(kebabCase("helloWorld")).toBe("HELLO-WORLD");
+		});
+	});
 });
 
 describe("screamingKebabCase", () => {
+	beforeEach(() => {
+		screamingKebabCase.config.reset();
+	});
+
 	test("Converts a space-separated string", () => {
 		expect(screamingKebabCase("hello world")).toBe("HELLO-WORLD");
 	});
@@ -62,5 +89,16 @@ describe("screamingKebabCase", () => {
 
 	test("Works without options", () => {
 		expect(screamingKebabCase("helloWorld")).toBe("HELLO-WORLD");
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(screamingKebabCase.config.default.groupNumbers).toBeFalse();
+			expect(screamingKebabCase.config.default.groupUppercaseLetters).toBeTrue();
+			expect(screamingKebabCase.config.default.parser).toBeUndefined();
+			expect(screamingKebabCase.config.groupNumbers).toBeFalse();
+			expect(screamingKebabCase.config.groupUppercaseLetters).toBeTrue();
+			expect(screamingKebabCase.config.parser).toBeUndefined();
+		});
 	});
 });

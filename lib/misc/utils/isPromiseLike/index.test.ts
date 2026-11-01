@@ -1,8 +1,12 @@
 // biome-ignore-all lint/suspicious/noThenProperty: Expected behavior
-import { describe, expect, expectTypeOf, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, test } from "bun:test";
 import { isPromiseLike } from ".";
 
 describe("isPromiseLike", () => {
+	beforeEach(() => {
+		isPromiseLike.config.reset();
+	});
+
 	describe("Promises", () => {
 		test("Resolved promise", () => {
 			expect(isPromiseLike(Promise.resolve(5))).toBeTrue();

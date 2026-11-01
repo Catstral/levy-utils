@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../../config";
+
+export interface LowerCaseUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Converts a string to lowercase.
  *
@@ -13,3 +19,5 @@
 export function lowerCase<const T extends string>(str: T): Lowercase<T> {
 	return str.toLowerCase() as Lowercase<T>;
 }
+
+lowerCase.config = createUtilConfig<LowerCaseUtilConfig>({});

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { customCase } from ".";
 
 describe("customCase", () => {
+	beforeEach(() => {
+		customCase.config.reset();
+	});
+
 	test("Joins words using the given separator, without a leading separator", () => {
 		expect(
 			customCase("hello world", {
@@ -83,5 +87,38 @@ describe("customCase", () => {
 				transform: (word) => word,
 			}),
 		).toBe("HTTP-server");
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(customCase.config.default.groupNumbers).toBeFalse();
+			expect(customCase.config.default.groupUppercaseLetters).toBeTrue();
+			expect(customCase.config.default.parser).toBeUndefined();
+			expect(customCase.config.groupNumbers).toBeFalse();
+			expect(customCase.config.groupUppercaseLetters).toBeTrue();
+			expect(customCase.config.parser).toBeUndefined();
+		});
+
+		test("Forwards splitOnNumbers to the underlying word split", () => {
+			customCase.config.groupNumbers = true;
+
+			expect(
+				customCase("foo123bar", {
+					seperator: "-",
+					transform: (word) => word,
+				}),
+			).toBe("foo-123-bar");
+		});
+
+		test("Forwards groupUppercaseLetters to the underlying word split", () => {
+			customCase.config.groupUppercaseLetters = false;
+
+			expect(
+				customCase("HTTPServer", {
+					seperator: "-",
+					transform: (word) => word,
+				}),
+			).toBe("H-T-T-P-Server");
+		});
 	});
 });

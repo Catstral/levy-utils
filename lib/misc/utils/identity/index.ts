@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface IdentityUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns the given value.
  *
@@ -10,3 +16,5 @@
 export function identity<const T>(value: T): T {
 	return value;
 }
+
+identity.config = createUtilConfig<IdentityUtilConfig>({});

@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface IsArrayUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given item is an array.
  *
@@ -9,3 +15,5 @@
 export function isArray(value: unknown): value is unknown[] {
 	return Array.isArray(value);
 }
+
+isArray.config = createUtilConfig<IsArrayUtilConfig>({});

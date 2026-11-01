@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { ClusterUtilError, cluster } from ".";
 
 describe("cluster", () => {
+	beforeEach(() => {
+		cluster.config.reset();
+	});
+
 	test("Splits a 5-item list into clusters of at most 2", () => {
 		const clustered = cluster([0, 1, 2, 3, 4], 2);
 

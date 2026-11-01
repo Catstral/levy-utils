@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { scatter } from ".";
 
 describe("scatter", () => {
+	beforeEach(() => {
+		scatter.config.reset();
+	});
+
 	test("Splits the given list with the original items", () => {
 		const list = [0, 1, 2, 3, 4, 5] as const;
 		const scattered = scatter(list);
@@ -101,5 +105,22 @@ describe("scatter", () => {
 
 		expect(scattered[0]).toBeArrayOfSize(0);
 		expect(scattered[1]).toBeArrayOfSize(5);
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(scatter.config.default.bias).toBe("ROUND");
+			expect(scatter.config.bias).toBe("ROUND");
+		});
+
+		test("Floor bias", () => {
+			scatter.config.bias = "FLOOR";
+
+			const list = [0, 1, 2, 3, 4] as const;
+			const scattered = scatter(list, 0.5);
+
+			expect(scattered[0]).toBeArrayOfSize(2);
+			expect(scattered[1]).toBeArrayOfSize(3);
+		});
 	});
 });

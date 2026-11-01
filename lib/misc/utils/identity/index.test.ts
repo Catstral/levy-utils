@@ -1,7 +1,11 @@
-import { describe, expect, expectTypeOf, test } from "bun:test";
+import { beforeEach, describe, expect, expectTypeOf, test } from "bun:test";
 import { identity } from ".";
 
 describe("identity", () => {
+	beforeEach(() => {
+		identity.config.reset();
+	});
+
 	describe("Primitives", () => {
 		test("String", () => {
 			expect(identity("foo")).toBe("foo");
@@ -123,7 +127,7 @@ describe("identity", () => {
 		});
 
 		test("Called without arguments at runtime returns undefined", () => {
-			const loose = identity as () => unknown;
+			const loose = identity as unknown as () => unknown;
 
 			expect(loose()).toBeUndefined();
 		});

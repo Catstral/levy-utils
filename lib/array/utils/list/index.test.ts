@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { ListUtilError, list } from ".";
 
 describe("list", () => {
+	beforeEach(() => {
+		list.config.reset();
+	});
+
 	test("Simple list", () => {
 		expect(list(4)).toEqual([0, 1, 2, 3, 4]);
 	});
@@ -151,5 +155,22 @@ describe("list", () => {
 				"Given start and end should cause the list to traverse negatively, but step is specified to traverse positively",
 			);
 		}
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(list.config.default.step).toBeUndefined();
+			expect(list.config.step).toBeUndefined();
+		});
+
+		test("Setting the default step to 2", () => {
+			list.config.step = 2;
+
+			expect(list.config.step).toBe(2);
+
+			const arr = list(4);
+
+			expect(arr).toEqual([0, 2, 4]);
+		});
 	});
 });

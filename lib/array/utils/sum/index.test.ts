@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { sum } from ".";
 
 describe("sum", () => {
+	beforeEach(() => {
+		sum.config.reset();
+	});
+
 	test("Simple sum of number array", () => {
 		const total = sum([1, 2, 3]);
 

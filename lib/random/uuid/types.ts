@@ -16,3 +16,8 @@ export interface UuidRNGOptions {
 	 */
 	random?: Uint8Array;
 }
+
+export interface UuidRNGConfig {
+	rng: UuidRNG | undefined;
+	random: Uint8Array | undefined;
+}

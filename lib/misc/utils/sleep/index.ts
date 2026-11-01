@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface SleepUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a promise that will resolve after the specified delay has elapsed.
  *
@@ -13,3 +19,5 @@ export async function sleep(delayMs: number): Promise<void> {
 		setTimeout(resolve, finalDelay);
 	});
 }
+
+sleep.config = createUtilConfig<SleepUtilConfig>({});
