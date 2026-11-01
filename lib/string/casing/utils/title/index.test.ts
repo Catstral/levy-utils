@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { titleCase } from ".";
 
-// TODO: add tests for config
-
 describe("titleCase", () => {
 	beforeEach(() => {
 		titleCase.config.reset();
@@ -26,5 +24,16 @@ describe("titleCase", () => {
 
 	test("Works without options", () => {
 		expect(titleCase("hello world")).toBe("Hello World");
+	});
+
+	describe("config", () => {
+		test("Reading the default configuration values (regression test)", () => {
+			expect(titleCase.config.default.groupNumbers).toBeFalse();
+			expect(titleCase.config.default.groupUppercaseLetters).toBeTrue();
+			expect(titleCase.config.default.parser).toBeUndefined();
+			expect(titleCase.config.groupNumbers).toBeFalse();
+			expect(titleCase.config.groupUppercaseLetters).toBeTrue();
+			expect(titleCase.config.parser).toBeUndefined();
+		});
 	});
 });
