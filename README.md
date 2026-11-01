@@ -22,6 +22,20 @@ bun add @catstral/levy-utils
 import { range, sift, toggle } from "@catstral/levy-utils";
 ```
 
+## Configuration
+Every utility has a changable config that can be set to change the default behavior of the utility. This means that you don't have to change how that utility works every time you call it. The config is always available by simply accessing `<utilName>.config`. It also has the readonly defaults available by doing `<utilName>.config.default`.
+
+For example, if you want the [`reduce`](#reducelist-initial-callback-options) utility to always work in descending direction you can do the following:
+```ts
+reduce.config.direction = "DESCENDING";
+```
+
+And now any time you use [`reduce`](#reducelist-initial-callback-options) it will work in the descending direction. The default value of it can still be read out if needed by just reading the `reduce.config.default.direction` value.
+
+If you at some point need to reset the configuration for whatever reason, there is a reset available for the config aswell, it performed by doing `<utilName>.config.reset()`.
+
+> Even if a utilty doesn't have any supported way of configuring how it works, it will still have a config object available for consistency.
+
 ## Utils
 A list of all the utilities supported:
 - [Array utilities](#array-utilities)
@@ -34,6 +48,7 @@ A list of all the utilities supported:
   - [fork](#forklist-condition)
   - [group](#grouplist-identity)
   - [hasItems](#hasitemslist)
+  - [isArray](#isarrayvalue)
   - [last](#lastlist-fallback)
   - [list](#liststartorlength-end-options)
   - [map](#maplist-callback)
@@ -65,6 +80,7 @@ A list of all the utilities supported:
   - [isPromiseLike](#ispromiselikevalue)
   - [isUndefined](#isundefinedvalue)
   - [match](#matchvalue-clause-fallback)
+  - [raise](#raisevalue)
   - [Range (class)](#rangerangestring)
     - [static from](#static-fromrange)
     - [details (getter)](#details-getter)
@@ -81,7 +97,6 @@ A list of all the utilities supported:
     - [toArray](#toarray)
     - [clone](#clone)
   - [range](#rangestartorlength-end-options)
-  - [raise](#raisevalue)
   - [readOnly / isReadOnly](#readonlyvalue-deepfreeze--isreadonlyvalue)
   - [safe](#safecallback)
   - [sleep](#sleepdelay)
@@ -155,6 +170,9 @@ cluster([1, 2, 3, 4, 5], 2);
 // [[1, 2], [3, 4], [5]]
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `concat(...values)`
 Concatenates values and arrays into a new array.
 
@@ -163,6 +181,9 @@ concat(1, [2, 3], 4);
 // Expected output:
 // [1, 2, 3, 4]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `counting(list, identity)`
 Reduces a list down to an object of keys (as determined by the `identity` callback) mapped to how many times that key occurred.
@@ -176,6 +197,9 @@ counting(["a", "b", "a", "c", "a"], (item) => item);
 //     c: 1
 // }
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `filter(list, predicate)`
 Returns a new list containing the items of a given list that pass a predicate.
@@ -192,6 +216,9 @@ await filter([1, 2, 3], async (n) => n > 1);
 // [2, 3]
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `filterMap(list, filter, mapper)`
 Returns a new list of items based on filtered and mapped values of a given list.
 
@@ -205,7 +232,10 @@ filterMap(
 // [20, 40]
 ```
 
-This utility was formerly called `select`.
+> This utility was formerly called `select`.
+
+##### Config
+This utility does not have any config.
 
 #### `first(list, fallback?)`
 Returns the first item of a list, or a fallback if the list is empty.
@@ -220,6 +250,9 @@ first([], "none");
 // "none"
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `fork(list, condition)`
 Splits a list into a tuple of two arrays based on a condition: items that pass, and items that don't.
 
@@ -228,6 +261,9 @@ fork([1, 2, 3, 4], (n) => n % 2 === 0);
 // Expected output:
 // [[2, 4], [1, 3]]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `group(list, identity)`
 Groups the items of a list into an object of keys (as determined by the `identity` callback) mapped to the items with that key.
@@ -240,6 +276,9 @@ group(["apple", "avocado", "banana"], (item) => item[0]);
 //     b: ["banana"],
 // }
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `hasItems(list)`
 Checks if a list has at least one item, narrowing its type to a non-empty tuple.
@@ -254,6 +293,25 @@ hasItems([]);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
+#### `isArray(value)`
+Returns a boolean whether the given value is an array or not.
+
+```ts
+isArray([]);
+// Expected output:
+// true
+
+isArray({});
+// expected output:
+// false
+```
+
+##### Config
+This utility does not have any config.
+
 #### `last(list, fallback?)`
 Returns the last item of a list, or a fallback if the list is empty.
 
@@ -266,6 +324,9 @@ last([], "none");
 // Expected output:
 // "none"
 ```
+
+##### Config
+This utility does not have any config.
 
 ### `list(startOrLength, end?, options?)`
 Returns an array with values to a specified size (inclusive), optionally stepped and/or mapped to another value.
@@ -296,6 +357,10 @@ options:
 - `step` - The steps used to generate the array.
 - `valueMapper` - A mapper function to map a step to a value.
 
+##### Config
+This utility has the following config available:
+- `step` (default: `undefined`) - The step used to generate the array.
+
 #### `map(list, callback)`
 Returns a new list of items based on mapped values of a given list.
 
@@ -310,6 +375,9 @@ await map([1, 2, 3], async (n) => n + 1);
 // Expected output:
 // [2, 3, 4]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `max(list, mapper?, options?)`
 Returns the largest item from a list.
@@ -343,6 +411,10 @@ max(
 // }
 ```
 
+##### Config
+This utility has the following config available:
+- `direction` (default: `"ASCENDING"`) - The direction the list should be checked in.
+
 #### `min(list, mapper?, options?)`
 Returns the smallest item from a list.
 
@@ -375,6 +447,10 @@ min(
 // }
 ```
 
+##### Config
+This utility has the following config available:
+- `direction` (default: `"ASCENDING"`) - The direction the list should be checked in.
+
 #### `overflow(list, clampLength)`
 Splits a list into a tuple of two arrays: the first `clampLength` items, and the rest of the items.
 
@@ -385,6 +461,9 @@ overflow([1, 2, 3, 4, 5], 3);
 // Expected output:
 // [[1, 2, 3], [4, 5]]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `reduce(list, initial, callback, options?)`
 Reduces all items of a list down to an accumulated result.
@@ -410,6 +489,10 @@ reduce([1, 2, 3], 0, (acc, n) => acc + n, {
 Options:
 - `direction` - `"ASCENDING"` or `"DESCENDING"`, determines the order the list is reduced in (default `"ASCENDING"`)
 - `result` - transforms the final accumulator into the returned result
+
+##### Config
+This utility has the following config available:
+- `direction` (default: `"ASCENDING"`) - The direction the list should be checked in.
 
 #### `select(list, callback)`
 Returns a new list built by deciding, per item, what should end up in the result. The callback receives a context object and must return one of its actions.
@@ -462,6 +545,9 @@ Throws a `SelectUtilError` if the callback returns an invalid action.
 
 This utility was reworked, it's old behaviour has moved to the `filterMap` utility.
 
+##### Config
+This utility does not have any config.
+
 #### `sift(list)`
 Filters all falsy values out of a list.
 
@@ -478,6 +564,9 @@ sift([1, 0, 2, null, 3, undefined, false]);
 // Expected output:
 // [1, 2, 3]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `sum(list, mapper?)`
 Sums a list of items into a total number.
@@ -499,6 +588,9 @@ sum(["3", "4", "5"], (item) => Number.parseInt(item, 10));
 // Expected output:
 // 12
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `toggle(list, itemToToggle, options?)`
 Toggles a value in an array: removes it if present, adds it if not.
@@ -535,6 +627,10 @@ Options:
 - `toKey` - maps an item to a key used to determine equality (defaults to comparing items directly)
 - `strategy` - `"APPEND"` or `"PREPEND"`, determines where new items are inserted (default `"APPEND"`)
 
+##### Config
+This utility has the following config available:
+- `strategy` (default: `"APPEND"`) - The strategy to use when toggling a value.
+
 <!-- !SECTION -->
 <!-- SECTION: Callback utils -->
 
@@ -551,6 +647,9 @@ chain(() => true, (value: boolean) => value ? "true" : "false");
 // Expected output:
 // "true"
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `compose(...callbacks)`
 Turns many callbacks into a single re-usable callback.
@@ -570,12 +669,18 @@ fn(5);
 // 12
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `defer(callback)`
 Defers a callback to the next execution cycle.
 
 ```ts
 defer(() => console.log("runs after the current call stack clears"));
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `noop()`
 No operation, this function does nothing. Useful for placeholder code.
@@ -585,6 +690,9 @@ noop();
 // Expected output:
 // undefined
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `pipe(value, callback)`
 Pipes a value into a callback and returns its result.
@@ -598,6 +706,9 @@ pipe("Foo", (value) => `${value} Bar`);
 // Expected output:
 // "Foo Bar"
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `preset(callback, parameters)`
 Presets the parameters of a callback with a callback that computes its arguments.
@@ -621,6 +732,9 @@ preset(Number.parseInt, ["0", 10])();
 // 0
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `retry(callback, options?)`
 Retries an async (or sync) callback until it succeeds or the maximum number of attempts is reached.
 
@@ -639,6 +753,13 @@ Options:
 - `backoff` - whether to double the delay after each retry (default `false`)
 - `onRetry` - callback invoked with the error and attempt number on each failed attempt
 
+##### Config
+This utility has the following config available:
+- `attempts` (default: `3`) - Maximum number of attempts.
+- `delay` (default: `1000`) - Delay between retries in milliseconds.
+- `backoff` (default: `false`) - Whether to double the delay after each retry
+- `onRetry` (default: `undefined`) - callback invoked with the error and attempt number on each failed attempt.
+
 #### `task(callback?)`
 Executes the given callback in asynchronous context.
 
@@ -651,6 +772,9 @@ task(async () => {
     await doSomething();
 });
 ```
+
+##### Config
+This utility does not have any config.
 
 <!-- !SECTION -->
 <!-- SECTION: Misc utils -->
@@ -669,6 +793,9 @@ compute((a: number, b: number) => a + b, 2, 3);
 // 5
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `identity(value)`
 Returns the given value as is, with its type inferred as narrowly as possible (as a `const` generic).
 
@@ -685,6 +812,9 @@ identity({
 //     a: 1,
 // }
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isEmpty(value)`
 Checks if a value is considered empty.
@@ -720,6 +850,9 @@ isEmpty({
 // false (the key exists)
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isNull(value)`
 Checks if a value is `null`.
 
@@ -732,6 +865,9 @@ isNull(undefined);
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isNullish(value)`
 Checks if a value is nullish: `null` or `undefined`.
@@ -750,6 +886,9 @@ isNullish(0);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isPrimitive(value)`
 Checks if a value is a primitive: `string`, `number`, `boolean`, `symbol`, `null`, or `undefined`.
 
@@ -762,6 +901,9 @@ isPrimitive({});
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isPromise(value)`
 Checks if a value is a `Promise` (an instance of `Promise`).
@@ -777,6 +919,9 @@ isPromise({
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isPromiseLike(value)`
 Checks if a value is promise-like: an object with a `then` function.
@@ -797,6 +942,9 @@ isPromiseLike({});
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isUndefined(value)`
 Checks if a value is `undefined`.
 
@@ -809,6 +957,9 @@ isUndefined(null);
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `match(value, clause, fallback?)`
 Matches a value to a clause that return a value
@@ -838,6 +989,31 @@ fn("C");
 // Expected output:
 // -1
 ```
+
+##### Config
+This utility does not have any config.
+
+#### `raise(value)`
+Throws the given value, never returns.
+
+- A string is wrapped in an `Error`.
+- A function is called without arguments and its result is thrown.
+- Any other value is thrown as is.
+
+This is useful for throwing in expression positions, such as a fallback.
+
+```ts
+raise("Something went wrong");
+// Expected to throw:
+// Error("Something went wrong")
+
+raise(() => new RangeError("Out of range"));
+// Expected to throw:
+// RangeError("Out of range")
+```
+
+##### Config
+This utility does not have any config.
 
 #### `Range(rangeString?)`
 > The constructor of this has an overload:  
@@ -1009,24 +1185,8 @@ options:
 
 > NOTE: `inclusiveEnd` default value here differs from the `inclusiveEnd` value set by [`Range`](#rangerangestring), this is for backwards compatibility.
 
-#### `raise(value)`
-Throws the given value, never returns.
-
-- A string is wrapped in an `Error`.
-- A function is called without arguments and its result is thrown.
-- Any other value is thrown as is.
-
-This is useful for throwing in expression positions, such as a fallback.
-
-```ts
-raise("Something went wrong");
-// Expected to throw:
-// Error("Something went wrong")
-
-raise(() => new RangeError("Out of range"));
-// Expected to throw:
-// RangeError("Out of range")
-```
+##### Config
+This utility does not have any config.
 
 #### `readOnly(value, deepFreeze?)` / `isReadOnly(value)`
 `readOnly` returns a read-only copy of an object, array, map, or set.
@@ -1060,6 +1220,9 @@ isReadOnly(original);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `safe(callback)`
 Executes the given callback and returns an option of the result.
 
@@ -1083,6 +1246,9 @@ safe(() => {
 // }
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `sleep(delay)`
 Returns a promise that resolves after the specified delay (in milliseconds).
 
@@ -1091,6 +1257,9 @@ await sleep(1000);
 // Expected output:
 // waits 1 second
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `timeout(value, delayMs, options?)` / `isTimeoutError(value)`
 Wraps a promise (or a callback that returns one) into a promise that rejects with a `TimeoutError` if it hasn't settled after the given delay (in milliseconds). If the promise settles first, its result (or error) is passed through.
@@ -1129,6 +1298,9 @@ try {
 Options:
 - `onTimeout` - a callback invoked with the delay when it elapses. Throwing inside it rejects the promise with the thrown value instead of a `TimeoutError`.
 
+##### Config
+This utility does not have any config.
+
 #### `unwrap(option, fallback?)`
 Directly returns the option's value, or throws the option's error.
 An option's error won't be thrown when a fallback is provided.
@@ -1146,6 +1318,9 @@ unwrap(option, null);
 // Expected output:
 // null
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `values(target)`
 Returns an array of values based on the given target.
@@ -1176,6 +1351,9 @@ values(new Map([
 // ["d", "e", "f"]
 ```
 
+##### Config
+This utility does not have any config.
+
 <!-- !SECTION -->
 <!-- SECTION: Number utils -->
 
@@ -1202,6 +1380,9 @@ isPrime(-9.2);
 // false
 ```
 
+###### Config
+This utility does not have any config.
+
 ##### `mod(dividend, divisor)`
 Returns the modulo of a dividend and a divisor.
 
@@ -1218,6 +1399,9 @@ mod(6, 10);
 // Expected output:
 // 6
 ```
+
+###### Config
+This utility does not have any config.
 
 #### `clamp(min, value, max)`
 Clamps a number between a minimum and maximum value.
@@ -1236,6 +1420,9 @@ clamp(-5, -20, 5);
 // -5
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isDecimal(value)`
 Checks if the given value is a number with decimals.
 
@@ -1252,6 +1439,9 @@ isDecimal(NaN);
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isEven(value)`
 Checks if the given value is an even number.
@@ -1270,6 +1460,9 @@ isEven(0.5);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isInteger(value)`
 Checks if the given value is an integer.
 
@@ -1282,6 +1475,9 @@ isInteger(4.5);
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isNegative(value)`
 Checks if the given value is a negative number.
@@ -1300,6 +1496,9 @@ isNegative(-0);
 // true
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isOdd(value)`
 Checks if the given value is an odd number.
 
@@ -1316,6 +1515,9 @@ isOdd(0.5);
 // Expected output:
 // false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `isPositive(value)`
 Checks if the given value is a positive number.
@@ -1334,6 +1536,9 @@ isPositive(0);
 // true
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `negative(value)`
 Converts a number into a negative number.
 
@@ -1347,6 +1552,9 @@ negative(-5);
 // -5
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `positive(value)`
 Converts a number into a positive number.
 
@@ -1359,6 +1567,9 @@ positive(5);
 // Expected output:
 // 5
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `sign(value)`
 Returns the sign of the given number: `1` if positive, `-1` if negative, `0` if zero (`NaN` is converted into zero).
@@ -1381,6 +1592,9 @@ sign(NaN);
 // 0
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `toFloat(value, fallback?)`
 Converts a value to a float, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
 
@@ -1397,6 +1611,10 @@ toFloat("not a number", -1);
 // Expected output:
 // -1
 ```
+
+##### Config
+This utility has the following config available:
+- `fallback` (default: `0`) - The number to fallback to if the conversion fails.
 
 #### `toInt(value, fallback?)`
 Converts a value to an integer, falling back to a default (`0` by default) if the conversion fails or the value isn't a supported type.
@@ -1415,6 +1633,10 @@ toInt("not a number", -1);
 // -1
 ```
 
+##### Config
+This utility has the following config available:
+- `fallback` (default: `0`) - The number to fallback to if the conversion fails.
+
 #### `trunc(value, fractionDigits?)`
 Truncates a number to the specified number of fraction digits.
 
@@ -1432,6 +1654,10 @@ trunc(1.789, 10)
 // 1.789
 ```
 
+##### Config
+This utility has the following config available:
+- `fractionDigits` (default: `0`) - The number of fraction digits to truncate to.
+
 <!-- !SECTION -->
 <!-- SECTION: object -->
 
@@ -1447,6 +1673,9 @@ entries({
 // Expected output:
 // [["a", 1], ["b", "two"]] (typed as [K, T[K]][])
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `extend(value, other)`
 Extends an object with another object.
@@ -1467,6 +1696,9 @@ extend(
 // }
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `isObject(item)`
 Checks if a value is an object, excluding arrays.
 
@@ -1480,6 +1712,9 @@ isObject([]);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `keys(value)`
 A typed version of `Object.keys`.
 
@@ -1491,6 +1726,9 @@ keys({
 // Expected output:
 // ["a", "b"] (typed as (keyof T)[])
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `omit(object, keys)`
 Returns a new object with the specified key(s) removed.
@@ -1524,6 +1762,9 @@ omit(
 // }
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `pick(object, keys)`
 Returns a new object containing only the specified key(s).
 
@@ -1556,6 +1797,9 @@ pick(
 // }
 ```
 
+##### Config
+This utility does not have any config.
+
 <!-- !SECTION -->
 <!-- SECTION: Random utils -->
 ### Randomization utilities
@@ -1571,6 +1815,9 @@ uuidMax();
 // "ffffffff-ffff-ffff-ffff-ffffffffffff"
 ```
 
+##### Config
+This utility does not have any config.
+
 ##### `uuidNil()`
 Returns the nil UUID string.
 
@@ -1579,6 +1826,9 @@ uuidNil();
 // Expected output:
 // "00000000-0000-0000-0000-000000000000"
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `uuidV1(options?)`
 > This is also aliased to `v1`
@@ -1609,6 +1859,15 @@ options:
 - `clockSequence` - The current clock sequence used for generation.
 - `node` - A list of random bytes used to complete the UUID V1.
 
+##### Config
+This utility has the following config available:
+- `random` (default: `undefined`) - The random bytes used to generate the UUID.
+- `rng` (default: `undefined`) - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` (default: `undefined`) - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `nanoseconds` (default: `undefined`) - A number that represents tha amount of nanoseconds have elapsed in the specified millisecond (This will always be 0 if not defined, javascript does not measure beyond the millisecond range).
+- `clockSequence` (default: `undefined`) - The current clock sequence used for generation.
+- `node` (default: `undefined`) - A list of random bytes used to complete the UUID V1.
+
 #### `uuidV4(options?)`
 > This is also aliased to `v4` or `uuid`
 
@@ -1629,6 +1888,11 @@ uuidV4({
 options:
 - `random` - The random bytes used to generate the UUID.
 - `rng` - A function to generate a list of random bytes for UUID generation.
+
+##### Config
+This utility has the following config available:
+- `random` (default: `undefined`) - The random bytes used to generate the UUID.
+- `rng` (default: `undefined`) - A function to generate a list of random bytes for UUID generation.
 
 #### `uuidV7(options?)`
 > This is also aliased to `v7`
@@ -1655,6 +1919,13 @@ options:
 - `milliseconds` - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
 - `sequence` - The current clock sequence used for generation.
 
+##### Config
+This utility has the following config available:
+- `random` (default: `undefined`) - The random bytes used to generate the UUID.
+- `rng` (default: `undefined`) - A function to generate a list of random bytes for UUID generation.
+- `milliseconds` (default: `undefined`) - A number that represents the amount of milliseconds from the EPOCH (number of milliseconds since 01-01-1970).
+- `sequence` (default: `undefined`) - The current clock sequence used for generation.
+
 #### `chance(percentage)`
 Returns a random boolean based on the specified percentage.  
 The percentage must be a number between 0 and 1. If it is not inside that range it will return a fixed value according to that percentage, so if percentage is more than or equal to 1 it will always return true and if percentage is less than or equal to 0 it will always return false.
@@ -1673,6 +1944,9 @@ chance(0);
 // false
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `draw(list)`
 Returns a random item from a specified list (or `undefined` if the list is empty).
 
@@ -1686,6 +1960,9 @@ draw([]);
 // undefined
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `maybe()`
 Returns a random boolean.
 
@@ -1694,6 +1971,9 @@ maybe();
 // Expected output:
 // true | false
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `random(min?, max?)`
 Returns a random value between a specified minimum and maximum value.
@@ -1715,6 +1995,9 @@ random(1, 0);
 // Expected output:
 // NaN
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `scatter(list, split?, options?)`
 Given an array, splits that array into 2 given a hard split and devides the items at random into the 2 given lists.  
@@ -1758,6 +2041,10 @@ scatter([0, 1, 2, 3, 4], 0.5, {
 options:
 - `bias` - When the split does not work exactly for the given array length, this will decide how to split the final item (e.g. given an array of 5 items and a split of `0.5` (50%), the bias will decide if the split will be `3 - 2` or `2 - 3`) (default = `"ROUND"`)
 
+##### Config
+This utility has the following config available:
+- `bias` (default: `"ROUND"`) - When the split does not work exactly for the given array length, this will decide how to split the final item.
+
 #### `shuffle(list)`
 Shuffles the array into a new array will all the items in a random order.
 
@@ -1766,6 +2053,9 @@ shuffle([0, 1, 2, 3, 4]);
 // Possible output:
 // [2, 4, 0, 1, 3]
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `uid(length?, charset?)`
 Returns a random string of characters gotten from a specified charset that can be used for ids.  
@@ -1784,6 +2074,11 @@ uid(8, "Aa");
 // Possible output:
 // "AaAAAaAA"
 ```
+
+##### Config
+This utility has the following config available:
+- `length` (default: `8`) - The length of the randomly generated string.
+- `charset` (default: `"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"`) - The string of where to pick the random characters from.
 
 <!-- !SECTION -->
 <!-- SECTION: String utils -->
@@ -1825,6 +2120,12 @@ camelCase("someUPPERValue", { groupUppercaseLetters: false });
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+
 ##### `capitalize(str)`
 Converts the first character of string to uppercase.
 
@@ -1833,6 +2134,9 @@ capitalize("some value");
 // Expected output:
 // "Some value"
 ```
+
+##### Config
+This utility does not have any config.
 
 ##### `customCase(str, options)`
 Converts a string into a custom cased version of the string, required a seperator and word transformer to work.
@@ -1902,6 +2206,12 @@ Options:
 
 > The default word parser uses a regex to determine the characters casing and splits the given string into words, those words are by default the entire word until a new uppercase letter or spacing character (using `/[\s-_]/` regex) is found. By default it tries to group all uppercase letters until a lowercase letter is found, if that is found then the character before that character is assumed to belong to new lowercase letter.
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+
 ##### `httpHeaderCase(str, options?)`
 Turns a string into a http header cased version of that same string.
 
@@ -1939,6 +2249,12 @@ httpHeaderCase("someUPPERValue", { groupUppercaseLetters: false });
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+
 ##### `kebabCase(str, options?)`
 Turns a string into a kebab cased version of that same string.
 
@@ -1974,6 +2290,13 @@ kebabCase("someUPPERValue", { groupUppercaseLetters: false });
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+- `screaming` (default: `false`) - Whether to uppercase every word instead of lowercasing them (SCREAMING-KEBAB-CASE).
+
 ##### `lowerCase(str)`
 Converts a string to lowercase.
 
@@ -1982,6 +2305,9 @@ lowerCase("SOME VALUE");
 // Expected output:
 // "some value"
 ```
+
+##### Config
+This utility does not have any config.
 
 ##### `pascalCase(str, options?)`
 Turns a string into a pascal cased version of that same string.
@@ -2018,6 +2344,12 @@ pascalCase("someUPPERValue", { groupUppercaseLetters: false });
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+
 ##### `snakeCase(str, options?)`
 Turns a string into a snake cased version of that same string.
 
@@ -2052,6 +2384,12 @@ snakeCase("someUPPERValue", { groupUppercaseLetters: false });
 ```
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
+
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
 
 ##### `titleCase(str, options?)`
 Turns a string into a title cased version of that same string.
@@ -2088,6 +2426,12 @@ titleCase("someUPPERValue", { groupUppercaseLetters: false });
 
 > The options for this are inherited from [`customCase`](#customcasestr-options) but without the seperator and word transformer
 
+##### Config
+This utility has the following config available:
+- `groupNumbers` (default: `false`) - Whether a run of digits should be split off into its own word, or seen as normal characters of the same word.
+- `groupUppercaseLetters` (default: `true`) - Whether consecutive uppercase letters should be grouped into a single word instead of being split one letter at a time.
+- `parser` (default: `undefined`) - A custom parser to parse a given string into word that are then used for changing the casing of words.
+
 ##### `uncapitalize(str)`
 Converts the first character of string to lowercase.
 
@@ -2097,6 +2441,9 @@ uncapitalize("Some value");
 // "some value"
 ```
 
+##### Config
+This utility does not have any config.
+
 ##### `upperCase(str)`
 Converts a string to UPPERCASE.
 
@@ -2105,6 +2452,9 @@ upperCase("some value");
 // Expected output:
 // "SOME VALUE"
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `parseUrlParams(url, transform?)`
 Parses the query params of a URL into an object. Optionally accepts a `transform` object to map each param key to a parser function, producing a typed result.
@@ -2128,6 +2478,9 @@ parseUrlParams("https://example.com?page=2&active=true", {
 // }
 ```
 
+##### Config
+This utility does not have any config.
+
 #### `slug(text)`
 Converts a string into a URL-friendly slug.
 
@@ -2136,6 +2489,9 @@ slug("Hello, World!");
 // Expected output:
 // "hello-world"
 ```
+
+##### Config
+This utility does not have any config.
 
 #### `textDifference(oldValue, newValue, options?)`
 Diffs two strings and returns either a constructed string with configurable wrapper tags around each changed part, or a list of raw diff nodes (`{ type, content, context }`).
@@ -2219,5 +2575,10 @@ Options:
   By default it will use no tags for `equal`.  
   for `insert` it will use `<span data-diff="insert">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="insert">` for opening and `</div>` for closing instead).  
   for `delete` it will use `<span data-diff="delete">` for opening and `</span>` for closing (if in block context and `htmlAware` is `true` then it will use `<div data-diff="delete">` for opening and `</div>` for closing instead).
+
+##### Config
+This utility has the following config available:
+- `htmlAware` (default: `false`) - If the difference should be HTML aware.
+- `tags` (default: `{}`) - The tags to use to mark the diff.
 
 <!-- !SECTION -->
