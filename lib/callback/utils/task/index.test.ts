@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { task } from ".";
 
 describe.concurrent("task", () => {
+	beforeEach(() => {
+		task.config.reset();
+	});
+
 	test.concurrent("Yields execution to the microtask queue when no callback is provided", async () => {
 		const order: number[] = [];
 		const promise = task().then(() => {
@@ -78,7 +82,17 @@ describe.concurrent("task", () => {
 
 	test.concurrent("Concurrently yields multiple tasks", async () => {
 		const completed: number[] = [];
-		const tasks = [task(() => completed.push(1)), task(() => completed.push(2)), task(() => completed.push(3))];
+		const tasks = [
+			task(() => {
+				completed.push(1);
+			}),
+			task(() => {
+				completed.push(2);
+			}),
+			task(() => {
+				completed.push(3);
+			}),
+		];
 
 		expect(completed).toEqual([1, 2, 3]);
 

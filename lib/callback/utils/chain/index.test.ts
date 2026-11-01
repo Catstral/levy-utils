@@ -1,18 +1,22 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { chain } from ".";
 
-describe.concurrent("chain", () => {
-	test.concurrent("No callbacks", () => {
+describe("chain", () => {
+	beforeEach(() => {
+		chain.config.reset();
+	});
+
+	test("No callbacks", () => {
 		expect(chain()).toBeUndefined();
 	});
 
-	test.concurrent("Single callback", () => {
+	test("Single callback", () => {
 		const result = chain(() => "foo");
 
 		expect(result).toBe("foo");
 	});
 
-	test.concurrent("Single callback receives undefined", () => {
+	test("Single callback receives undefined", () => {
 		const fn = mock((value: unknown) => value);
 
 		chain(fn);
@@ -21,7 +25,7 @@ describe.concurrent("chain", () => {
 		expect(fn).toBeCalledWith(undefined);
 	});
 
-	test.concurrent("Multiple callbacks chain the return value", () => {
+	test("Multiple callbacks chain the return value", () => {
 		const result = chain(
 			() => 1,
 			(value: number) => value + 1,
@@ -31,7 +35,7 @@ describe.concurrent("chain", () => {
 		expect(result).toBe(4);
 	});
 
-	test.concurrent("Multiple callbacks pass the previous value in order", () => {
+	test("Multiple callbacks pass the previous value in order", () => {
 		const second = mock((value: boolean) => (value ? "true" : "false"));
 		const third = mock((value: string) => value.toUpperCase());
 
@@ -46,7 +50,7 @@ describe.concurrent("chain", () => {
 		expect(result).toBe("TRUE");
 	});
 
-	test.concurrent("Callbacks are called in order", () => {
+	test("Callbacks are called in order", () => {
 		const order: number[] = [];
 
 		chain(
@@ -58,7 +62,7 @@ describe.concurrent("chain", () => {
 		expect(order).toEqual([1, 2, 3]);
 	});
 
-	test.concurrent("Returns the result of the final callback", () => {
+	test("Returns the result of the final callback", () => {
 		const result = chain(
 			() => "foo",
 			() => "bar",

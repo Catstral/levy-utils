@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { toggle } from ".";
 
 describe("toggle", () => {
+	beforeEach(() => {
+		toggle.config.reset();
+	});
+
 	describe("Appending", () => {
 		test("Adds a new item to an empty array", () => {
 			expect(toggle([], "a")).toEqual(["a"]);

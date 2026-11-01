@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { omit } from ".";
 
 describe("omit", () => {
+	beforeEach(() => {
+		omit.config.reset();
+	});
+
 	test("Omitting the only key (literal) results in an empty object", () => {
 		expect(
 			omit(

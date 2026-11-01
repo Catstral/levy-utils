@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../../config";
+
+export interface UuidMaxUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Returns a max UUID string that is all 'f' (or ones in bit form).
  *
@@ -8,3 +14,5 @@
 export function uuidMax(): string {
 	return "ffffffff-ffff-ffff-ffff-ffffffffffff";
 }
+
+uuidMax.config = createUtilConfig<UuidMaxUtilConfig>({});

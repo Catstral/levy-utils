@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { OverflowUtilError, overflow } from ".";
 
 describe("overflow", () => {
+	beforeEach(() => {
+		overflow.config.reset();
+	});
+
 	test("Splits a list into a clamped and rest list", () => {
 		const [clamped, rest] = overflow([0, 1, 2, 3, 4], 2);
 
@@ -46,7 +50,7 @@ describe("overflow", () => {
 
 	test("A negative clamp length throws an OverflowUtilError", () => {
 		try {
-			overflow([0, 1, 2], -1);
+			overflow([0, 1, 2], -1 as number);
 			expect().fail("Invalid clamp length definition passed to overflow");
 		} catch (err) {
 			expect(err).toBeInstanceOf(OverflowUtilError);

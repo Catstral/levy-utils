@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { counting } from ".";
 
 describe("counting", () => {
+	beforeEach(() => {
+		counting.config.reset();
+	});
+
 	test("Counts occurrences grouped by a string key", () => {
 		const counted = counting(
 			[

@@ -1,4 +1,5 @@
-import { UtilError } from "~/error";
+import { createUtilConfig } from "../../../config";
+import { UtilError } from "../../../error";
 
 export interface SelectDiscardAction {
 	type: "DISCARD";
@@ -93,6 +94,10 @@ export interface SelectContext<T, R = T> {
 
 export class SelectUtilError extends UtilError {
 	public readonly util = "select";
+}
+
+export interface SelectUtilConfig {
+	[key: string]: never;
 }
 
 /**
@@ -239,3 +244,5 @@ export function select<T, R = T>(
 
 	return result as R[];
 }
+
+select.config = createUtilConfig<SelectUtilConfig>({});

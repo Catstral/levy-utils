@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { chance } from ".";
 
 describe("chance", () => {
+	beforeEach(() => {
+		chance.config.reset();
+	});
+
 	test("Returns a boolean", () => {
 		expect(chance(0.5)).toBeBoolean();
 	});

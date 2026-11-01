@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { sign } from ".";
 
 describe("sign", () => {
+	beforeEach(() => {
+		sign.config.reset();
+	});
+
 	// Positive numbers return positive one
 	test.each([1, 0.5, Number.MAX_SAFE_INTEGER, Infinity])("%d returns positive one", (value) => {
 		expect(sign(value)).toBe(1);

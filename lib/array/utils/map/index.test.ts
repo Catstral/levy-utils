@@ -1,9 +1,13 @@
-import { describe, expect, expectTypeOf, mock, test } from "bun:test";
-import { sleep } from "~/misc/utils/sleep";
-import type { Promisable } from "~/types";
+import { beforeEach, describe, expect, expectTypeOf, mock, test } from "bun:test";
+import { sleep } from "../../../misc/utils/sleep";
+import type { Promisable } from "../../../types";
 import { map } from ".";
 
 describe("map", () => {
+	beforeEach(() => {
+		map.config.reset();
+	});
+
 	describe("sync", () => {
 		test("Maps every item of a list", () => {
 			expect(map([1, 2, 3], (value) => value * 2)).toEqual([2, 4, 6]);

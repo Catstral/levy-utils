@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { last } from ".";
 
 describe("last", () => {
+	beforeEach(() => {
+		last.config.reset();
+	});
+
 	test("Returns the last item of a list", () => {
 		const list = ["A", "B", "C"];
 

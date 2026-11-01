@@ -1,4 +1,9 @@
-import type { Key } from "~/types";
+import { createUtilConfig } from "../../../config";
+import type { Key } from "../../../types";
+
+export interface GroupUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Reduces a list down to an object of keys specified by the given `identity` callback.
@@ -27,3 +32,5 @@ export function group<const T, const K extends Key = Key>(
 
 	return grouped;
 }
+
+group.config = createUtilConfig<GroupUtilConfig>({});

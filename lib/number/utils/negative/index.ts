@@ -1,4 +1,9 @@
-import type { IsNegative, Negative } from "~/number";
+import { createUtilConfig } from "../../../config";
+import type { IsNegative, Negative } from "../../../number";
+
+export interface NegativeUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Converts a number into a negative number.
@@ -13,6 +18,12 @@ export function negative<const T extends number>(value: T): Negative<T> {
 	return -Math.abs(value) as Negative<T>;
 }
 
+negative.config = createUtilConfig<NegativeUtilConfig>({});
+
+export interface IsNegativeUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is a negative number.
  *
@@ -25,3 +36,5 @@ export function negative<const T extends number>(value: T): Negative<T> {
 export function isNegative<const T extends number>(value: T): IsNegative<T> {
 	return (value < 0 || Object.is(value, -0)) as IsNegative<T>;
 }
+
+isNegative.config = createUtilConfig<IsNegativeUtilConfig>({});

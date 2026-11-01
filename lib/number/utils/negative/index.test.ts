@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isNegative, negative } from ".";
 
 describe("negative", () => {
+	beforeEach(() => {
+		negative.config.reset();
+	});
+
 	test("Positive number are converted into negative numbers", () => {
 		expect(negative(1)).toBe(-1);
 		expect(negative(0.5)).toBe(-0.5);
@@ -23,6 +27,10 @@ describe("negative", () => {
 });
 
 describe("isNegative", () => {
+	beforeEach(() => {
+		isNegative.config.reset();
+	});
+
 	test("Negative values return true", () => {
 		expect(isNegative(-1)).toBeTrue();
 		expect(isNegative(-0.5)).toBeTrue();

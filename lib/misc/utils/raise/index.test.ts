@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { raise } from ".";
 
 function caught(value: unknown): unknown {
@@ -12,6 +12,10 @@ function caught(value: unknown): unknown {
 }
 
 describe("raise", () => {
+	beforeEach(() => {
+		raise.config.reset();
+	});
+
 	describe("String", () => {
 		test("Throws an Error with the string as message", () => {
 			expect(() => raise("foo")).toThrow(new Error("foo"));

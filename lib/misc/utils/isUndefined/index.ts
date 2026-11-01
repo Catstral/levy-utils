@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface IsUndefinedUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Checks if the given value is undefined.
  *
@@ -9,3 +15,5 @@
 export function isUndefined(value: unknown): value is undefined {
 	return value === undefined;
 }
+
+isUndefined.config = createUtilConfig<IsUndefinedUtilConfig>({});

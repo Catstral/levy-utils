@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { mod } from ".";
 
 describe("mod", () => {
+	beforeEach(() => {
+		mod.config.reset();
+	});
+
 	test("Returns zero when the dividend is zero", () => {
 		expect(mod(0, 2)).toBe(0);
 	});

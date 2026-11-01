@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { SelectUtilError, select } from ".";
 
 describe("select", () => {
+	beforeEach(() => {
+		select.config.reset();
+	});
+
 	test("Discard leaves every item out", () => {
 		const selected = select([1, 2, 3], ({ discard }) => discard());
 

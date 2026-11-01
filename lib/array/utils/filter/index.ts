@@ -1,4 +1,9 @@
-import type { Promisable } from "~/types";
+import { createUtilConfig } from "../../../config";
+import type { Promisable } from "../../../types";
+
+export interface FilterUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns a new list containing the items of a given list that pass a predicate.
@@ -110,3 +115,5 @@ export function filter(
 
 	return values;
 }
+
+filter.config = createUtilConfig<FilterUtilConfig>({});

@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { uncapitalize } from ".";
 
 describe("uncapitilize", () => {
+	beforeEach(() => {
+		uncapitalize.config.reset();
+	});
+
 	test("Converts a string", () => {
 		expect(uncapitalize("Hello World")).toBe("hello World");
 	});

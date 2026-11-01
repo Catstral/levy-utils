@@ -1,4 +1,9 @@
-import { getCryptoSecureRandomNumber } from "~/random/helper";
+import { createUtilConfig } from "../../../config";
+import { getCryptoSecureRandomNumber } from "../../../random/helper";
+
+export interface DrawUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Returns a random item from a given array or `undefined` if the array length is 0.
@@ -20,3 +25,5 @@ export function draw(list: readonly unknown[]): unknown {
 
 	return list[getCryptoSecureRandomNumber(list.length)];
 }
+
+draw.config = createUtilConfig<DrawUtilConfig>({});

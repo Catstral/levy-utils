@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { lowerCase } from ".";
 
 describe("lowerCase", () => {
+	beforeEach(() => {
+		lowerCase.config.reset();
+	});
+
 	test("Converts a string", () => {
 		expect(lowerCase("Hello World")).toBe("hello world");
 	});

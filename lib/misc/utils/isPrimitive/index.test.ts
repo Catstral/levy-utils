@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isPrimitive } from ".";
 
 describe("isPrimitive", () => {
+	beforeEach(() => {
+		isPrimitive.config.reset();
+	});
+
 	describe("Primitives", () => {
 		test("String", () => {
 			expect(isPrimitive("foo")).toBeTrue();

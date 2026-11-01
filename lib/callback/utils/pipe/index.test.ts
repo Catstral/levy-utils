@@ -1,7 +1,11 @@
-import { describe, expect, mock, test } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { pipe } from ".";
 
 describe("pipe", () => {
+	beforeEach(() => {
+		pipe.config.reset();
+	});
+
 	test("Passes the value to the callback and returns the result", () => {
 		const result = pipe(5, (n) => n * 2);
 

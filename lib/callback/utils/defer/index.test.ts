@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { defer } from ".";
 
 describe.concurrent("defer", () => {
+	beforeEach(() => {
+		defer.config.reset();
+	});
+
 	test.concurrent("Does not call the callback synchronously", () => {
 		let called = false;
 

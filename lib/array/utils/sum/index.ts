@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface SumUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Sums a list of items into a total number.
  *
@@ -37,3 +43,5 @@ export function sum<const T>(list: T[], mapper?: (item: T) => number): number {
 
 	return result;
 }
+
+sum.config = createUtilConfig<SumUtilConfig>({});

@@ -1,8 +1,14 @@
+import { createUtilConfig } from "../../../config";
+
 export type IsDecimal<T extends number> = number extends T
 	? boolean
 	: `${T}` extends `${number}.${number}`
 		? true
 		: false;
+
+export interface IsDecimalUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Checks if the given value is a number with decimals.
@@ -20,3 +26,5 @@ export function isDecimal<const T extends number>(value: T): IsDecimal<T> {
 
 	return !Number.isInteger(value) as IsDecimal<T>;
 }
+
+isDecimal.config = createUtilConfig<IsDecimalUtilConfig>({});

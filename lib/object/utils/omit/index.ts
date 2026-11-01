@@ -1,3 +1,9 @@
+import { createUtilConfig } from "../../../config";
+
+export interface OmitUtilConfig {
+	[key: string]: never;
+}
+
 /**
  * Omits certain keys off of an object and returns a new object without those keys.
  *
@@ -24,3 +30,5 @@ export function omit<const T extends Record<string, unknown>, const K extends ke
 
 	return omitted;
 }
+
+omit.config = createUtilConfig<OmitUtilConfig>({});

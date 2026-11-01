@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isReadOnly, readOnly } from ".";
 
 describe("isReadOnly", () => {
+	beforeEach(() => {
+		isReadOnly.config.reset();
+	});
+
 	test("Plain mutable object", () => {
 		expect(isReadOnly({ foo: "bar" })).toBeFalse();
 	});
@@ -29,6 +33,10 @@ describe("isReadOnly", () => {
 });
 
 describe("readOnly", () => {
+	beforeEach(() => {
+		readOnly.config.reset();
+	});
+
 	describe("Shallow (default)", () => {
 		test("Result is frozen (object)", () => {
 			expect(Object.isFrozen(readOnly({ foo: "bar" }))).toBeTrue();

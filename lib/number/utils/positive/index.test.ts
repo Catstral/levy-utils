@@ -1,7 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import { isPositive, positive } from ".";
 
 describe("positive", () => {
+	beforeEach(() => {
+		positive.config.reset();
+	});
+
 	test("Negative number are converted into positive numbers", () => {
 		expect(positive(-1)).toBe(1);
 		expect(positive(-0.5)).toBe(0.5);
@@ -23,6 +27,10 @@ describe("positive", () => {
 });
 
 describe("isPositive", () => {
+	beforeEach(() => {
+		isPositive.config.reset();
+	});
+
 	// Positive values return true
 	test.each([1, 0.5, 0, Number.MAX_SAFE_INTEGER, Infinity])("%d returns true", (value) => {
 		expect(isPositive(value)).toBeTrue();

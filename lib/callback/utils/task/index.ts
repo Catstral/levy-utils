@@ -1,4 +1,9 @@
-import type { Promisable } from "~/types";
+import { createUtilConfig } from "../../../config";
+import type { Promisable } from "../../../types";
+
+export interface TaskUtilConfig {
+	[key: string]: never;
+}
 
 /**
  * Executes the given callback in asynchronous context.
@@ -13,3 +18,5 @@ import type { Promisable } from "~/types";
 export async function task(callback?: () => Promisable<void>): Promise<void> {
 	await callback?.();
 }
+
+task.config = createUtilConfig<TaskUtilConfig>({});

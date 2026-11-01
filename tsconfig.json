@@ -15,9 +15,6 @@
 		"noImplicitReturns": true,
 		"skipLibCheck": true,
 		"noEmit": true,
-		"paths": {
-			"~/*": ["./lib/*"]
-		},
 		"declaration": true,
 		"outDir": "./dist",
 		"rootDir": "./lib"
